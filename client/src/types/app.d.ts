@@ -24,11 +24,7 @@ interface Track {
   isLiked: boolean
 }
 
-enum ToastType {
-  INFO,
-  ERROR,
-  SUCCESS,
-}
+type ToastType = 'info' | 'error' | 'success'
 
 interface Filter {
   component: VueElement
