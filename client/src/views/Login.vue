@@ -7,6 +7,7 @@ import { useToastStore } from '../stores/toast'
 import { AxiosError } from 'axios'
 import appApi from '../api/appApi'
 import { useRouter } from 'vue-router'
+import validator from 'validator'
 
 const authStore = useAuthStore()
 const toastStore = useToastStore()
@@ -16,7 +17,23 @@ const router = useRouter()
 const email = ref('')
 const password = ref('')
 
+//create this object so we show the same error message regardless of what happens 
+//(wheter frontend validation fails or backend validation fails)
+const LOGIN_TOAST_MESSAGE = {
+  type: 'error' as ToastType,
+  title: 'Invalid email or password',
+}
+
+function validate() {
+  if (!validator.isEmail(email.value)) return false
+  if (!validator.isLength(password.value, { min: 6 })) return false
+  return true
+}
+
 async function login() {
+  //validate input
+  if (!validate()) return toastStore.show(LOGIN_TOAST_MESSAGE)
+
   wrapLogin.run(
     async () => {
       const response = await appApi.post<{ user: User; token: string }>('/login', {
@@ -34,10 +51,11 @@ async function login() {
     },
     err => {
       if (err instanceof AxiosError && err.response) {
+        //axios error
         switch (err.response.data.message) {
           case 'INVALID_CREDENTIALS':
             //show invalid email or password toast
-            toastStore.show({ type: 'error', title: 'Invalid email or password' })
+            toastStore.show(LOGIN_TOAST_MESSAGE)
             break
           default:
             //show generic error toast

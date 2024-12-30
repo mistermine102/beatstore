@@ -3,18 +3,25 @@ import { onMounted, ref, type Component } from 'vue'
 import FrontpageHero from '../components/FrontpageHero.vue'
 import BaseSearchbar from '../components/base/BaseSearchbar.vue'
 import TracksContainer from '../components/TracksContainer.vue'
-
 import FiltersList from '../components/filters/FiltersList.vue'
 import { BpmFilter, KeyFilter, GenreFilter, PopularityFilter } from '../components/filters/Filters.vine'
+import appApi from '../api/appApi'
+import useAsyncWrap from '../hooks/useAsyncWrap'
+
+const wrapGetTracks = useAsyncWrap()
 
 const filters: Component[] = [BpmFilter, GenreFilter, KeyFilter, PopularityFilter]
-
 const tracks = ref<Track[]>([])
 
-function getTracks() {}
+function getTracks() {
+  wrapGetTracks.run(async () => {
+    const response = await appApi.get('/beats')
+    console.log(response)
+  })
+}
 
 onMounted(() => {
-  //get the tracks
+  getTracks()
 })
 </script>
 <template>

@@ -20,12 +20,9 @@ const borderColorStyle = computed(() => {
   <div v-if="toastStore.isOpen" class="z-[2] fixed flex justify-center top-0 left-0 right-0">
     <div class="bg-grey p-4 w-fit px-16 rounded-regular border-l-4" :class="borderColorStyle">
       <div class="flex justify-between items-center">
-        <div v-if="toastStore.type === 'info'" class="text-blue-500"></div>
-        <div v-if="toastStore.type === 'success'" class="text-green-500"></div>
-        <div v-if="toastStore.type === 'error'" class="text-red-500"></div>
         <h3>{{ toastStore.title }}</h3>
       </div>
-      <p>{{ toastStore.message }}</p>
+      <p class=" text-textLightGrey">{{ toastStore.message }}</p>
     </div>
   </div>
 </template>
