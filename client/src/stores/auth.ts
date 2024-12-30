@@ -5,13 +5,12 @@ export const useAuthStore = defineStore('authStore', () => {
   const user = ref<User | null>(null)
   const token = ref<string | null>(null)
 
-  function setUser(newUser: User | null) {
-    user.value = newUser
-  }
+  function setAuth(newUser: User, newToken: string) {
+    localStorage.setItem('token', newToken)
 
-  function setToken(newToken: string | null) {
+    user.value = newUser
     token.value = newToken
   }
 
-  return { user, token, setUser, setToken }
+  return { user, token, setAuth }
 })

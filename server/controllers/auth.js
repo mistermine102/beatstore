@@ -13,6 +13,11 @@ export const register = async (req, res) => {
 
   const { username, email, password } = req.body
 
+  //check if user with that email exists
+  const foundUser = await User.findOne({ email })
+
+  if (foundUser) throw new AppError('EMAIL_NOT_AVAILABLE', 400)
+
   //hash password
   const hashedPassword = await Brcypt.hash(password, 12)
 
@@ -38,7 +43,7 @@ export const register = async (req, res) => {
     id: savedUser._id.toString(),
   }
 
-  const token = jwt.sign(userPayload, process.env.JWT_SECRET, { expiresIn: 60 * 60 * 24 * 7 })
+  const token = jwt.sign(userPayload, process.env.JWT_SECRET)
 
   const responseUser = {
     ...savedUser._doc,
@@ -61,20 +66,20 @@ export const login = async (req, res) => {
   const user = await User.findOne({ email })
 
   if (!user) {
-    throw new AppError('Invalid email or password', 400)
+    throw new AppError('INVALID_CREDENTIALS', 400)
   }
 
   const isPasswordCorrect = await Brcypt.compare(password, user.password)
 
   if (!isPasswordCorrect) {
-    throw new AppError('Invalid email or password', 400)
+    throw new AppError('INVALID_CREDENTIALS', 400)
   }
 
   const userPayload = {
     id: user._id.toString(),
   }
 
-  const token = jwt.sign(userPayload, process.env.JWT_SECRET, { expiresIn: 60 * 60 * 24 * 7 })
+  const token = jwt.sign(userPayload, process.env.JWT_SECRET)
 
   const responseUser = {
     ...user._doc,

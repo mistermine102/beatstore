@@ -4,15 +4,14 @@ import FrontpageHero from '../components/FrontpageHero.vue'
 import BaseSearchbar from '../components/base/BaseSearchbar.vue'
 import TracksContainer from '../components/TracksContainer.vue'
 
-import Filters from '../components/filters/Filters.vue'
-import BpmFilter from '../components/filters/Bpm.vue'
-import GenreFilter from '../components/filters/Genre.vue'
-import KeyFilter from '../components/filters/Key.vue'
-import PopularityFilter from '../components/filters/Popularity.vue'
+import FiltersList from '../components/filters/FiltersList.vue'
+import { BpmFilter, KeyFilter, GenreFilter, PopularityFilter } from '../components/filters/Filters.vine'
 
 const filters: Component[] = [BpmFilter, GenreFilter, KeyFilter, PopularityFilter]
 
 const tracks = ref<Track[]>([])
+
+function getTracks() {}
 
 onMounted(() => {
   //get the tracks
@@ -24,7 +23,7 @@ onMounted(() => {
     <BaseSearchbar />
     <div class="flex gap-8 mt-16">
       <div class="w-1/5">
-        <Filters :filters="filters" />
+        <FiltersList :filters="filters" />
       </div>
       <div class="w-4/5">
         <div class="grid grid-cols-3 gap-4 mb-4">

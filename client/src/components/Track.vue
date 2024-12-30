@@ -10,5 +10,3 @@ defineProps<Props>()
     {{ track.title }}
   </div>
 </template>
-
-//Props //optional props and render information based on wheter it's passed

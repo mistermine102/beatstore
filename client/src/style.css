@@ -8,8 +8,8 @@
   --background: #181818;
   --textDarkGrey: #242424;
   --textLightGrey: #a2a2a2;
-  --rounded: 0.5rem;
-  --fontPrimary: 'DM Sans', sans-serif;
+  --rounded: 0rem;
+  --fontPrimary: 'Tiny5', sans-serif;
   --fontSecondary: 'Tiny5', sans-serif;
 }
 
@@ -88,16 +88,14 @@ body {
   background-color: var(--primary);
   padding: 0.5rem 2rem;
   border-radius: var(--rounded);
-  font-weight: 500;
   font-family: inherit;
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
 .base-btn-alt {
-  border: 1px solid var(--primary);
+  border: 2px solid var(--primary);
   padding: 0.5rem 2rem;
   border-radius: var(--rounded);
-  font-weight: 500;
   font-family: inherit;
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
@@ -122,7 +120,6 @@ body {
 
 .base-link {
   color: var(--textPrimary);
-  font-weight: 600;
 }
 
 .base-error-msg {
@@ -150,7 +147,6 @@ body {
   height: 20px;
   width: 20px;
   background-color: #d5d5d5;
-  border-radius: 2px;
   cursor: pointer;
   display: flex;
   justify-items: center;
@@ -172,6 +168,10 @@ body {
 }
 .base-checkbox input:checked::after {
   display: block;
+}
+
+.icon {
+  width: 24px;
 }
 
 @tailwind base;

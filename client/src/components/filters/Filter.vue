@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import BasePopover from '../base/BasePopover.vue'
+import { ChevronDownIcon } from '../icons/index.vine'
 
 interface Props {
   btnCaption: string
@@ -12,15 +13,14 @@ defineProps<Props>()
 <template>
   <BasePopover>
     <template #popover-button>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center">
         <span>{{ btnCaption }}</span>
+        <ChevronDownIcon />
       </div>
     </template>
     <template #popover-content>
-      <div class="bg-darkGrey p-4 rounded-regular shadow-lg">
-        <p class="mb-2 text">{{ popoverTitle }}</p>
-        <slot></slot>
-      </div>
+      <p class="mb-2 text">{{ popoverTitle }}</p>
+      <slot></slot>
     </template>
   </BasePopover>
 </template>

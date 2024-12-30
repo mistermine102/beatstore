@@ -15,18 +15,23 @@
     "@vuelidate/validators": "^2.0.4",
     "axios": "^1.7.9",
     "pinia": "^2.3.0",
+    "pixelarticons": "^1.8.0",
     "vue": "^3.5.13",
+    "vue-material-design-icons": "^5.3.1",
     "vue-router": "^4.5.0",
+    "vue-vine": "^0.1.42",
     "vuex": "^4.1.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.1",
+    "@vue-vine/eslint-config": "^0.2.12",
     "@vue/tsconfig": "^0.7.0",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
     "typescript": "~5.6.2",
     "vite": "^6.0.3",
-    "vue-tsc": "^2.1.10"
+    "vue-tsc": "^2.1.10",
+    "vue-vine-tsc": "^0.0.13"
   }
 }

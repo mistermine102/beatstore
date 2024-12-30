@@ -1,34 +1,63 @@
 <script setup lang="ts">
-import BaseButton from '../components/base/BaseButton.vue'
-// import { useVuelidate } from '@vuelidate/core'
-// import { required, helpers } from '@vuelidate/validators'
 import { ref } from 'vue'
-import useAsyncRequest from '../hooks/useAsyncRequest'
+import { useAuthStore } from '../stores/auth'
+import BaseButton from '../components/base/BaseButton.vue'
+import useAsyncWrap from '../hooks/useAsyncWrap'
+import { useToastStore } from '../stores/toast'
+import { AxiosError } from 'axios'
 import appApi from '../api/appApi'
-import type { AxiosResponse } from 'axios'
+import { useRouter } from 'vue-router'
+
+const authStore = useAuthStore()
+const toastStore = useToastStore()
+const wrapLogin = useAsyncWrap()
+const router = useRouter()
 
 const email = ref('')
 const password = ref('')
 
-const loginReq = useAsyncRequest<{ user: User; token: string }>()
-
 async function login() {
-  const response = await loginReq.send(appApi, { method: 'post', url: '/auth12313' })
+  wrapLogin.run(
+    async () => {
+      const response = await appApi.post<{ user: User; token: string }>('/login', {
+        email: email.value,
+        password: password.value,
+      })
 
-  console.log('this runs despite the error')
+      const { user, token } = response.data
 
+      //set store values and local storage token
+      authStore.setAuth(user, token)
+
+      router.push('/')
+      toastStore.show({ type: 'success', title: 'Logged in!' })
+    },
+    err => {
+      if (err instanceof AxiosError && err.response) {
+        switch (err.response.data.message) {
+          case 'INVALID_CREDENTIALS':
+            //show invalid email or password toast
+            toastStore.show({ type: 'error', title: 'Invalid email or password' })
+            break
+          default:
+            //show generic error toast
+            toastStore.show({ type: 'error', title: 'Something went wrong' })
+        }
+      }
+    }
+  )
 }
 </script>
 
 <template>
-  <div class="flex flex-col items-center justify-center">
-    <h2 class="base-heading">Log in</h2>
-    <form class="flex flex-col p-4 w-1/2" @submit.prevent="login">
-      <div class="mb-4">
+  <div class="flex flex-col items-center justify-center mt-16">
+    <h2 class="base-heading">Sign in</h2>
+    <form class="flex flex-col p-4 w-1/2 mt-8" @submit.prevent="login">
+      <div class="flex flex-col gap-y-4 mb-8">
         <input v-model="email" type="text" placeholder="Email" class="base-input w-full" />
+        <input v-model="password" type="password" placeholder="Password" class="base-input w-full" />
       </div>
-      <input v-model="password" type="password" placeholder="Password" class="base-input w-full" />
-      <BaseButton :isLoading="loginReq.isLoading">Continue</BaseButton>
+      <BaseButton :isLoading="wrapLogin.isLoading.value">Continue</BaseButton>
     </form>
     <div>
       <p>You don't have an account? <router-link class="base-link" to="/register">Sign up now</router-link></p>

@@ -1,0 +1,31 @@
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useToastStore } from '../stores/toast'
+
+const toastStore = useToastStore()
+
+const borderColorStyle = computed(() => {
+  switch (toastStore.type) {
+    case 'info':
+      return 'border-blue-500'
+    case 'error':
+      return 'border-red-500'
+    case 'success':
+      return 'border-green-500'
+  }
+})
+</script>
+
+<template>
+  <div v-if="toastStore.isOpen" class="z-[2] fixed flex justify-center top-0 left-0 right-0">
+    <div class="bg-grey p-4 w-fit px-16 rounded-regular border-l-4" :class="borderColorStyle">
+      <div class="flex justify-between items-center">
+        <div v-if="toastStore.type === 'info'" class="text-blue-500"></div>
+        <div v-if="toastStore.type === 'success'" class="text-green-500"></div>
+        <div v-if="toastStore.type === 'error'" class="text-red-500"></div>
+        <h3>{{ toastStore.title }}</h3>
+      </div>
+      <p>{{ toastStore.message }}</p>
+    </div>
+  </div>
+</template>
