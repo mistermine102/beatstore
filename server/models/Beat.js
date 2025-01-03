@@ -2,22 +2,29 @@ import mongoose from 'mongoose'
 import { Schema } from 'mongoose'
 
 const schema = new Schema({
-  title: String,
+  title: {
+    type: String,
+    required: true,
+  },
   bpm: String,
   key: String,
   genre: String,
-  audio: Object,
+  playable: Boolean,
+  audio: {
+    type: Object,
+    required: true,
+  },
   image: Object,
   price: Object,
   author: {
     type: Schema.Types.ObjectId,
     ref: 'User',
   },
-  trackType: String,
+  type: String,
   totalLikes: Number,
   totalStreams: Number,
 })
 
-const Beat = mongoose.model('Beat', schema)
+const Beat = mongoose.model('beat', schema)
 
 export default Beat

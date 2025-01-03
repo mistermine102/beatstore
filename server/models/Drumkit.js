@@ -5,6 +5,7 @@ const schema = new Schema({
   title: String,
   price: Object,
   image: Object,
+  playable: Boolean,
   directories: [
     {
       title: String,
@@ -22,7 +23,7 @@ const schema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'User',
   },
-  trackType: String,
+  type: String,
   totalLikes: Number,
 })
 

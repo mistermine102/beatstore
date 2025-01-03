@@ -11,7 +11,7 @@ export const toggleBeatLike = async (req, res, next) => {
   const beat = await Beat.findById(id)
   if (!beat) throw new AppError('Cannot find a track', 400)
 
-  req.trackType = 'Beat'
+  req.trackType = 'beat'
   req.track = beat
   req.collectionName = 'beats'
 

@@ -1,14 +1,10 @@
 import Beat from '../models/Beat.js'
 import Like from '../models/Like.js'
-
 import AppError from '../classes/AppError.js'
 import Audio from '../classes/Audio.js'
 import Price from '../classes/Price.js'
-
 import { uploadFileToS3, deleteFileFromS3, generateSignedUrl } from '../s3.js'
 import isLiked from '../isLiked.js'
-
-import { validationResult } from 'express-validator'
 import Sharp from 'sharp'
 import Mongoose from 'mongoose'
 import getAudioDuration from '../utils/getAudioDuration.js'
@@ -18,15 +14,11 @@ import { getAverageColor } from 'fast-average-color-node'
 export const uploadBeatImage = async (req, res) => {
   const { id } = req.params
 
-  if (!Mongoose.Types.ObjectId.isValid(id)) {
-    throw new AppError('Invalid id', 400)
-  }
+  if (!Mongoose.Types.ObjectId.isValid(id)) throw new AppError('INVALID_ID', 400)
 
   const beat = await Beat.findById(id)
 
-  if (!beat) {
-    throw new AppError('Cannot find a beat', 400)
-  }
+  if (!beat) throw new AppError('TRACK_NOT_FOUND', 400)
 
   if (!req.file) {
     beat.image = {
@@ -54,12 +46,6 @@ export const uploadBeatImage = async (req, res) => {
 }
 
 export const getSingleBeat = async (req, res) => {
-  const { errors } = validationResult(req)
-
-  if (errors && errors.length) {
-    throw new AppError('Invalid input', 400, errors)
-  }
-
   const { id } = req.params
 
   const beat = await Beat.findById(id).populate('author')
@@ -79,7 +65,7 @@ export const getSingleBeat = async (req, res) => {
   }
 
   //determine wheter the beat is liked
-  beatDoc.isLiked = await isLiked(req, 'Beat', beat)
+  beatDoc.isLiked = await isLiked(req, 'beat', beat)
 
   res.json({
     beat: beatDoc,
@@ -87,20 +73,7 @@ export const getSingleBeat = async (req, res) => {
 }
 
 export const getBeats = async (req, res) => {
-  const page = parseInt(req.params.page)
-  const ITEMS_PER_PAGE = 5
-  let areMoreDocs = false
-
-  const count = await Beat.countDocuments()
-
-  if (count > page * ITEMS_PER_PAGE) {
-    areMoreDocs = true
-  }
-
-  const beats = await Beat.find()
-    .limit(ITEMS_PER_PAGE)
-    .skip((page - 1) * ITEMS_PER_PAGE)
-    .populate('author')
+  const beats = await Beat.find().populate('author')
 
   const beatsDocs = []
 
@@ -119,21 +92,15 @@ export const getBeats = async (req, res) => {
       username: beatDoc.author.username,
     }
 
-    beatDoc.isLiked = await isLiked(req, 'Beat', beat)
+    beatDoc.isLiked = await isLiked(req, 'beat', beat)
 
     beatsDocs.push(beatDoc)
   }
 
-  res.json({ beats: beatsDocs, areMoreDocs })
+  res.json({ beats: beatsDocs })
 }
 
 export const uploadBeat = async (req, res) => {
-  const { errors } = validationResult(req)
-
-  if (errors && errors.length) {
-    throw new AppError('Invalid input', 400, errors)
-  }
-
   //upload file to s3
   const filename = await uploadFileToS3(req.file)
 
@@ -160,33 +127,32 @@ export const uploadBeat = async (req, res) => {
     audio,
     price,
     author: req.userId,
-    trackType: 'Beat',
+    type: 'beat',
     totalLikes: 0,
     totalStreams: 0,
+    playable: true
   })
 
   await newBeat.save()
 
   //update user's uploads and recent upload
-  await updateUploadsOnCreate(req.userId, 'Beat', newBeat._id)
+  await updateUploadsOnCreate(req.userId, 'beat', newBeat._id)
 
   //send response
   res.json({ newBeat })
 }
 
 export const deleteBeat = async (req, res) => {
-  const { errors } = validationResult(req)
-
-  if (errors && errors.length) {
-    throw new AppError('Invalid input', 400, errors)
-  }
-
   const { beatId } = req.body
+  
+  if (!Mongoose.Types.ObjectId.isValid(beatId)) throw new AppError('INVALID_ID', 400)
 
   const beat = await Beat.findById(beatId)
 
+  if (!beat) throw new AppError('TRACK_NOT_FOUND')
+
   if (!beat.author.equals(req.userId)) {
-    throw new AppError('Not authorized', 403)
+    throw new AppError('NOT_AUTHORIZED', 403)
   }
 
   //delete file from s3
@@ -198,13 +164,13 @@ export const deleteBeat = async (req, res) => {
   }
 
   //delete beat's likes
-  await Like.deleteMany({ trackType: 'Beat', trackId: beatId })
+  await Like.deleteMany({ trackType: 'beat', trackId: beatId })
 
   //delete beat from database
   await beat.deleteOne()
 
   //update author's uploads
-  await updateUploadsOnDelete(req.userId, 'Beat', beat._id)
+  await updateUploadsOnDelete(req.userId, 'beat', beat._id)
 
   //send response
   res.json({ deletedBeat: beat })
@@ -218,7 +184,7 @@ export const updateBeat = async (req, res) => {
 
   //authorize
   if (!beat.author.equals(req.userId)) {
-    throw new AppError('Not authorized', 403)
+    throw new AppError('NOT_AUTHORIZED', 403)
   }
 
   beat.title = title

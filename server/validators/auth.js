@@ -1,9 +1,8 @@
 import { body } from 'express-validator'
-import User from '../models/User.js'
 
 export const loginValidators = [
-  body('email').notEmpty().isLength({ min: 1 }).withMessage('Email cannot be empty').isEmail().withMessage('Email must be valid'),
-  body('password').notEmpty().isLength({ min: 1 }).withMessage('Password cannot be empty').isString().withMessage('Password must be a string'),
+  // body('email').notEmpty().isLength({ min: 1 }).withMessage('Email cannot be empty').isEmail().withMessage('Email must be valid'),
+  // body('password').notEmpty().isLength({ min: 1 }).withMessage('Password cannot be empty').isString().withMessage('Password must be a string'),
 ]
 
 export const registerValidators = [

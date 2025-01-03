@@ -3,7 +3,7 @@ import AppError from './classes/AppError.js'
 
 const storage = multer.memoryStorage()
 
-const allowedAudioMimetypes = ['audio/wav', 'audio/mp3', 'audio/mpeg']
+const allowedAudioMimetypes = ['audio/wav', 'audio/wave', 'audio/mp3', 'audio/mpeg']
 const allowedImageMimetypes = ['image/jpeg', 'image/png']
 
 export const trackImageUpload = multer({

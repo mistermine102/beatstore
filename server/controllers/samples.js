@@ -51,12 +51,6 @@ export const uploadSampleImage = async (req, res) => {
 }
 
 export const getSingleSample = async (req, res) => {
-  const { errors } = validationResult(req)
-
-  if (errors && errors.length) {
-    throw new AppError('Invalid input', 400, errors)
-  }
-
   const { id } = req.params
 
   const sample = await Sample.findById(id).populate('author')
@@ -84,20 +78,7 @@ export const getSingleSample = async (req, res) => {
 }
 
 export const getSamples = async (req, res) => {
-  const page = parseInt(req.params.page)
-  const ITEMS_PER_PAGE = 5
-  let areMoreDocs = false
-
-  const count = await Sample.countDocuments()
-
-  if (count > page * ITEMS_PER_PAGE) {
-    areMoreDocs = true
-  }
-
-  const samples = await Sample.find()
-    .limit(ITEMS_PER_PAGE)
-    .skip((page - 1) * ITEMS_PER_PAGE)
-    .populate('author')
+  const samples = await Sample.find().populate('author')
 
   const sampleDocs = []
 
@@ -121,16 +102,10 @@ export const getSamples = async (req, res) => {
     sampleDocs.push(sampleDoc)
   }
 
-  res.json({ samples: sampleDocs, areMoreDocs })
+  res.json({ samples: sampleDocs })
 }
 
 export const uploadSample = async (req, res) => {
-  const { errors } = validationResult(req)
-
-  if (errors && errors.length) {
-    throw new AppError('Invalid input', 400, errors)
-  }
-
   //upload file to s3
   const filename = await uploadFileToS3(req.file)
 
@@ -156,9 +131,10 @@ export const uploadSample = async (req, res) => {
     audio,
     price,
     author: req.userId,
-    trackType: 'Sample',
+    type: 'Sample',
     totalLikes: 0,
     totalStreams: 0,
+    playable: true,
   })
 
   await newSample.save()
@@ -171,12 +147,6 @@ export const uploadSample = async (req, res) => {
 }
 
 export const deleteSample = async (req, res) => {
-  const { errors } = validationResult(req)
-
-  if (errors && errors.length) {
-    throw new AppError('Invalid input', 400, errors)
-  }
-
   const { sampleId } = req.body
 
   const sample = await Sample.findById(sampleId)

@@ -112,12 +112,6 @@ export const toggleFollow = async (req, res) => {
 }
 
 export const editProfile = async (req, res) => {
-  const { errors } = validationResult(req)
-
-  if (errors && errors.length) {
-    throw new AppError('Invalid input', 400, errors)
-  }
-
   const user = await User.findById(req.userId)
 
   //authorize

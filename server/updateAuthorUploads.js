@@ -17,7 +17,7 @@ export const updateUploadsOnCreate = async (userId, trackType, trackId) => {
 export const updateUploadsOnDelete = async (userId, trackType, trackId) => {
   const author = await User.findById(userId)
 
-  author.uploads = author.uploads.filter(track => !(track.trackId.equals(trackId) && track.trackType === trackType))
+  author.uploads = author.uploads.filter(track => !(track.trackId.equals(trackId) && track.type === trackType))
 
   author.totalUploads--
 

@@ -7,17 +7,18 @@ import { trackImageUpload } from '../multer.js'
 
 import { isAuthenticated } from '../middleware/auth.js'
 import tryCatch from '../utils/tryCatch.js'
+import validate from '../middleware/validate.js'
 
 const router = express.Router()
 
-router.post('/', isAuthenticated, uploadSampleValidators, sampleUpload.single('audio'), tryCatch(uploadSample))
+router.post('/', isAuthenticated, uploadSampleValidators, validate, sampleUpload.single('audio'), tryCatch(uploadSample))
 
 router.post('/:id/image', isAuthenticated, trackImageUpload.single('image'), tryCatch(uploadSampleImage))
 
-router.get('/page/:page', tryCatch(getSamples))
+router.get('/', tryCatch(getSamples))
 
-router.get('/:id', getSingleSampleValidators, tryCatch(getSingleSample))
+router.get('/:id', getSingleSampleValidators, validate, tryCatch(getSingleSample))
 
-router.delete('/', isAuthenticated, deleteSampleValidators, tryCatch(deleteSample))
+router.delete('/', isAuthenticated, deleteSampleValidators, validate, tryCatch(deleteSample))
 
 export default router

@@ -8,11 +8,12 @@ const schema = new Schema({
   audio: Object,
   image: Object,
   price: Object,
+  playable: Boolean,
   author: {
     type: Schema.Types.ObjectId,
     ref: 'User',
   },
-  trackType: String,
+  type: String,
   totalLikes: Number,
   totalStreams: Number,
 })

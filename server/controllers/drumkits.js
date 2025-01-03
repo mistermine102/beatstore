@@ -124,12 +124,6 @@ export const uploadDrumkitImage = async (req, res) => {
 }
 
 export const uploadDrumkit = async (req, res) => {
-  const { errors } = validationResult(req)
-
-  if (errors && errors.length) {
-    throw new AppError('Invalid input', 400, errors)
-  }
-
   if (!req.body.drumkit || !req.files) {
     throw new AppError('Invalid data', 400)
   }
@@ -191,8 +185,9 @@ export const uploadDrumkit = async (req, res) => {
     price,
     directories: newDirectories,
     author: req.userId,
-    trackType: 'Drumkit',
+    type: 'Drumkit',
     totalLikes: 0,
+    playable: false
   })
 
   await newDrumkit.save()

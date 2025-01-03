@@ -4,7 +4,7 @@ import AppError from '../classes/AppError.js'
 export const toggleLike = async (req, res) => {
   const { trackType, track, collectionName } = req
 
-  if (!trackType || !track || !collectionName) throw new AppError('Invalid data', 400)
+  if (!trackType || !track || !collectionName) throw new AppError('INVALID_DATA', 400)
 
   const id = track._id.toString()
 

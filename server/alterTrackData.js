@@ -6,7 +6,7 @@ export default async track => {
   }
 
   //attach audio url
-  if (track.trackType === 'Beat' || track.trackType === 'Sample') {
+  if (track.type === 'beat' || track.type === 'Sample') {
     const audioUrl = await generateSignedUrl(track.audio.filename)
 
     newTrack.audio = {

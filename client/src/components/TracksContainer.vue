@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import EmptyState from './EmptyState.vue'
 import Track from './Track.vue'
 
@@ -9,8 +9,6 @@ interface Props {
 }
 
 defineProps<Props>()
-
-const tracks = ref<Track[]>([])
 </script>
 
 <template>
@@ -20,7 +18,7 @@ const tracks = ref<Track[]>([])
     </div>
     <div v-else>
       <div v-if="!tracks.length" class="flex justify-left">
-        <EmptyState></EmptyState>
+        <EmptyState />
       </div>
       <div v-else class="grid gap-8">
         <Track v-for="track in tracks" :track="track" :key="track._id"></Track>
