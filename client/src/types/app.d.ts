@@ -45,7 +45,7 @@ interface BaseTrack {
   bpm?: string
 }
 
-interface PlayableTrack extends BaseTrack {
+interface BasePlayableTrack extends BaseTrack {
   audio: {
     url: string
     duration: {
@@ -56,7 +56,7 @@ interface PlayableTrack extends BaseTrack {
   totalStreams: number
 }
 
-interface Beat extends PlayableTrack {
+interface Beat extends BasePlayableTrack {
   type: TrackType = 'beat'
   playable: true
   key?: string
@@ -64,7 +64,7 @@ interface Beat extends PlayableTrack {
   bpm?: string
 }
 
-interface Sample extends PlayableTrack {
+interface Sample extends BasePlayableTrack {
   type: TrackType = 'sample'
   playable: true
   key?: string
@@ -79,6 +79,8 @@ interface Drumkit extends BaseTrack {
 }
 
 type Track = Beat | Sample | Drumkit
+
+type PlayableTrack = Beat | Sample
 
 interface Filter {
   component: VueElement

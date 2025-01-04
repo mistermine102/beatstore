@@ -6,7 +6,7 @@ import appApi from '../api/appApi'
 import useAsyncWrap from '../hooks/useAsyncWrap'
 import { PlayIcon, PauseIcon } from './icons/index.vine'
 
-const props = defineProps<{ track: Track }>()
+const props = defineProps<{ track: PlayableTrack }>()
 
 const audioPlayerStore = useAudioPlayerStore()
 const { track: currentlyPlayingTrack, isPaused } = storeToRefs(audioPlayerStore)
@@ -14,10 +14,6 @@ const wrapCountStream = useAsyncWrap()
 
 // Methods
 function playAudio() {
-  //play audio
-  audioPlayerStore.track = props.track
-  audioPlayerStore.isPaused = false
-
   //count stream
   if (!currentlyPlayingTrack.value || currentlyPlayingTrack.value._id !== props.track._id) {
     let trackUrl = ''
@@ -39,10 +35,17 @@ function playAudio() {
       await appApi.post(requestUrl)
     })
   }
+
+  //set new track to audio player if new track is played
+  if (!currentlyPlayingTrack.value || currentlyPlayingTrack.value._id !== props.track._id) {
+    audioPlayerStore.setNewTrack(props.track)
+  }
+  //play audio
+  audioPlayerStore.toggle()
 }
 
 function pauseAudio() {
-  audioPlayerStore.isPaused = true
+  audioPlayerStore.toggle()
 }
 
 // Computed

@@ -19,9 +19,9 @@ const progressStyles = computed(() => {
   }
 })
 
-function handleMouseMove(e: MouseEvent) {
+function handlePercentageChange(e: MouseEvent) {
   if (!bar.value) return
-
+  
   let percentage = 0
 
   const leftBound = bar.value.offsetLeft
@@ -40,20 +40,20 @@ function handleMouseMove(e: MouseEvent) {
 }
 
 function handleScrubEnter() {
-  document.addEventListener('mousemove', handleMouseMove)
+  document.addEventListener('mousemove', handlePercentageChange)
   document.addEventListener('mouseup', handleScrubLeave)
 }
 
 function handleScrubLeave() {
-  document.removeEventListener('mousemove', handleMouseMove)
+  document.removeEventListener('mousemove', handlePercentageChange)
   document.removeEventListener('mouseup', handleScrubLeave)
 }
 </script>
 
 <template>
-  <div class="py-4 range-input-bar-container" @mousedown.prevent="handleScrubEnter" ref="bar">
+  <div class="py-4 range-input-bar-container cursor-pointer" @click="handlePercentageChange" @mousedown.prevent="handleScrubEnter" ref="bar">
     <div class="range-input-bar min-w-[100px]">
-      <div class="range-input-thumb" @mousedown.prevent="handleScrubEnter" :style="thumbStyles"></div>
+      <div class="range-input-thumb pointer-events-none" :style="thumbStyles"></div>
       <div class="range-input-progress" :style="progressStyles"></div>
     </div>
   </div>
