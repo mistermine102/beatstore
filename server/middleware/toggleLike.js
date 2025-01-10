@@ -25,7 +25,7 @@ export const toggleSampleLike = async (req, res, next) => {
   const sample = await Sample.findById(id)
   if (!sample) throw new AppError('Cannot find a track', 400)
 
-  req.trackType = 'Sample'
+  req.trackType = 'sample'
   req.track = sample
   req.collectionName = 'samples'
 

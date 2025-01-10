@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import BaseButton from '../components/base/BaseButton.vue'
-import useAsyncWrap from '../hooks/useAsyncWrap'
+import useAsyncWrap from '../composables/useAsyncWrap'
 import { useToastStore } from '../stores/toast'
 import { AxiosError } from 'axios'
 import appApi from '../api/appApi'
@@ -11,7 +11,7 @@ import validator from 'validator'
 
 const authStore = useAuthStore()
 const toastStore = useToastStore()
-const wrapLogin = useAsyncWrap()
+const wrapLogin = reactive(useAsyncWrap()) 
 const router = useRouter()
 
 const email = ref('')
@@ -75,7 +75,7 @@ async function login() {
         <input v-model="email" type="text" placeholder="Email" class="base-input w-full" />
         <input v-model="password" type="password" placeholder="Password" class="base-input w-full" />
       </div>
-      <BaseButton :isLoading="wrapLogin.isLoading.value">Continue</BaseButton>
+      <BaseButton :isLoading="wrapLogin.isLoading">Continue</BaseButton>
     </form>
     <div>
       <p>You don't have an account? <router-link class="base-link" to="/register">Sign up now</router-link></p>

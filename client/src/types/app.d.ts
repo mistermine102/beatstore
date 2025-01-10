@@ -89,3 +89,17 @@ interface Filter {
 }
 
 type ToastType = 'info' | 'error' | 'success'
+
+interface Profile {
+  createdAt: Date
+  uploads: Track[]
+  username: string
+  _id: string
+  isFollowed: boolean
+  totalFollows: number
+  totalUploads: number
+  specification: string
+  image: {
+    url: string
+  }
+}

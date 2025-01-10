@@ -3,20 +3,20 @@ import alterTrackData from '../alterTrackData.js'
 import AppError from '../classes/AppError.js'
 import Follow from '../models/Follow.js'
 import Mongoose from 'mongoose'
-import { validationResult } from 'express-validator'
 import Sharp from 'sharp'
 import { getAverageColor } from 'fast-average-color-node'
 import { uploadFileToS3, generateSignedUrl } from '../s3.js'
+import isLiked from '../isLiked.js'
 
 export const getProfile = async (req, res) => {
   const { id: userId } = req.params
-  if (!Mongoose.Types.ObjectId.isValid(userId)) throw new AppError('Invalid id', 400)
+  if (!Mongoose.Types.ObjectId.isValid(userId)) throw new AppError('INVALID_ID', 400)
 
   const user = await User.findById(userId).populate({
     path: 'uploads.trackId',
     populate: 'author',
   })
-  if (!user) throw new AppError('Cannot find a user', 400)
+  if (!user) throw new AppError('USER_NOT_FOUND', 400)
 
   const { createdAt, uploads, username, _id, totalFollows, totalUploads, specification, image } = user._doc
 
@@ -25,6 +25,8 @@ export const getProfile = async (req, res) => {
 
   for (const track of uploads) {
     const modifiedUpload = await alterTrackData(track.trackId)
+    modifiedUpload.isLiked = await isLiked(req, track.trackId.type, track.trackId)
+
     modifiedUploads.push(modifiedUpload)
   }
 
@@ -55,7 +57,7 @@ export const getProfile = async (req, res) => {
       ...image,
       url: imageUrl,
     }
-  } 
+  }
 
   const userDoc = {
     createdAt,
@@ -69,7 +71,7 @@ export const getProfile = async (req, res) => {
     image: modifiedImage,
   }
 
-  res.send({ user: userDoc })
+  res.send({ profile: userDoc })
 }
 
 export const toggleFollow = async (req, res) => {

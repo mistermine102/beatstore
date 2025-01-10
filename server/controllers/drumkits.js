@@ -50,7 +50,7 @@ export const getSingleDrumkit = async (req, res) => {
   drumkitDoc.isLiked = await isLiked(req, 'Drumkit', drumkit)
 
   res.json({
-    drumkit: drumkitDoc,
+    track: drumkitDoc,
   })
 }
 
@@ -120,7 +120,7 @@ export const uploadDrumkitImage = async (req, res) => {
 
   await drumkit.save()
 
-  res.json({ drumkit })
+  res.json({ track: drumkit })
 }
 
 export const uploadDrumkit = async (req, res) => {
@@ -187,10 +187,10 @@ export const uploadDrumkit = async (req, res) => {
     author: req.userId,
     type: 'Drumkit',
     totalLikes: 0,
-    playable: false
+    playable: false,
   })
 
   await newDrumkit.save()
 
-  res.send({ drumkit: newDrumkit })
+  res.send({ newTrack: newDrumkit })
 }

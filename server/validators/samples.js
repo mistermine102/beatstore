@@ -22,17 +22,3 @@ export const uploadSampleValidators = [
   body('bpm').trim().isEmpty().withMessage('Bpm cannot be empty').isString().withMessage('Bpm must be a string'),
   body('key').trim().isEmpty().withMessage('Key cannot be empty').isString().withMessage('Key must be a string'),
 ]
-
-export const deleteSampleValidators = [
-  body('sampleId').custom(async id => {
-    if (!Mongoose.Types.ObjectId.isValid(id)) {
-      throw new Error('Invalid id')
-    }
-
-    const sample = await Sample.findById(id)
-
-    if (!sample) {
-      throw new Error('Cannot find a sample')
-    }
-  }),
-]

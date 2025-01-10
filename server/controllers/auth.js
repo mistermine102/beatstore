@@ -1,7 +1,6 @@
 import Brcypt from 'bcryptjs'
 import User from '../models/User.js'
 import jwt from 'jsonwebtoken'
-import { validationResult } from 'express-validator'
 import AppError from '../classes/AppError.js'
 
 export const register = async (req, res) => {

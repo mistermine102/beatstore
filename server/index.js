@@ -22,6 +22,10 @@ import profileRoutes from './routes/profile.js'
 
 import { verifyToken } from './middleware/auth.js'
 
+import { getSingleBeat } from './controllers/beats.js'
+import { getSingleSample } from './controllers/samples.js'
+import { getSingleDrumkit } from './controllers/drumkits.js'
+
 const app = express()
 
 app.use(cors())
@@ -37,6 +41,7 @@ app.use(authRoutes)
 app.use(toggleLikeRoutes)
 app.use(streamRoutes)
 app.use('/profile', profileRoutes)
+
 
 //404 invalid route
 app.all('*', invalidRoute)

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 
 export const useAudioPlayerStore = defineStore('audioPlayerStore', () => {
   const track = ref<PlayableTrack | null>(null)
@@ -11,6 +11,9 @@ export const useAudioPlayerStore = defineStore('audioPlayerStore', () => {
   const isScrubbing = ref(false)
   const duration = ref(0)
   const currentTime = ref(0)
+
+  //audio player is implemented with listeners on audio HTMLelement
+  //for example: toggle method plays audio -> onplay listener updates state
 
   async function toggle() {
     audio.value.paused ? audio.value.play() : audio.value.pause()
@@ -56,11 +59,13 @@ export const useAudioPlayerStore = defineStore('audioPlayerStore', () => {
   }
 
   function setVolume(newVolume: number) {
+    //volume isn't updated with listener beacuse of value differences 
+    //(volume.value is in range 0 to 100, audio.volume is in range 0 to 1)
+
     //update state variable
     volume.value = newVolume
 
     //update audio volume
-    //audio volume needs to be in range 0 to 1
     //power to scale volume quadraticly (volume 50 on slider should actually be 0.25)
     audio.value.volume = Math.pow(newVolume, 2) / 10000
   }

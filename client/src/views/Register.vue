@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 import BaseButton from '../components/base/BaseButton.vue'
 import { useToastStore } from '../stores/toast'
-import useAsyncWrap from '../hooks/useAsyncWrap'
+import useAsyncWrap from '../composables/useAsyncWrap'
 import appApi from '../api/appApi'
 import { useAuthStore } from '../stores/auth'
 import { AxiosError } from 'axios'
 import { useRouter } from 'vue-router'
 import validator from 'validator'
 
-const wrapRegister = useAsyncWrap()
+const wrapRegister = reactive(useAsyncWrap()) 
 const authStore = useAuthStore()
 const toastStore = useToastStore()
 const router = useRouter()
@@ -81,7 +81,7 @@ function register() {
         <input v-model="username" type="text" placeholder="Username" class="base-input w-full" />
         <input v-model="password" type="password" placeholder="Password" class="base-input w-full" />
       </div>
-      <BaseButton :isLoading="wrapRegister.isLoading.value">Continue</BaseButton>
+      <BaseButton :isLoading="wrapRegister.isLoading">Continue</BaseButton>
     </form>
     <div>
       <p>Already have an account? <router-link class="base-link" to="/login">Log in now</router-link></p>

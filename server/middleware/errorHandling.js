@@ -12,6 +12,7 @@ export default (err, req, res, next) => {
   }
 
   console.log('ERROR', statusCode, message )
+  console.log(err)
 
   if (statusCode === 500) {
     message = 'Something went wrong'

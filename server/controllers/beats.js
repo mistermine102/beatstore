@@ -68,7 +68,7 @@ export const getSingleBeat = async (req, res) => {
   beatDoc.isLiked = await isLiked(req, 'beat', beat)
 
   res.json({
-    beat: beatDoc,
+    track: beatDoc,
   })
 }
 
@@ -130,24 +130,24 @@ export const uploadBeat = async (req, res) => {
     type: 'beat',
     totalLikes: 0,
     totalStreams: 0,
-    playable: true
+    playable: true,
   })
 
   await newBeat.save()
 
   //update user's uploads and recent upload
-  await updateUploadsOnCreate(req.userId, 'beat', newBeat._id)
+  await updateUploadsOnCreate(req.userId, newBeat.type, newBeat.constructor.modelName, newBeat._id)
 
   //send response
-  res.json({ newBeat })
+  res.json({ newTrack: newBeat })
 }
 
 export const deleteBeat = async (req, res) => {
-  const { beatId } = req.body
-  
-  if (!Mongoose.Types.ObjectId.isValid(beatId)) throw new AppError('INVALID_ID', 400)
+  const { trackId } = req.body
 
-  const beat = await Beat.findById(beatId)
+  if (!Mongoose.Types.ObjectId.isValid(trackId)) throw new AppError('INVALID_ID', 400)
+
+  const beat = await Beat.findById(trackId)
 
   if (!beat) throw new AppError('TRACK_NOT_FOUND')
 
@@ -164,7 +164,7 @@ export const deleteBeat = async (req, res) => {
   }
 
   //delete beat's likes
-  await Like.deleteMany({ trackType: 'beat', trackId: beatId })
+  await Like.deleteMany({ trackType: 'beat', trackId })
 
   //delete beat from database
   await beat.deleteOne()

@@ -10,7 +10,7 @@ const { track } = storeToRefs(audioPlayerStore)
     <div class="flex-1 flex justify-end">
       <img :src="track.image.url" alt="Track image" class="rounded-regular h-[80px]" />
     </div>
-    <router-link :to="'track/' + track._id" class="text-nowrap text-left text-lg flex-1">
+    <router-link :to="`/track/${track.type}/${track._id}`" class="text-nowrap text-left text-lg flex-1">
       {{ track.title }}
     </router-link>
   </div>

@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
 import EmptyState from './EmptyState.vue'
 import Track from './Track.vue'
 
 interface Props {
   tracks: Track[]
-  isLoading: boolean
+  isLoading?: boolean
 }
 
-defineProps<Props>()
+const { isLoading = false } = defineProps<Props>()
+const emit = defineEmits(['likeToggled'])
 </script>
 
 <template>
-  <div class="h-full">
+  <div>
     <div v-if="isLoading" class="flex justify-center h-full">
       <div class="loader"></div>
     </div>
@@ -21,7 +21,7 @@ defineProps<Props>()
         <EmptyState />
       </div>
       <div v-else class="grid gap-8">
-        <Track v-for="track in tracks" :track="track" :key="track._id"></Track>
+        <Track v-for="track in tracks" :track="track" :key="track._id" @like-toggled="emit('likeToggled', track)"></Track>
       </div>
     </div>
   </div>

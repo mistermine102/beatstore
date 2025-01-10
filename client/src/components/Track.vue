@@ -1,13 +1,18 @@
 <script setup lang="ts">
 import PlayPauseBtn from './PlayPauseBtn.vue'
+import { HeartIcon } from './icons/index.vine'
 defineProps<{ track: Track }>()
+
+const emit = defineEmits(['likeToggled'])
 </script>
 <template>
   <div class="grid grid-cols-3 gap-x-4">
     <div class="flex gap-x-4">
-      <img class="image-thumbnail" v-if="track.image" :src="track.image.url" alt="Track image" />
+      <img class="image-thumbnail" :src="track.image.url" alt="Track image" />
       <div>
-        <h2 class="whitespace-nowrap text-xl">{{ track.title }}</h2>
+        <router-link :to="`/track/${track.type}/${track._id}`">
+          <h2 class="whitespace-nowrap text-xl">{{ track.title }}</h2>
+        </router-link>
         <p class="text-textLightGrey" v-if="track.playable">{{ track.audio.duration.formatted }}</p>
         <PlayPauseBtn v-if="track.playable" :track="track" />
       </div>
@@ -18,12 +23,13 @@ defineProps<{ track: Track }>()
       <p v-if="track.genre !== undefined">Genre: {{ track.genre || 'Unknown' }}</p>
     </div>
     <div>
-      <p>{{ track.author.username }}</p>
-      <div>
-        {{ track.totalLikes }}
-      </div>
-      <div v-if="track.totalStreams !== undefined">
-        {{ track.totalStreams }}
+      <p class="text-textLightGrey">{{ track.author.username }}</p>
+      <div class="mt-2">
+        <div class="flex items-center gap-x-2">
+          <button @click="emit('likeToggled')">
+            <HeartIcon :class="[track.isLiked ? 'text-primary' : '']" />
+          </button>
+        </div>
       </div>
     </div>
   </div>

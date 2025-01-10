@@ -12,10 +12,11 @@ const schema = new Schema({
   uploads: [
     {
       trackType: String,
+      modelName: String,
       createdAt: Date,
       trackId: {
         type: Schema.Types.ObjectId,
-        refPath: 'uploads.trackType',
+        refPath: 'uploads.modelName',
       },
     },
   ],

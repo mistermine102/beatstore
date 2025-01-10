@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, reactive } from 'vue'
 import { useAudioPlayerStore } from '../stores/audioPlayer'
 import { storeToRefs } from 'pinia'
 import appApi from '../api/appApi'
-import useAsyncWrap from '../hooks/useAsyncWrap'
+import useAsyncWrap from '../composables/useAsyncWrap'
 import { PlayIcon, PauseIcon } from './icons/index.vine'
 
 const props = defineProps<{ track: PlayableTrack }>()
 
 const audioPlayerStore = useAudioPlayerStore()
 const { track: currentlyPlayingTrack, isPaused } = storeToRefs(audioPlayerStore)
-const wrapCountStream = useAsyncWrap()
+
+const wrapCountStream = reactive(useAsyncWrap())
 
 // Methods
 function playAudio() {

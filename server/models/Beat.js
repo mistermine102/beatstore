@@ -25,6 +25,6 @@ const schema = new Schema({
   totalStreams: Number,
 })
 
-const Beat = mongoose.model('beat', schema)
+const Beat = mongoose.model('Beat', schema)
 
 export default Beat
