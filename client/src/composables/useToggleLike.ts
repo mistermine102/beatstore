@@ -22,21 +22,7 @@ function useToggleTrackLike() {
 
     //send api request
     wrapToggleLike.run(async () => {
-      let trackUrl: string
-
-      switch (track.type) {
-        case 'beat':
-          trackUrl = '/beats'
-          break
-        case 'sample':
-          trackUrl = '/samples'
-          break
-        case 'drumkit':
-          trackUrl = '/drumkits'
-          break
-      }
-
-      await appApi.post(`${trackUrl}/${track._id}/like`)
+      await appApi.post(`/tracks/${track._id}/like`)
     })
   }
   return toggleTrackLike

@@ -34,7 +34,7 @@ export const profileImageUpload = multer({
   },
 })
 
-export const beatUpload = multer({
+export const trackUpload = multer({
   storage,
   fileFilter: (req, file, cb) => {
     if (!allowedAudioMimetypes.includes(file.mimetype.toLowerCase())) {

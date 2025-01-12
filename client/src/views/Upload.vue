@@ -10,6 +10,7 @@ import { useRouter } from 'vue-router'
 
 interface NewTrack {
   title: string
+  type: TrackType
   image: File | null
   bpm?: string
   key?: string
@@ -54,6 +55,7 @@ const TRACK_TYPES_BUTTONS = [
 //defining schemas
 const NEW_BEAT_SCHEMA: NewBeat = {
   title: '',
+  type: 'beat',
   bpm: '',
   key: '',
   genre: '',
@@ -63,11 +65,13 @@ const NEW_BEAT_SCHEMA: NewBeat = {
 
 const NEW_DRUMKIT_SCHEMA: NewDrumkit = {
   title: '',
+  type: 'drumkit',
   image: null,
 }
 
 const NEW_SAMPLE_SCHEMA: NewSample = {
   title: '',
+  type: 'sample',
   bpm: '',
   key: '',
   image: null,
@@ -122,27 +126,13 @@ function uploadTrack(e: Event) {
   if (!validate()) return
 
   wrapUploadTrack.run(async () => {
-    let trackUrl: string
-
-    switch (uploadType.value) {
-      case 'beat':
-        trackUrl = '/beats'
-        break
-      case 'sample':
-        trackUrl = '/samples'
-        break
-      case 'drumkit':
-        trackUrl = '/drumkits'
-        break
-    }
-
     //set image field to null so backend doesn't complain it got an unexpected field (issue only with file fields)
-    const response = await appApi.postForm<{ newTrack: Track }>(trackUrl, {
+    const response = await appApi.postForm<{ trackId: string }>('/tracks', {
       ...newTrack.value,
       image: null,
     })
 
-    await appApi.postForm(`${trackUrl}/${response.data.newTrack._id}/image`, {
+    await appApi.postForm(`tracks/${response.data.trackId}/image`, {
       image: newTrack.value.image,
     })
 

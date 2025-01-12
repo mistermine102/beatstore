@@ -1,5 +1,5 @@
 import User from '../models/User.js'
-import alterTrackData from '../alterTrackData.js'
+import formatTrackData from '../formatTrackData.js'
 import AppError from '../classes/AppError.js'
 import Follow from '../models/Follow.js'
 import Mongoose from 'mongoose'
@@ -13,8 +13,13 @@ export const getProfile = async (req, res) => {
   if (!Mongoose.Types.ObjectId.isValid(userId)) throw new AppError('INVALID_ID', 400)
 
   const user = await User.findById(userId).populate({
-    path: 'uploads.trackId',
-    populate: 'author',
+    path: 'uploads',
+    populate: {
+      path: 'author',
+      select: {
+        username: 1,
+      },
+    },
   })
   if (!user) throw new AppError('USER_NOT_FOUND', 400)
 
@@ -24,10 +29,9 @@ export const getProfile = async (req, res) => {
   const modifiedUploads = []
 
   for (const track of uploads) {
-    const modifiedUpload = await alterTrackData(track.trackId)
-    modifiedUpload.isLiked = await isLiked(req, track.trackId.type, track.trackId)
-
-    modifiedUploads.push(modifiedUpload)
+    const formattedTrack = await formatTrackData(track)
+    formattedTrack.isLiked = await isLiked(req, track._id)
+    modifiedUploads.push(formattedTrack)
   }
 
   //determine wheter profile is followed
@@ -40,11 +44,7 @@ export const getProfile = async (req, res) => {
     const index = 'Follower' + req.userId + 'Followed' + userId
     const follow = await Follow.findOne({ index })
 
-    if (!follow) {
-      isFollowed = false
-    } else {
-      isFollowed = true
-    }
+    isFollowed = follow ? true : false
   }
 
   let modifiedImage = {}

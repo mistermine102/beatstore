@@ -11,13 +11,8 @@ const schema = new Schema({
   totalUploads: Number,
   uploads: [
     {
-      trackType: String,
-      modelName: String,
-      createdAt: Date,
-      trackId: {
-        type: Schema.Types.ObjectId,
-        refPath: 'uploads.modelName',
-      },
+      type: Schema.Types.ObjectId,
+      ref: 'Track',
     },
   ],
   createdAt: Date,

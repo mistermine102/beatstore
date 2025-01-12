@@ -17,23 +17,8 @@ const wrapCountStream = reactive(useAsyncWrap())
 function playAudio() {
   //count stream
   if (!currentlyPlayingTrack.value || currentlyPlayingTrack.value._id !== props.track._id) {
-    let trackUrl = ''
-
-    switch (props.track.type) {
-      case 'beat':
-        trackUrl = '/beats'
-        break
-      case 'sample':
-        trackUrl = '/samples'
-        break
-      default:
-        break
-    }
-
-    const requestUrl = trackUrl + '/' + props.track._id + '/stream'
-
     wrapCountStream.run(async () => {
-      await appApi.post(requestUrl)
+      await appApi.post(`/tracks/${props.track._id}/stream`)
     })
   }
 

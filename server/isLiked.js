@@ -1,15 +1,13 @@
 import Like from './models/Like.js'
 
-export default async (req, trackType, track) => {
+export default async (req, trackId) => {
   let isLiked = false
 
   if (req.isAuthenticated) {
-    const index = trackType + track._id.toString() + 'User' + req.userId.toString()
-    const like = await Like.findOne({ index })
+    const likeId = `User-${req.userId}Track-${trackId}`
+    const foundLike = await Like.findById(likeId)
 
-    if (like) {
-      isLiked = true
-    }
+    if (foundLike) isLiked = true
   }
 
   return isLiked

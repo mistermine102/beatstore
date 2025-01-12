@@ -51,25 +51,8 @@ const wrapGetTracks = reactive(useAsyncWrap())
 
 function getTracks() {
   wrapGetTracks.run(async () => {
-    let response
-
-    switch (trackType.value) {
-      case 'beat':
-        //get beats
-        response = await appApi.get<{ beats: Beat[] }>('/beats')
-        tracks.value = response.data.beats
-        break
-      case 'sample':
-        //get samples
-        response = await appApi.get<{ samples: Sample[] }>('/samples')
-        tracks.value = response.data.samples
-        break
-      case 'drumkit':
-        //get drumkits
-        response = await appApi.get<{ drumkits: Drumkit[] }>('/drumkits')
-        tracks.value = response.data.drumkits
-        break
-    }
+    const response = await appApi.get<{ tracks: Track[] }>(`/tracks/${trackType.value}`)
+    tracks.value = response.data.tracks
   })
 }
 

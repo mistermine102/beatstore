@@ -8,32 +8,12 @@ import { useRouter } from 'vue-router'
 const { track } = defineProps<{ track: Track }>()
 
 const router = useRouter()
-
 const wrapDeleteTrack = useAsyncWrap()
 
 function deleteTrack() {
-  let trackUrl: string
-
-  switch (track.type) {
-    case 'beat':
-      trackUrl = '/beats'
-      break
-    case 'sample':
-      trackUrl = '/samples'
-      break
-    case 'drumkit':
-      trackUrl = '/drumkits'
-      break
-  }
-
   wrapDeleteTrack.run(async () => {
     if (!track) return
-
-    await appApi.delete(`${trackUrl}`, {
-      data: {
-        trackId: track._id,
-      },
-    })
+    await appApi.delete(`/tracks/${track._id}`)
     router.push('/')
   })
 }

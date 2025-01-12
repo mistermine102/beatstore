@@ -13,8 +13,7 @@ import AuthorPanel from '../components/singleTrack/AuthorPanel.vue'
 const route = useRoute()
 const wrapGetTrack = reactive(useAsyncWrap())
 
-const { type: trackType, id: trackId } = route.params as {
-  type: TrackType
+const { id: trackId } = route.params as {
   id: string
 }
 
@@ -22,21 +21,7 @@ const track = ref<Track | null>(null)
 
 function getTrack() {
   wrapGetTrack.run(async () => {
-    let trackUrl: string
-
-    switch (trackType) {
-      case 'beat':
-        trackUrl = '/beats'
-        break
-      case 'sample':
-        trackUrl = '/samples'
-        break
-      case 'drumkit':
-        trackUrl = '/drumkits'
-        break
-    }
-
-    const response = await appApi.get<{ track: Track }>(`${trackUrl}/${trackId}`)
+    const response = await appApi.get<{ track: Track }>(`tracks/single/${trackId}`)
     track.value = response.data.track
   })
 }
