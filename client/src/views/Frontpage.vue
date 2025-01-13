@@ -37,7 +37,7 @@ const FILTERS = {
   drumkit: DRUMKIT_FILTERS,
 }
 
-const { tracks, getTracks, isLoading, toggleLike } = useTracks()
+const { tracks, getTracks, isLoading, toggleLike, isMore, loadMoreTracks, isLoadingMore } = useTracks()
 
 //shallow ref because we have an array of components
 const filters = shallowRef<Component[]>(BEAT_FILTERS)
@@ -67,7 +67,14 @@ onMounted(() => {
             {{ btn.title }}
           </button>
         </div>
-        <TracksContainer :tracks="tracks" :isLoading="isLoading" @likeToggled="toggleLike" />
+        <TracksContainer
+          :tracks="tracks"
+          :isLoading="isLoading"
+          :isLoadingMore="isLoadingMore"
+          :isMore="isMore"
+          @likeToggled="toggleLike"
+          @loadedMore="loadMoreTracks(trackType)"
+        />
       </div>
     </div>
   </div>

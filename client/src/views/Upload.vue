@@ -105,8 +105,8 @@ function validate() {
   const type: ToastType = 'error'
   const title = "Can't upload"
 
-  if (!newTrack.value.title) {
-    toastStore.show({ type, title, message: 'Title is required' })
+  if (newTrack.value.title.length < 4) {
+    toastStore.show({ type, title, message: 'Title must be at least 4 characters long' })
     return false
   }
 
@@ -132,9 +132,11 @@ function uploadTrack(e: Event) {
       image: null,
     })
 
-    await appApi.postForm(`tracks/${response.data.trackId}/image`, {
-      image: newTrack.value.image,
-    })
+    if (newTrack.value.image) {
+      await appApi.postForm(`tracks/${response.data.trackId}/image`, {
+        image: newTrack.value.image,
+      })
+    }
 
     toastStore.show({ type: 'success', title: 'Uploaded succesfully' })
     router.push('/')

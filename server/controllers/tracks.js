@@ -157,13 +157,16 @@ export const deleteTrack = async (req, res) => {
 }
 
 export const getTracks = async (req, res) => {
+  const DEFAULT_AMOUNT = 10
+  const MAX_AMOUNT = 500
+
   const { type } = req.params
   const start = req.query.start ? parseInt(req.query.start) : 0
-  const amount = req.query.amount ? parseInt(req.query.amount) : 10
+  const amount = req.query.amount ? parseInt(req.query.amount) : DEFAULT_AMOUNT
 
   //validate query
   if (isNaN(start) || start < 0) throw new AppError('INVALID_START_VALUE', 400)
-  if (isNaN(amount) || amount > 100 || amount < 0) throw new AppError('INVALID_AMOUNT', 400)
+  if (isNaN(amount) || amount > MAX_AMOUNT || amount < 0) throw new AppError('INVALID_AMOUNT', 400)
 
   //validate track type
   if (type !== 'beat' && type !== 'sample' && type !== 'drumkit') throw new AppError('INVALID_TYPE', 400)

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-defineProps<{ isLoading?: boolean }>()
+defineProps<{ isLoading?: boolean; alt?: boolean }>()
 </script>
 
 <template>
-  <button class="base-btn h-12 relative w-full">
+  <button class="h-12 relative w-full" :class="alt ? 'base-btn-alt' : 'base-btn'">
     <div v-if="isLoading" class="scale-50 absolute inset-0">
       <div class="loader"></div>
     </div>

@@ -5,21 +5,37 @@ import useToggleLike from './useToggleLike'
 
 export default function useTracks() {
   const wrapGetTracks = useAsyncWrap()
+  const wrapLoadMore = useAsyncWrap()
   const toggleLike = useToggleLike()
 
   const tracks = ref<Track[]>([])
+  const isMore = ref(false)
 
-  async function getTracks(type: TrackType) {
-    await wrapGetTracks.run(async () => {
-      const response = await appApi.get<{ tracks: Track[] }>(`/tracks/${type}`)
+  function getTracks(type: TrackType) {
+    wrapGetTracks.run(async () => {
+      const response = await appApi.get<{ tracks: Track[]; isMore: boolean }>(`/tracks/${type}`)
+
       tracks.value = response.data.tracks
+      isMore.value = response.data.isMore
+    })
+  }
+
+  function loadMoreTracks(type: TrackType) {
+    wrapLoadMore.run(async () => {
+      const response = await appApi.get<{ tracks: Track[]; isMore: boolean }>(`/tracks/${type}?start=${tracks.value.length}`)
+
+      tracks.value = tracks.value.concat(response.data.tracks)
+      isMore.value = response.data.isMore
     })
   }
 
   return {
     tracks,
     isLoading: wrapGetTracks.isLoading,
+    isLoadingMore: wrapLoadMore.isLoading,
     getTracks,
+    loadMoreTracks,
+    isMore,
     toggleLike,
   }
 }
