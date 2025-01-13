@@ -158,24 +158,37 @@ export const deleteTrack = async (req, res) => {
 
 export const getTracks = async (req, res) => {
   const { type } = req.params
+  const start = req.query.start ? parseInt(req.query.start) : 0
+  const amount = req.query.amount ? parseInt(req.query.amount) : 10
+
+  //validate query
+  if (isNaN(start) || start < 0) throw new AppError('INVALID_START_VALUE', 400)
+  if (isNaN(amount) || amount > 100 || amount < 0) throw new AppError('INVALID_AMOUNT', 400)
 
   //validate track type
-  if (type !== 'beat' && type !== 'sample' && type !== 'drumkit') {
-    throw new AppError('INVALID_TYPE', 400)
-  }
+  if (type !== 'beat' && type !== 'sample' && type !== 'drumkit') throw new AppError('INVALID_TYPE', 400)
 
   //only populate username on author
-  const tracks = await Track.find({ type }).populate('author', 'username')
+  const tracks = await Track.find({ type }).skip(start).limit(amount).populate('author', 'username')
+  const trackIds = tracks.map(el => el._id)
 
-  const formattedTracks = []
+  //create an object where keys are trackIds and values are wheter they're liked status
+  const likes = await isLiked(req, trackIds)
 
-  for (const track of tracks) {
-    const formattedTrack = await formatTrackData(track)
-    formattedTrack.isLiked = await isLiked(req, track._id)
-    formattedTracks.push(formattedTrack)
-  }
+  //promise.all to promise to process tracks in parallel
+  const formattedTracks = await Promise.all(
+    tracks.map(async track => {
+      const formattedTrack = await formatTrackData(track)
+      formattedTrack.isLiked = likes[track._id]
+      return formattedTrack
+    })
+  )
 
-  res.json({ tracks: formattedTracks })
+  // Check if there are more tracks available in the database
+  const totalTracksCount = await Track.countDocuments({ type })
+  const isMore = totalTracksCount > start + amount
+
+  res.json({ tracks: formattedTracks, isMore })
 }
 
 export const getSingleTrack = async (req, res) => {
