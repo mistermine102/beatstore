@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, type Ref } from 'vue'
 import appApi from '../api/appApi'
 import useAsyncWrap from './useAsyncWrap'
 import { useAuthStore } from '../stores/auth'
@@ -12,16 +12,20 @@ function useProfile() {
 
   const wrapGetProfile = useAsyncWrap()
 
-  async function getProfile(profileId: string) {
+  function getProfile(profileId: string, uploadsTarget?: Ref<Track[]>) {
     wrapGetProfile.run(async () => {
       const { data } = await appApi.get<{ profile: Profile }>(`/profile/${profileId}`)
       profile.value = data.profile
+      
+      if (uploadsTarget) {
+        uploadsTarget.value = profile.value.uploads
+      }
     })
   }
 
   const wrapToggleFollow = useAsyncWrap()
 
-  async function toggleFollow() {
+  function toggleFollow() {
     if (!profile.value) return
 
     if (!authStore.user) {
@@ -34,8 +38,8 @@ function useProfile() {
 
       await appApi.post(`/profile/${profile.value?._id}/follow`)
       toastStore.show({
-        title: profile.value.isFollowed ? 'Followed!' : 'Unfollowed!',
-        type: profile.value.isFollowed ? 'success' : 'info',
+        title: profile.value.isFollowed ? 'Unfollowed!' : 'Followed!',
+        type: profile.value.isFollowed ? 'info' : 'success',
       })
 
       //if a profile is follewed when we toggle that means we unfollow

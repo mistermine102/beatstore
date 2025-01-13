@@ -7,8 +7,12 @@ interface Props {
   isLoading?: boolean
 }
 
+interface Emits {
+  (e: 'likeToggled', track: Track): void
+}
+
 const { isLoading = false } = defineProps<Props>()
-const emit = defineEmits(['likeToggled'])
+const emit = defineEmits<Emits>()
 </script>
 
 <template>

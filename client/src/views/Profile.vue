@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import TracksContainer from '../components/TracksContainer.vue'
 import useProfile from '../composables/useProfile'
+import useTracks from '../composables/useTracks'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import moment from 'moment'
-import useToggleLike from '../composables/useToggleLike'
-import useAsyncWrap from '../composables/useAsyncWrap'
-import { reactive } from 'vue'
+import { onMounted } from 'vue'
 
 const route = useRoute()
 const authStore = useAuthStore()
@@ -16,17 +15,9 @@ const { id: profileId } = route.params as {
 }
 
 const { profile, getProfile, toggleFollow, isLoading } = useProfile()
+const { tracks, toggleLike } = useTracks()
 
-getProfile(profileId)
-
-const toggleLike = useToggleLike()
-
-function toggleTrackLike(track: Track) {
-  const foundTrack = profile.value?.uploads.find(el => el._id === track._id)
-  if (!foundTrack) return
-
-  toggleLike(foundTrack)
-}
+getProfile(profileId, tracks)
 </script>
 
 <template>
@@ -69,9 +60,9 @@ function toggleTrackLike(track: Track) {
           </div>
         </div>
       </div>
-      <div class="mt-8">
+      <div class="mt-8 mx-8">
         <h2 class="base-heading mb-4">Uploads</h2>
-        <TracksContainer :tracks="profile.uploads" heading="Uploads" @like-toggled="toggleTrackLike" />
+        <TracksContainer :tracks="tracks" heading="Uploads" @like-toggled="toggleLike" />
       </div>
     </div>
   </div>

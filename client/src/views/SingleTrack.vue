@@ -3,9 +3,8 @@ import { useRoute } from 'vue-router'
 import useAsyncWrap from '../composables/useAsyncWrap'
 import appApi from '../api/appApi'
 import { reactive, ref } from 'vue'
+import useToggleLike from '../composables/useToggleLike'
 import EmptyState from '../components/EmptyState.vue'
-import useToggleTrackLike from '../composables/useToggleLike'
-
 import GeneralInfoPanel from '../components/singleTrack/GeneralInfoPanel.vue'
 import DetailsPanel from '../components/singleTrack/DetailsPanel.vue'
 import AuthorPanel from '../components/singleTrack/AuthorPanel.vue'
@@ -28,7 +27,7 @@ function getTrack() {
 
 getTrack()
 
-const toggleTrackLike = useToggleTrackLike()
+const toggleLike = useToggleLike()
 </script>
 
 <template>
@@ -40,7 +39,7 @@ const toggleTrackLike = useToggleTrackLike()
     <div v-else>
       <GeneralInfoPanel :track="track" />
       <div class="grid grid-cols-3 gap-x-8">
-        <DetailsPanel class="col-span-2" :track="track" @track-like-toggled="toggleTrackLike(track)" />
+        <DetailsPanel class="col-span-2" :track="track" @track-like-toggled="toggleLike(track)" />
         <AuthorPanel :profile-id="track.author._id" />
       </div>
     </div>

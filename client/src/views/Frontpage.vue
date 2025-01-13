@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref, shallowRef, watch, type Component } from 'vue'
+import { onMounted, ref, shallowRef, watch, type Component } from 'vue'
 import FrontpageHero from '../components/FrontpageHero.vue'
 import BaseSearchbar from '../components/base/BaseSearchbar.vue'
 import TracksContainer from '../components/TracksContainer.vue'
 import FiltersList from '../components/filters/FiltersList.vue'
 import { BpmFilter, KeyFilter, GenreFilter, PopularityFilter } from '../components/filters/Filters.vine'
-import appApi from '../api/appApi'
-import useAsyncWrap from '../composables/useAsyncWrap'
-import useToggleLike from '../composables/useToggleLike'
+import useTracks from '../composables/useTracks'
 
 //track type
 const TRACK_TYPES_BUTTONS = [
@@ -28,8 +26,6 @@ const TRACK_TYPES_BUTTONS = [
   },
 ]
 
-const trackType = ref<TrackType>('beat')
-
 //filters
 const BEAT_FILTERS = [BpmFilter, KeyFilter, GenreFilter, PopularityFilter]
 const SAMPLE_FILTERS = [BpmFilter, KeyFilter, PopularityFilter]
@@ -41,38 +37,20 @@ const FILTERS = {
   drumkit: DRUMKIT_FILTERS,
 }
 
+const { tracks, getTracks, isLoading, toggleLike } = useTracks()
+
 //shallow ref because we have an array of components
 const filters = shallowRef<Component[]>(BEAT_FILTERS)
-
-//get tracks
-const tracks = ref<Track[]>([])
-
-const wrapGetTracks = reactive(useAsyncWrap())
-
-function getTracks() {
-  wrapGetTracks.run(async () => {
-    const response = await appApi.get<{ tracks: Track[] }>(`/tracks/${trackType.value}`)
-    tracks.value = response.data.tracks
-  })
-}
-
-const toggleLike = useToggleLike()
-
-function toggleTrackLike(track: Track) {
-  const foundTrack = tracks.value.find(el => el._id === track._id)
-  if (!foundTrack) return
-
-  toggleLike(foundTrack)
-}
+const trackType = ref<TrackType>('beat')
 
 //get new tracks and update track filters when track type changes
 watch(trackType, () => {
   filters.value = FILTERS[trackType.value]
-  getTracks()
+  getTracks(trackType.value)
 })
 
 onMounted(() => {
-  getTracks()
+  getTracks(trackType.value)
 })
 </script>
 <template>
@@ -89,7 +67,7 @@ onMounted(() => {
             {{ btn.title }}
           </button>
         </div>
-        <TracksContainer :tracks="tracks" :isLoading="wrapGetTracks.isLoading" @likeToggled="toggleTrackLike" />
+        <TracksContainer :tracks="tracks" :isLoading="isLoading" @likeToggled="toggleLike" />
       </div>
     </div>
   </div>

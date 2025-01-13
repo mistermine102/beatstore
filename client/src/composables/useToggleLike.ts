@@ -1,31 +1,30 @@
 import appApi from '../api/appApi'
 import useAsyncWrap from './useAsyncWrap'
-import useToggleProperty from './useToggleProperty'
 import { useAuthStore } from '../stores/auth'
 import { useToastStore } from '../stores/toast'
 
-function useToggleTrackLike() {
-  const toggleProperty = useToggleProperty()
+function useToggleLike() {
   const wrapToggleLike = useAsyncWrap()
   const authStore = useAuthStore()
   const toastStore = useToastStore()
 
-  function toggleTrackLike(track: Track) {
+  function toggleLike(track: Track) {
     //check if user is authenticated
     if (!authStore.user) {
       toastStore.show({ type: 'info', title: 'Must be logged in to leave a like!' })
       return
     }
 
-    //toggle property
-    toggleProperty(track, 'isLiked', 'totalLikes')
+    ///modify state
+    track.isLiked ? track.totalLikes-- : track.totalLikes++
+    track.isLiked = !track.isLiked
 
     //send api request
     wrapToggleLike.run(async () => {
       await appApi.post(`/tracks/${track._id}/like`)
     })
   }
-  return toggleTrackLike
+  return toggleLike
 }
 
-export default useToggleTrackLike
+export default useToggleLike
