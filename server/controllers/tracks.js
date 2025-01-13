@@ -10,7 +10,7 @@ import Sharp from 'sharp'
 import { getAverageColor } from 'fast-average-color-node'
 import formatTrackData from '../formatTrackData.js'
 
-const uploadSchemas = {
+const UPLOAD_SCHEMAS = {
   beat: {
     title: '',
     type: 'beat',
@@ -38,14 +38,26 @@ const uploadSchemas = {
   },
 }
 
+const FILTER_SCHEMAS = {
+  beat: {
+    bpm: 'range',
+    key: 'exact',
+    genre: 'exact',
+  },
+  sample: {
+    bpm: 'range',
+  },
+  drumkit: {},
+}
+
 export const uploadTrack = async (req, res) => {
   const { type } = req.body
 
-  const uploadSchema = uploadSchemas[type]
+  const uploadSchema = UPLOAD_SCHEMAS[type]
   const newTrack = new Track()
 
   //attach fields that exists in schema to the new track
-  //basically it creates new Track based on a given uploadSchema (uploadSchemas are defines above)
+  //basically it creates new Track based on a given uploadSchema (UPLOAD_SCHEMAS are defines above)
   //it adds fields associated with a given track type
   //we can later check if a field exists on a track and execute needed code
   for (const schemaKey of Object.keys(uploadSchema)) {
@@ -157,22 +169,33 @@ export const deleteTrack = async (req, res) => {
 }
 
 export const getTracks = async (req, res) => {
-  const DEFAULT_AMOUNT = 10
-  const MAX_AMOUNT = 500
+  const { type } = req.params // Validated 'type'
+  const start = parseInt(req.query.start) || 0 // Defaults to 0 if not provided
+  const amount = parseInt(req.query.amount) || 10 // Defaults to 10 if not provided
 
-  const { type } = req.params
-  const start = req.query.start ? parseInt(req.query.start) : 0
-  const amount = req.query.amount ? parseInt(req.query.amount) : DEFAULT_AMOUNT
+  const filterSchema = FILTER_SCHEMAS[type]
 
-  //validate query
-  if (isNaN(start) || start < 0) throw new AppError('INVALID_START_VALUE', 400)
-  if (isNaN(amount) || amount > MAX_AMOUNT || amount < 0) throw new AppError('INVALID_AMOUNT', 400)
+  const filter = {}
+  filter.type = type
 
-  //validate track type
-  if (type !== 'beat' && type !== 'sample' && type !== 'drumkit') throw new AppError('INVALID_TYPE', 400)
+  //key here refers to the object key not key as a track property
+  for (const [key, value] of Object.entries(filterSchema)) {
+    switch (value) {
+      case 'exact':
+        if (req.query[key] !== undefined) filter[key] = req.query[key]
+        break
+      case 'range':
+        if (req.query[key] !== undefined) {
+          filter[key] = {}
+          if (req.query[key].min !== undefined) filter[key].$gte = parseInt(req.query[key].min)
+          if (req.query[key].max !== undefined) filter[key].$lte = parseInt(req.query[key].max)
+        }
+        break
+    }
+  }
 
   //only populate username on author
-  const tracks = await Track.find({ type }).skip(start).limit(amount).populate('author', 'username')
+  const tracks = await Track.find(filter).skip(start).limit(amount).populate('author', 'username')
   const trackIds = tracks.map(el => el._id)
 
   //create an object where keys are trackIds and values are wheter they're liked status
@@ -188,7 +211,7 @@ export const getTracks = async (req, res) => {
   )
 
   // Check if there are more tracks available in the database
-  const totalTracksCount = await Track.countDocuments({ type })
+  const totalTracksCount = await Track.countDocuments(filter)
   const isMore = totalTracksCount > start + amount
 
   res.json({ tracks: formattedTracks, isMore })

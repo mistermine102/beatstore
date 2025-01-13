@@ -28,7 +28,7 @@ const schema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'User',
   },
-  bpm: String,
+  bpm: Number,
   key: String,
   genre: String,
   price: Object,

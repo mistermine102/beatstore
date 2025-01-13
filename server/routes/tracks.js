@@ -1,5 +1,5 @@
 import express from 'express'
-import { body } from 'express-validator'
+import { body, query, param } from 'express-validator'
 import tryCatch from '../utils/tryCatch.js'
 import { isAuthenticated } from '../middleware/auth.js'
 import validate from '../middleware/validate.js'
@@ -8,6 +8,25 @@ import { getTracks, uploadTrack, streamTrack, toggleTrackLike, uploadTrackImage,
 import isValidId from '../middleware/isValidId.js'
 
 const router = express.Router()
+
+const getTracksValidators = [
+  param('type')
+    .exists()
+    .withMessage('type is required')
+    .isIn(['beat', 'sample', 'drumkit'])
+    .withMessage('type must be one of: beat, sample, drumkit'),
+  query('start')
+    .optional() // Allow 'start' to be omitted
+    .isInt({ min: 0 })
+    .withMessage('start must be an integer greater than or equal to 0'),
+  // Validate 'amount'
+  query('amount')
+    .optional() // Allow 'amount' to be omitted
+    .isInt({ min: 0, max: 100 })
+    .withMessage('amount must be an integer between 0 and 100'),
+  query('bpmMin').optional().isInt({ min: 0 }).withMessage('bpmMin must be a positive integer'),
+  query('bpmMax').optional().isInt({ min: 0 }).withMessage('bpmMax must be a positive integer'),
+]
 
 const uploadTrackValidators = [
   body('type')
@@ -20,7 +39,7 @@ const uploadTrackValidators = [
   body('title').exists().withMessage('Title cannot be empty').trim().isString().withMessage('Title must be a string').isLength({ min: 4 }),
 ]
 
-router.get('/:type', tryCatch(getTracks))
+router.get('/:type', getTracksValidators, validate, tryCatch(getTracks))
 
 router.get('/single/:trackId', isValidId('trackId'), tryCatch(getSingleTrack))
 

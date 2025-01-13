@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { Component } from 'vue';
+import type { Component } from 'vue'
 
 interface Props {
-    filters: Component[]
+  filters: Component[]
 }
 
 defineProps<Props>()
@@ -15,4 +15,3 @@ defineProps<Props>()
     </div>
   </div>
 </template>
-

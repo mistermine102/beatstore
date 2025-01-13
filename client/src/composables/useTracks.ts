@@ -3,6 +3,20 @@ import appApi from '../api/appApi'
 import useAsyncWrap from './useAsyncWrap'
 import useToggleLike from './useToggleLike'
 
+interface GetTracksFilters {
+  bpm?: {
+    min: number
+    max: number
+  }
+  bpmMax?: number
+  key?: string
+  genre?: string
+  popularity?: {
+    min: number
+    max: number
+  }
+}
+
 export default function useTracks() {
   const wrapGetTracks = useAsyncWrap()
   const wrapLoadMore = useAsyncWrap()
@@ -11,9 +25,13 @@ export default function useTracks() {
   const tracks = ref<Track[]>([])
   const isMore = ref(false)
 
-  function getTracks(type: TrackType) {
+  function getTracks(type: TrackType, options?: { filters?: GetTracksFilters }) {
     wrapGetTracks.run(async () => {
-      const response = await appApi.get<{ tracks: Track[]; isMore: boolean }>(`/tracks/${type}`)
+      const filters = options && options.filters ? options.filters : {}
+
+      const response = await appApi.get<{ tracks: Track[]; isMore: boolean }>(`/tracks/${type}`, {
+        params: filters,
+      })
 
       tracks.value = response.data.tracks
       isMore.value = response.data.isMore

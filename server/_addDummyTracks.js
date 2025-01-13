@@ -4,13 +4,48 @@ dotenv.config()
 import mongoose from 'mongoose'
 import Track from './models/Track.js'
 
+const GENRES = ['Trap', 'R&B', 'Drill', 'Rage', 'Boombap']
+
+const KEYS = [
+  'A Minor',
+  'A# Minor',
+  'B Minor',
+  'C Minor',
+  'C# Minor',
+  'D Minor',
+  'D# Minor',
+  'E Minor',
+  'F Minor',
+  'F# Minor',
+  'G Minor',
+  'G# Minor',
+  'A Major',
+  'A# Major',
+  'B Major',
+  'C Major',
+  'C# Major',
+  'D Major',
+  'D# Major',
+  'E Major',
+  'F Major',
+  'F# Major',
+  'G Major',
+  'G# Major',
+]
+
 const addDummyTracks = async () => {
   await Track.deleteMany()
   console.log('removed tracks')
 
   const docs = []
 
-  for (let i = 0; i < 2000; i++) {
+  let bpm, genre, key
+
+  for (let i = 0; i < 50; i++) {
+    bpm = Math.floor(Math.random() * 100) + 90
+    genre = GENRES[Math.floor(Math.random() * GENRES.length)]
+    key = KEYS[Math.floor(Math.random() * KEYS.length)]
+
     const newBeat = new Track({
       title: 'Beat ' + i,
       type: 'beat',
@@ -25,13 +60,16 @@ const addDummyTracks = async () => {
         },
       },
       author: '6772fc0631d11efd2fe7f72f',
-      bpm: '166',
-      key: 'A# Minor',
-      genre: 'Trap',
+      bpm,
+      key,
+      genre,
       playable: true,
       totalLikes: 0,
       totalStreams: 0,
     })
+
+    bpm = Math.floor(Math.random() * 100) + 90
+    key = KEYS[Math.floor(Math.random() * KEYS.length)]
 
     const newSample = new Track({
       title: 'Sample ' + i,
@@ -47,8 +85,8 @@ const addDummyTracks = async () => {
         },
       },
       author: '6772fc0631d11efd2fe7f72f',
-      bpm: '166',
-      key: 'A# Minor',
+      bpm,
+      key,
       playable: true,
       totalLikes: 0,
       totalStreams: 0,
