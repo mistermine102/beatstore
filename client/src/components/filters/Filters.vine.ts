@@ -1,10 +1,23 @@
+import { ref, watch } from 'vue'
 import Filter from './Filter.vue'
 
 export function BpmFilter() {
+  const emit = vineEmits<{ valueChanged: [{ min: string; max: string } | null] }>()
+  const bpm = ref({ min: '', max: '' })
+
+  watch(
+    bpm,
+    () => {
+      const valueToEmit = !bpm.value.min && !bpm.value.max ? null : bpm.value
+      emit('valueChanged', valueToEmit)
+    },
+    { deep: true }
+  )
+
   return vine`<Filter btnCaption="Bpm" popoverTitle="Bpm">
     <div class="flex gap-4">
-      <input class="base-input py-1 px-2 w-24" type="text" name="" id="" placeholder="from" />
-      <input class="base-input py-1 px-2 w-24" type="text" name="" id="" placeholder="to" />
+      <input v-model="bpm.min" class="base-input py-1 px-2 w-24" type="text" name="" id="" placeholder="from" />
+      <input v-model="bpm.max" class="base-input py-1 px-2 w-24" type="text" name="" id="" placeholder="to" />
     </div>
   </Filter>`
 }

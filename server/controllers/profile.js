@@ -30,7 +30,7 @@ export const getProfile = async (req, res) => {
 
   for (const track of uploads) {
     const formattedTrack = await formatTrackData(track)
-    formattedTrack.isLiked = await isLiked(req, track._id)
+    formattedTrack.isLiked = false
     modifiedUploads.push(formattedTrack)
   }
 

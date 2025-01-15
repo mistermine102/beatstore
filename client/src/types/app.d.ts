@@ -82,12 +82,6 @@ type Track = Beat | Sample | Drumkit
 
 type PlayableTrack = Beat | Sample
 
-interface Filter {
-  component: VueElement
-  btnCaption: string
-  popoverTitle: string
-}
-
 type ToastType = 'info' | 'error' | 'success'
 
 interface Profile {
@@ -102,4 +96,13 @@ interface Profile {
   image: {
     url: string
   }
+}
+
+interface GetTracksFilters {
+  bpm?: {
+    min: string
+    max: string
+  }
+  key?: string
+  genre?: string
 }

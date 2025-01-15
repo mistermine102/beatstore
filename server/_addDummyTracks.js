@@ -3,6 +3,7 @@ dotenv.config()
 
 import mongoose from 'mongoose'
 import Track from './models/Track.js'
+import User from './models/User.js'
 
 const GENRES = ['Trap', 'R&B', 'Drill', 'Rage', 'Boombap']
 
@@ -103,6 +104,15 @@ const addDummyTracks = async () => {
     })
     docs.push(newBeat, newSample, newDrumkit)
   }
+
+  //update author uploads
+  const author = await User.findById('6772fc0631d11efd2fe7f72f')
+
+  author.uploads.push(...docs.map(el => el._id))
+  author.totalUploads += 150
+
+  await author.save()
+
   await Track.insertMany(docs)
   console.log('added new tracks')
 }

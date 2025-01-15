@@ -46,6 +46,7 @@ const FILTER_SCHEMAS = {
   },
   sample: {
     bpm: 'range',
+    key: 'exact',
   },
   drumkit: {},
 }
@@ -186,9 +187,14 @@ export const getTracks = async (req, res) => {
         break
       case 'range':
         if (req.query[key] !== undefined) {
-          filter[key] = {}
-          if (req.query[key].min !== undefined) filter[key].$gte = parseInt(req.query[key].min)
-          if (req.query[key].max !== undefined) filter[key].$lte = parseInt(req.query[key].max)
+          const parsedMin = parseInt(req.query[key].min)
+          const parsedMax = parseInt(req.query[key].max)
+
+          if (!isNaN(parsedMin) || !isNaN(parsedMax)) {
+            filter[key] = {}
+            if (!isNaN(parsedMin)) filter[key].$gte = parsedMin
+            if (!isNaN(parsedMax)) filter[key].$lte = parsedMax
+          }
         }
         break
     }

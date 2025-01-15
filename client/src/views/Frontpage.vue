@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import { onMounted, ref, shallowRef, watch, type Component } from 'vue'
+import { computed, ref, watch } from 'vue'
 import FrontpageHero from '../components/FrontpageHero.vue'
 import BaseSearchbar from '../components/base/BaseSearchbar.vue'
 import TracksContainer from '../components/TracksContainer.vue'
-import ActiveFiltersList from '../components/ActiveFiltersList.vue'
-import FiltersList from '../components/filters/FiltersList.vue'
-import { BpmFilter, KeyFilter, GenreFilter, PopularityFilter } from '../components/filters/Filters.vine'
 import useTracks from '../composables/useTracks'
+import BasePopover from '../components/base/BasePopover.vue'
 
 //track type
 const TRACK_TYPES_BUTTONS = [
@@ -27,41 +25,121 @@ const TRACK_TYPES_BUTTONS = [
   },
 ]
 
-
-//filters
-const BEAT_FILTERS = [BpmFilter, KeyFilter, GenreFilter, PopularityFilter]
-const SAMPLE_FILTERS = [BpmFilter, KeyFilter, PopularityFilter]
-const DRUMKIT_FILTERS = [PopularityFilter]
-
-const FILTERS = {
-  beat: BEAT_FILTERS,
-  sample: SAMPLE_FILTERS,
-  drumkit: DRUMKIT_FILTERS,
-}
-
 const { tracks, getTracks, isLoading, toggleLike, isMore, loadMoreTracks, isLoadingMore } = useTracks()
-
-//shallow ref because we have an array of components
-const filters = shallowRef<Component[]>(BEAT_FILTERS)
 const trackType = ref<TrackType>('beat')
 
-//get new tracks and update track filters when track type changes
-watch(trackType, () => {
-  filters.value = FILTERS[trackType.value]
-  getTracks(trackType.value, {
-    filters: {
-      key: 'A Minor',
-    },
-  })
+interface BaseFilter {
+  id: string
+  type: string
+  label: string
+}
+
+interface RangeFilter extends BaseFilter {
+  type: 'range'
+  value: {
+    min: string
+    max: string
+  }
+}
+
+interface ExactFilter extends BaseFilter {
+  type: 'exact'
+  value: string
+}
+
+type Filter = RangeFilter | ExactFilter
+
+const bpmFilter = ref<Filter>({
+  id: 'bpm',
+  type: 'range',
+  label: 'Bpm',
+  value: {
+    min: '',
+    max: '',
+  },
 })
 
-onMounted(() => {
-  getTracks(trackType.value, {
-    filters: {
-      key: 'A Minor',
-    },
-  })
+const keyFilter = ref<Filter>({
+  id: 'key',
+  type: 'exact',
+  label: 'Key',
+  value: '',
 })
+
+const genreFilter = ref<Filter>({
+  id: 'genre',
+  type: 'exact',
+  label: 'Genre',
+  value: '',
+})
+
+const BeatFilters: Filter[] = [bpmFilter.value, keyFilter.value, genreFilter.value]
+const SampleFilters: Filter[] = [bpmFilter.value, keyFilter.value]
+const DrumkitFilters: Filter[] = []
+
+const filters = {
+  beat: BeatFilters,
+  sample: SampleFilters,
+  drumkit: DrumkitFilters,
+}
+
+//initial get tracks
+getTracks(trackType.value)
+
+//filters logic
+const currentFilters = ref<Filter[]>(BeatFilters)
+
+// Computed property that returns the filters object, excluding empty strings
+const activeFilters = computed(() => {
+  const filterObject: any = {}
+  const filterSchema = filters[trackType.value]
+
+  for (const filter of filterSchema) {
+    switch (filter.type) {
+      case 'exact':
+        // If the filter is 'exact', add it to the object if it's not empty
+        if (filter.value) filterObject[filter.id] = filter.value
+        break
+      case 'range':
+        // If the filter is 'range', add min and max values if they exist
+        filterObject[filter.id] = {}
+        if (filter.value.min) filterObject[filter.id].min = filter.value.min
+        if (filter.value.max) filterObject[filter.id].max = filter.value.max
+        break
+    }
+  }
+
+  return filterObject
+})
+
+function removeFilter(filterId: string) {
+  const filter = currentFilters.value.find(el => el.id === filterId)
+  if (!filter) return console.log('NO FILTER FOUND')
+
+  switch (filter.type) {
+    case 'exact':
+      filter.value = ''
+      return
+    case 'range':
+      filter.value.min = ''
+      filter.value.max = ''
+      return
+  }
+}
+
+//get new tracks when track type changes
+watch(trackType, () => {
+  currentFilters.value = filters[trackType.value]
+  getTracks(trackType.value, { filters: activeFilters.value })
+})
+
+watch(
+  currentFilters,
+  () => {
+    getTracks(trackType.value, { filters: activeFilters.value })
+  },
+  { deep: true }
+)
 </script>
 <template>
   <div class="h-full">
@@ -69,7 +147,20 @@ onMounted(() => {
     <BaseSearchbar />
     <div class="flex gap-8 mt-16">
       <div class="w-1/5">
-        <FiltersList :filters="filters" />
+        <BasePopover v-for="filter in currentFilters">
+          <template #popover-button>
+            <p>{{ filter.label }}</p>
+          </template>
+          <template #popover-content>
+            <div v-if="filter.type === 'range'" class="flex gap-x-2">
+              <input v-model="filter.value.min" type="text" class="base-input px-2 py-1 w-[100px]" placeholder="From" />
+              <input v-model="filter.value.max" type="text" class="base-input px-2 py-1 w-[100px]" placeholder="To" />
+            </div>
+            <div v-if="filter.type === 'exact'" class="flex gap-x-2">
+              <input v-model="filter.value" type="text" class="base-input px-2 py-1 w-[100px]" :placeholder="filter.label" />
+            </div>
+          </template>
+        </BasePopover>
       </div>
       <div class="w-4/5">
         <div class="grid grid-cols-3 gap-4 mb-4">
@@ -77,14 +168,27 @@ onMounted(() => {
             {{ btn.title }}
           </button>
         </div>
-        <!-- <ActiveFiltersList class="mb-4" /> -->
+        <div>
+          <div v-for="filter in currentFilters">
+            <div v-if="filter.value" class="cursor-pointer" @click="removeFilter(filter.id)">
+              <p v-if="filter.type === 'exact'">
+                <span>{{ filter.label }}: {{ filter.value }}</span>
+              </p>
+              <p v-if="filter.type === 'range'">
+                <span v-if="filter.value.min && filter.value.max">{{ filter.label }}: {{ filter.value.min }} - {{ filter.value.max }}</span>
+                <span v-if="filter.value.min && !filter.value.max">{{ filter.label }}: Above {{ filter.value.min }}</span>
+                <span v-if="filter.value.max && !filter.value.min">{{ filter.label }}: Below {{ filter.value.max }}</span>
+              </p>
+            </div>
+          </div>
+        </div>
         <TracksContainer
           :tracks="tracks"
           :isLoading="isLoading"
           :isLoadingMore="isLoadingMore"
           :isMore="isMore"
           @likeToggled="toggleLike"
-          @loadedMore="loadMoreTracks(trackType)"
+          @loadedMore="loadMoreTracks(trackType, { filters: activeFilters })"
         />
       </div>
     </div>
