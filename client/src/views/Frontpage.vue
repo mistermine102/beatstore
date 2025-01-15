@@ -1,146 +1,34 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import FrontpageHero from '../components/FrontpageHero.vue'
 import BaseSearchbar from '../components/base/BaseSearchbar.vue'
 import TracksContainer from '../components/TracksContainer.vue'
 import useTracks from '../composables/useTracks'
 import BasePopover from '../components/base/BasePopover.vue'
+import useTrackFilters from '../composables/useTrackFilters'
 
-//track type
+// Track type logic
 const TRACK_TYPES_BUTTONS = [
-  {
-    title: 'Beats',
-    type: 'beat' as TrackType,
-    urlSuffix: 'beats',
-  },
-  {
-    title: 'Samples',
-    type: 'sample' as TrackType,
-    urlSuffix: 'samples',
-  },
-  {
-    title: 'Drumkits',
-    type: 'drumkit' as TrackType,
-    urlSuffix: 'drumkits',
-  },
+  { title: 'Beats', type: 'beat' as TrackType, urlSuffix: 'beats' },
+  { title: 'Samples', type: 'sample' as TrackType, urlSuffix: 'samples' },
+  { title: 'Drumkits', type: 'drumkit' as TrackType, urlSuffix: 'drumkits' },
 ]
 
-const { tracks, getTracks, isLoading, toggleLike, isMore, loadMoreTracks, isLoadingMore } = useTracks()
 const trackType = ref<TrackType>('beat')
 
-interface BaseFilter {
-  id: string
-  type: string
-  label: string
-}
+const { tracks, getTracks, isLoading, toggleLike, isMore, loadMoreTracks, isLoadingMore } = useTracks()
+const { currentFilters, activeFilters, removeFilter } = useTrackFilters(trackType)
 
-interface RangeFilter extends BaseFilter {
-  type: 'range'
-  value: {
-    min: string
-    max: string
-  }
-}
 
-interface ExactFilter extends BaseFilter {
-  type: 'exact'
-  value: string
-}
-
-type Filter = RangeFilter | ExactFilter
-
-const bpmFilter = ref<Filter>({
-  id: 'bpm',
-  type: 'range',
-  label: 'Bpm',
-  value: {
-    min: '',
-    max: '',
-  },
-})
-
-const keyFilter = ref<Filter>({
-  id: 'key',
-  type: 'exact',
-  label: 'Key',
-  value: '',
-})
-
-const genreFilter = ref<Filter>({
-  id: 'genre',
-  type: 'exact',
-  label: 'Genre',
-  value: '',
-})
-
-const BeatFilters: Filter[] = [bpmFilter.value, keyFilter.value, genreFilter.value]
-const SampleFilters: Filter[] = [bpmFilter.value, keyFilter.value]
-const DrumkitFilters: Filter[] = []
-
-const filters = {
-  beat: BeatFilters,
-  sample: SampleFilters,
-  drumkit: DrumkitFilters,
-}
-
-//initial get tracks
+// Fetch initial tracks
 getTracks(trackType.value)
 
-//filters logic
-const currentFilters = ref<Filter[]>(BeatFilters)
-
-// Computed property that returns the filters object, excluding empty strings
-const activeFilters = computed(() => {
-  const filterObject: any = {}
-  const filterSchema = filters[trackType.value]
-
-  for (const filter of filterSchema) {
-    switch (filter.type) {
-      case 'exact':
-        // If the filter is 'exact', add it to the object if it's not empty
-        if (filter.value) filterObject[filter.id] = filter.value
-        break
-      case 'range':
-        // If the filter is 'range', add min and max values if they exist
-        filterObject[filter.id] = {}
-        if (filter.value.min) filterObject[filter.id].min = filter.value.min
-        if (filter.value.max) filterObject[filter.id].max = filter.value.max
-        break
-    }
-  }
-
-  return filterObject
-})
-
-function removeFilter(filterId: string) {
-  const filter = currentFilters.value.find(el => el.id === filterId)
-  if (!filter) return console.log('NO FILTER FOUND')
-
-  switch (filter.type) {
-    case 'exact':
-      filter.value = ''
-      return
-    case 'range':
-      filter.value.min = ''
-      filter.value.max = ''
-      return
-  }
-}
-
-//get new tracks when track type changes
-watch(trackType, () => {
-  currentFilters.value = filters[trackType.value]
+// Watch for filter changes
+watch(activeFilters, () => {
   getTracks(trackType.value, { filters: activeFilters.value })
 })
-
-watch(
-  currentFilters,
-  () => {
-    getTracks(trackType.value, { filters: activeFilters.value })
-  },
-  { deep: true }
-)
 </script>
+
 <template>
   <div class="h-full">
     <FrontpageHero />

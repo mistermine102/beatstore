@@ -98,7 +98,7 @@ const newTrack = ref<NewTrack>(NEW_BEAT_SCHEMA)
 //update new track when upload type changes
 watch(uploadType, () => {
   //find schema of a selected upload type and assign it
-  newTrack.value = SCHEMAS[uploadType.value]
+  newTrack.value = SCHEMAS[uploadType.value as keyof typeof SCHEMAS]
 })
 
 function validate() {

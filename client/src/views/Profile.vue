@@ -5,7 +5,7 @@ import useTracks from '../composables/useTracks'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import moment from 'moment'
-import { onMounted } from 'vue'
+import { watch } from 'vue'
 
 const route = useRoute()
 const authStore = useAuthStore()
@@ -15,9 +15,18 @@ const { id: profileId } = route.params as {
 }
 
 const { profile, getProfile, toggleFollow, isLoading } = useProfile()
-const { tracks, toggleLike } = useTracks()
+const { tracks, toggleLike, getTracks, isMore, isLoadingMore, loadMoreTracks } = useTracks()
 
-getProfile(profileId, tracks)
+getProfile(profileId)
+getTracks('all', { filters: { authorId: profileId } })
+
+watch(
+  () => route.params.id,
+  () => {
+    getProfile(profileId)
+    getTracks('all', { filters: { authorId: profileId } })
+  }
+)
 </script>
 
 <template>
@@ -62,7 +71,14 @@ getProfile(profileId, tracks)
       </div>
       <div class="mt-8 mx-8">
         <h2 class="base-heading mb-4">Uploads</h2>
-        <TracksContainer :tracks="tracks" heading="Uploads" @like-toggled="toggleLike" />
+        <TracksContainer
+          :tracks="tracks"
+          :is-loading-more="isLoadingMore"
+          :is-more="isMore"
+          @loaded-more="loadMoreTracks('all', { filters: { authorId: profileId } })"
+          heading="Uploads"
+          @like-toggled="toggleLike"
+        />
       </div>
     </div>
   </div>

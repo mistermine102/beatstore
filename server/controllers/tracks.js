@@ -49,6 +49,7 @@ const FILTER_SCHEMAS = {
     key: 'exact',
   },
   drumkit: {},
+  all: {},
 }
 
 export const uploadTrack = async (req, res) => {
@@ -173,12 +174,17 @@ export const getTracks = async (req, res) => {
   const { type } = req.params // Validated 'type'
   const start = parseInt(req.query.start) || 0 // Defaults to 0 if not provided
   const amount = parseInt(req.query.amount) || 10 // Defaults to 10 if not provided
+  const { authorId } = req.query
 
   const filterSchema = FILTER_SCHEMAS[type]
-
   const filter = {}
-  filter.type = type
 
+  if(authorId) filter.author = authorId
+
+  //don't add type filter if querying for all tracks
+  if (type !== 'all') filter.type = type
+
+  //create a filter object based on avilable filters for each track type and filters send in query
   //key here refers to the object key not key as a track property
   for (const [key, value] of Object.entries(filterSchema)) {
     switch (value) {

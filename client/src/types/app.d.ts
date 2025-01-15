@@ -4,7 +4,7 @@ interface User {
   username: string
 }
 
-type TrackType = 'beat' | 'sample' | 'drumkit'
+type TrackType = 'beat' | 'sample' | 'drumkit' | 'all'
 
 interface BaseTrack {
   _id: string
@@ -86,7 +86,6 @@ type ToastType = 'info' | 'error' | 'success'
 
 interface Profile {
   createdAt: Date
-  uploads: Track[]
   username: string
   _id: string
   isFollowed: boolean
@@ -105,4 +104,5 @@ interface GetTracksFilters {
   }
   key?: string
   genre?: string
+  authorId?: string
 }

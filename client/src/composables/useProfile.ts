@@ -12,14 +12,10 @@ function useProfile() {
 
   const wrapGetProfile = useAsyncWrap()
 
-  function getProfile(profileId: string, uploadsTarget?: Ref<Track[]>) {
+  function getProfile(profileId: string) {
     wrapGetProfile.run(async () => {
-      const { data } = await appApi.get<{ profile: Profile }>(`/profile/${profileId}`)
-      profile.value = data.profile
-      
-      if (uploadsTarget) {
-        uploadsTarget.value = profile.value.uploads
-      }
+      const profileResponse = await appApi.get<{ profile: Profile }>(`/profile/${profileId}`)
+      profile.value = profileResponse.data.profile
     })
   }
 

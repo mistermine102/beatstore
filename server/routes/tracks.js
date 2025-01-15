@@ -13,8 +13,8 @@ const getTracksValidators = [
   param('type')
     .exists()
     .withMessage('type is required')
-    .isIn(['beat', 'sample', 'drumkit'])
-    .withMessage('type must be one of: beat, sample, drumkit'),
+    .isIn(['beat', 'sample', 'drumkit', 'all'])
+    .withMessage('type must be one of: beat, sample, drumkit, all'),
   query('start')
     .optional() // Allow 'start' to be omitted
     .isInt({ min: 0 })
@@ -24,8 +24,10 @@ const getTracksValidators = [
     .optional() // Allow 'amount' to be omitted
     .isInt({ min: 0, max: 100 })
     .withMessage('amount must be an integer between 0 and 100'),
-  query('bpmMin').optional().isInt({ min: 0 }).withMessage('bpmMin must be a positive integer'),
-  query('bpmMax').optional().isInt({ min: 0 }).withMessage('bpmMax must be a positive integer'),
+  query('authorId')
+    .optional() // Allow 'AuthorId' to be omitted
+    .isMongoId()
+    .withMessage('AuthorId must be a valid MongoDB ObjectId'),
 ]
 
 const uploadTrackValidators = [

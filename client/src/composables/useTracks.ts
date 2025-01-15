@@ -4,8 +4,6 @@ import useAsyncWrap from './useAsyncWrap'
 import useToggleLike from './useToggleLike'
 
 export default function useTracks() {
-
-
   const wrapGetTracks = useAsyncWrap()
   const wrapLoadMore = useAsyncWrap()
   const toggleLike = useToggleLike()

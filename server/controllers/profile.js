@@ -1,38 +1,20 @@
 import User from '../models/User.js'
-import formatTrackData from '../formatTrackData.js'
 import AppError from '../classes/AppError.js'
 import Follow from '../models/Follow.js'
 import Mongoose from 'mongoose'
 import Sharp from 'sharp'
 import { getAverageColor } from 'fast-average-color-node'
 import { uploadFileToS3, generateSignedUrl } from '../s3.js'
-import isLiked from '../isLiked.js'
 
 export const getProfile = async (req, res) => {
   const { id: userId } = req.params
   if (!Mongoose.Types.ObjectId.isValid(userId)) throw new AppError('INVALID_ID', 400)
 
-  const user = await User.findById(userId).populate({
-    path: 'uploads',
-    populate: {
-      path: 'author',
-      select: {
-        username: 1,
-      },
-    },
-  })
+  const user = await User.findById(userId)
+
   if (!user) throw new AppError('USER_NOT_FOUND', 400)
 
-  const { createdAt, uploads, username, _id, totalFollows, totalUploads, specification, image } = user._doc
-
-  //modify uploads
-  const modifiedUploads = []
-
-  for (const track of uploads) {
-    const formattedTrack = await formatTrackData(track)
-    formattedTrack.isLiked = false
-    modifiedUploads.push(formattedTrack)
-  }
+  const { createdAt, username, _id, totalFollows, totalUploads, specification, image } = user._doc
 
   //determine wheter profile is followed
   let isFollowed = false
@@ -61,7 +43,6 @@ export const getProfile = async (req, res) => {
 
   const userDoc = {
     createdAt,
-    uploads: modifiedUploads,
     username,
     _id,
     isFollowed,
