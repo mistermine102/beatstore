@@ -181,12 +181,20 @@ export const getTracks = async (req, res) => {
   const { type } = req.params // Validated 'type'
   const start = parseInt(req.query.start) || 0 // Defaults to 0 if not provided
   const amount = parseInt(req.query.amount) || 10 // Defaults to 10 if not provided
-  const { authorId } = req.query
+  const { authorId, phrase } = req.query
 
   const filterSchema = FILTER_SCHEMAS[type]
   const filter = {}
 
   if (authorId) filter.author = authorId
+
+  // Apply phrase-based search if 'phrase' is provided
+  if (phrase) {
+    const formattedPhrase = phrase.trim().toLowerCase()
+
+    // Use $text search if available
+    filter.$text = { $search: formattedPhrase }
+  }
 
   //don't add type filter if querying for all tracks
   if (type !== 'all') filter.type = type

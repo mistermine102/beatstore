@@ -37,6 +37,9 @@ const schema = new Schema({
   totalStreams: Number,
 })
 
+// Add a text index on the title to allow text search
+schema.index({ title: 'text' });
+
 const Track = mongoose.model('Track', schema)
 
 export default Track

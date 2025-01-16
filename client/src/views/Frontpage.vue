@@ -30,7 +30,7 @@ const { currentFilters, activeFilters, removeFilter } =
   useTrackFilters(trackType)
 
 // Fetch initial tracks
-getTracks(trackType.value)
+getTracks(trackType.value, {filters: {phrase: 'test'}})
 
 // Watch for filter changes
 watch(activeFilters, () => {

@@ -105,4 +105,5 @@ interface GetTracksFilters {
   key?: string
   genre?: string
   authorId?: string
+  phrase?: string
 }
