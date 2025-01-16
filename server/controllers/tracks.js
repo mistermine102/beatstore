@@ -41,12 +41,12 @@ const UPLOAD_SCHEMAS = {
 const FILTER_SCHEMAS = {
   beat: {
     bpm: 'range',
-    key: 'exact',
-    genre: 'exact',
+    key: 'set',
+    genre: 'set',
   },
   sample: {
     bpm: 'range',
-    key: 'exact',
+    key: 'set',
   },
   drumkit: {},
   all: {},
@@ -63,7 +63,9 @@ export const uploadTrack = async (req, res) => {
   //it adds fields associated with a given track type
   //we can later check if a field exists on a track and execute needed code
   for (const schemaKey of Object.keys(uploadSchema)) {
-    newTrack[schemaKey] = req.body[schemaKey] ? req.body[schemaKey] : uploadSchema[schemaKey]
+    newTrack[schemaKey] = req.body[schemaKey]
+      ? req.body[schemaKey]
+      : uploadSchema[schemaKey]
   }
 
   //attach author
@@ -114,7 +116,9 @@ export const uploadTrackImage = async (req, res) => {
   if (!track) throw new AppError('TRACK_NOT_FOUND', 404)
 
   // Process the uploaded image (resize, compress, etc.)
-  const processedBuffer = await Sharp(req.file.buffer).resize(300, 300).toBuffer()
+  const processedBuffer = await Sharp(req.file.buffer)
+    .resize(300, 300)
+    .toBuffer()
 
   // Upload image to S3
   const filename = await uploadFileToS3(processedBuffer)
@@ -142,7 +146,8 @@ export const deleteTrack = async (req, res) => {
 
   if (!track) throw new AppError('TRACK_NOT_FOUND', 400)
 
-  if (!track.author.equals(req.userId)) throw new AppError('NOT_AUTHORIZED', 403)
+  if (!track.author.equals(req.userId))
+    throw new AppError('NOT_AUTHORIZED', 403)
 
   //delete file from s3
   await deleteFileFromS3(track.audio.filename)
@@ -161,7 +166,9 @@ export const deleteTrack = async (req, res) => {
   //update author's uploads
   const author = await User.findById(req.userId)
 
-  author.uploads = author.uploads.filter(trackId => !trackId.equals(track._id))
+  author.uploads = author.uploads.filter(
+    (trackId) => !trackId.equals(track._id)
+  )
   author.totalUploads--
 
   await author.save()
@@ -179,17 +186,28 @@ export const getTracks = async (req, res) => {
   const filterSchema = FILTER_SCHEMAS[type]
   const filter = {}
 
-  if(authorId) filter.author = authorId
+  if (authorId) filter.author = authorId
 
   //don't add type filter if querying for all tracks
   if (type !== 'all') filter.type = type
 
-  //create a filter object based on avilable filters for each track type and filters send in query
-  //key here refers to the object key not key as a track property
+  //create a filter object based on available filters for each track type and filters sent in query
+  //key here refers to the object key, not key as a track property
   for (const [key, value] of Object.entries(filterSchema)) {
     switch (value) {
       case 'exact':
         if (req.query[key] !== undefined) filter[key] = req.query[key]
+        break
+      case 'set':
+        if (req.query[key] !== undefined) {
+          // Split the values by commas and filter out any empty values
+          const values = req.query[key]
+            .split(',')
+            .map((val) => val.trim())
+            .filter(Boolean)
+          // Apply the filter using $in to match any of the provided values
+          filter[key] = { $in: values }
+        }
         break
       case 'range':
         if (req.query[key] !== undefined) {
@@ -206,16 +224,21 @@ export const getTracks = async (req, res) => {
     }
   }
 
-  //only populate username on author
-  const tracks = await Track.find(filter).skip(start).limit(amount).populate('author', 'username')
-  const trackIds = tracks.map(el => el._id)
+  console.log(filter)
 
-  //create an object where keys are trackIds and values are wheter they're liked status
+  //only populate username on author
+  const tracks = await Track.find(filter)
+    .skip(start)
+    .limit(amount)
+    .populate('author', 'username')
+  const trackIds = tracks.map((el) => el._id)
+
+  //create an object where keys are trackIds and values are whether they're liked
   const likes = await isLiked(req, trackIds)
 
-  //promise.all to promise to process tracks in parallel
+  //promise.all to process tracks in parallel
   const formattedTracks = await Promise.all(
-    tracks.map(async track => {
+    tracks.map(async (track) => {
       const formattedTrack = await formatTrackData(track)
       formattedTrack.isLiked = likes[track._id]
       return formattedTrack

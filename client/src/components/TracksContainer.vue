@@ -20,8 +20,8 @@ const emit = defineEmits<Emits>()
 </script>
 
 <template>
-  <div>
-    <div v-if="isLoading" class="flex justify-center h-full">
+  <div class="min-h-[400px]">
+    <div v-if="isLoading" class="flex justify-center items-center h-full">
       <div class="loader"></div>
     </div>
     <div v-else>

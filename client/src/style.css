@@ -204,6 +204,12 @@ body {
   pointer-events: none;
 }
 
+.active-filter-badge {
+  background-color: var(--darkGrey);
+  padding: 2px 8px;
+  cursor: pointer
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
