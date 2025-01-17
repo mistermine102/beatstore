@@ -1,33 +1,6 @@
 import { computed, ref, watch, type Ref } from 'vue'
 
-// Define the filter interfaces
-interface BaseFilter {
-  id: string
-  type: string
-  label: string
-}
-
-interface RangeFilter extends BaseFilter {
-  type: 'range'
-  value: {
-    min: string
-    max: string
-  }
-}
-
-interface ExactFilter extends BaseFilter {
-  type: 'exact'
-  value: string
-}
-
-interface SetFilter extends BaseFilter {
-  type: 'set'
-  values: [string, boolean][]
-}
-
-type Filter = RangeFilter | ExactFilter | SetFilter
-
-export default function useFilters(trackType: Ref<string>) {
+export default function useFilters(trackType: Ref<TrackType>) {
   // Define the filters
   const bpmFilter = ref<Filter>({
     id: 'bpm',
@@ -89,11 +62,7 @@ export default function useFilters(trackType: Ref<string>) {
   })
 
   // Define filters for each track type
-  const BeatFilters: Filter[] = [
-    bpmFilter.value,
-    keyFilter.value,
-    genreFilter.value,
-  ]
+  const BeatFilters: Filter[] = [bpmFilter.value, keyFilter.value, genreFilter.value]
   const SampleFilters: Filter[] = [bpmFilter.value, keyFilter.value]
   const DrumkitFilters: Filter[] = []
 
@@ -104,9 +73,7 @@ export default function useFilters(trackType: Ref<string>) {
   }
 
   // Reactive reference for the current filters
-  const currentFilters = ref<Filter[]>(
-    filters[trackType.value as keyof typeof filters]
-  )
+  const currentFilters = ref<Filter[]>(filters[trackType.value as keyof typeof filters])
 
   // Update `currentFilters` when `trackType` changes
   watch(trackType, () => {
@@ -116,17 +83,18 @@ export default function useFilters(trackType: Ref<string>) {
   // Computed property for active filters
   const activeFilters = computed(() => {
     const filterObject: Record<string, any> = {}
-    const filterSchema = filters[trackType.value as keyof typeof filters]
 
-    for (const filter of filterSchema) {
+    for (const filter of currentFilters.value) {
       switch (filter.type) {
         case 'exact':
           if (filter.value) filterObject[filter.id] = filter.value
           break
         case 'range':
-          filterObject[filter.id] = {}
-          if (filter.value.min) filterObject[filter.id].min = filter.value.min
-          if (filter.value.max) filterObject[filter.id].max = filter.value.max
+          if (filter.value.min || filter.value.max) {
+            filterObject[filter.id] = {}
+            if (filter.value.min) filterObject[filter.id].min = filter.value.min
+            if (filter.value.max) filterObject[filter.id].max = filter.value.max
+          }
           break
         case 'set':
           if (filter.values.find((el) => el[1])) {
@@ -135,7 +103,6 @@ export default function useFilters(trackType: Ref<string>) {
               .map((el) => el[0])
               .join(',')
           }
-
           break
       }
     }

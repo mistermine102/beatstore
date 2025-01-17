@@ -107,3 +107,30 @@ interface GetTracksFilters {
   authorId?: string
   phrase?: string
 }
+
+// Define the filter interfaces
+interface BaseFilter {
+  id: string
+  type: string
+  label: string
+}
+
+interface RangeFilter extends BaseFilter {
+  type: 'range'
+  value: {
+    min: string
+    max: string
+  }
+}
+
+interface ExactFilter extends BaseFilter {
+  type: 'exact'
+  value: string
+}
+
+interface SetFilter extends BaseFilter {
+  type: 'set'
+  values: [string, boolean][]
+}
+
+type Filter = RangeFilter | ExactFilter | SetFilter

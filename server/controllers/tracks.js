@@ -63,9 +63,7 @@ export const uploadTrack = async (req, res) => {
   //it adds fields associated with a given track type
   //we can later check if a field exists on a track and execute needed code
   for (const schemaKey of Object.keys(uploadSchema)) {
-    newTrack[schemaKey] = req.body[schemaKey]
-      ? req.body[schemaKey]
-      : uploadSchema[schemaKey]
+    newTrack[schemaKey] = req.body[schemaKey] ? req.body[schemaKey] : uploadSchema[schemaKey]
   }
 
   //attach author
@@ -116,9 +114,7 @@ export const uploadTrackImage = async (req, res) => {
   if (!track) throw new AppError('TRACK_NOT_FOUND', 404)
 
   // Process the uploaded image (resize, compress, etc.)
-  const processedBuffer = await Sharp(req.file.buffer)
-    .resize(300, 300)
-    .toBuffer()
+  const processedBuffer = await Sharp(req.file.buffer).resize(300, 300).toBuffer()
 
   // Upload image to S3
   const filename = await uploadFileToS3(processedBuffer)
@@ -146,8 +142,7 @@ export const deleteTrack = async (req, res) => {
 
   if (!track) throw new AppError('TRACK_NOT_FOUND', 400)
 
-  if (!track.author.equals(req.userId))
-    throw new AppError('NOT_AUTHORIZED', 403)
+  if (!track.author.equals(req.userId)) throw new AppError('NOT_AUTHORIZED', 403)
 
   //delete file from s3
   await deleteFileFromS3(track.audio.filename)
@@ -166,9 +161,7 @@ export const deleteTrack = async (req, res) => {
   //update author's uploads
   const author = await User.findById(req.userId)
 
-  author.uploads = author.uploads.filter(
-    (trackId) => !trackId.equals(track._id)
-  )
+  author.uploads = author.uploads.filter((trackId) => !trackId.equals(track._id))
   author.totalUploads--
 
   await author.save()
@@ -181,17 +174,20 @@ export const getTracks = async (req, res) => {
   const { type } = req.params // Validated 'type'
   const start = parseInt(req.query.start) || 0 // Defaults to 0 if not provided
   const amount = parseInt(req.query.amount) || 10 // Defaults to 10 if not provided
-  const { authorId, phrase } = req.query
+  const { authorId, phrase, liked } = req.query
 
   const filterSchema = FILTER_SCHEMAS[type]
   const filter = {}
 
   if (authorId) filter.author = authorId
 
+  if (liked && req.isAuthenticated) {
+    //find tracks liked by
+  }
+
   // Apply phrase-based search if 'phrase' is provided
   if (phrase) {
     const formattedPhrase = phrase.trim().toLowerCase()
-
     // Use $text search if available
     filter.$text = { $search: formattedPhrase }
   }
@@ -232,13 +228,8 @@ export const getTracks = async (req, res) => {
     }
   }
 
-  console.log(filter)
-
   //only populate username on author
-  const tracks = await Track.find(filter)
-    .skip(start)
-    .limit(amount)
-    .populate('author', 'username')
+  const tracks = await Track.find(filter).skip(start).limit(amount).populate('author', 'username')
   const trackIds = tracks.map((el) => el._id)
 
   //create an object where keys are trackIds and values are whether they're liked

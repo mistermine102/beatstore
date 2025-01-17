@@ -69,7 +69,7 @@ watch(
           </div>
         </div>
       </div>
-      <div class="mt-8 mx-8">
+      <div class="mt-8">
         <h2 class="base-heading mb-4">Uploads</h2>
         <TracksContainer
           :tracks="tracks"

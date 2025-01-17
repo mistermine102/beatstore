@@ -122,6 +122,7 @@ function validate() {
 }
 
 function uploadTrack(e: Event) {
+  console.log(newTrack.value)
   e.preventDefault()
   if (!validate()) return
 
@@ -156,7 +157,7 @@ function uploadTrack(e: Event) {
       <!-- if a field exists on schema (isn't undefined) then display it's input -->
       <div v-if="newTrack.audio !== undefined">
         <h2 class="mt-8 mb-2 text-lg">Audio file</h2>
-        <UploadFileContainer @file-selected="file => (newTrack.audio = file)" id="audio" max-file-size="25MB" accept="audio/*">
+        <UploadFileContainer @file-selected="(file) => newTrack.audio = file" id="audio" max-file-size="25MB" accept="audio/*">
           <template #icon>
             <UploadIcon class="w-[48px]" />
           </template>
