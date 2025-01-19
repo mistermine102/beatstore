@@ -1,72 +1,43 @@
 import User from '../models/User.js'
 import AppError from '../classes/AppError.js'
 import Follow from '../models/Follow.js'
-import Mongoose from 'mongoose'
 import Sharp from 'sharp'
 import { getAverageColor } from 'fast-average-color-node'
 import { uploadFileToS3, generateSignedUrl } from '../s3.js'
 
-export const getProfile = async (req, res) => {
-  const { id: userId } = req.params
-  if (!Mongoose.Types.ObjectId.isValid(userId)) throw new AppError('INVALID_ID', 400)
+export const getSingleProfile = async (req, res) => {
+  const { profileId: userId } = req.params
 
-  const user = await User.findById(userId)
-
+  const user = await User.findById(userId).select('createdAt username _id totalFollows totalUploads specification image')
   if (!user) throw new AppError('USER_NOT_FOUND', 400)
 
-  const { createdAt, username, _id, totalFollows, totalUploads, specification, image } = user._doc
+  const formattedProfile = { ...user._doc }
 
-  //determine wheter profile is followed
-  let isFollowed = false
+  //determine if a profile is followed by a user
+  formattedProfile.isFollowed = false
 
-  if (!req.isAuthenticated) {
-    isFollowed = false
-  } else {
-    //userId (not req.userId) is a profile's id in this case
-    const index = 'Follower' + req.userId + 'Followed' + userId
-    const follow = await Follow.findOne({ index })
-
-    isFollowed = follow ? true : false
+  if (req.isAuthenticated) {
+    const followId = 'Follower' + req.userId + 'Followed' + userId
+    const follow = await Follow.findById(followId)
+    if (follow) formattedProfile.isFollowed = true
   }
 
-  let modifiedImage = {}
+  //attach profile image url
+  formattedProfile.image.url = await generateSignedUrl(user.image.filename)
 
-  if (image) {
-    const imageUrl = await generateSignedUrl(image.filename)
-
-    //get profile's image
-    modifiedImage = {
-      ...image,
-      url: imageUrl,
-    }
-  }
-
-  const userDoc = {
-    createdAt,
-    username,
-    _id,
-    isFollowed,
-    totalFollows,
-    totalUploads,
-    specification,
-    image: modifiedImage,
-  }
-
-  res.send({ profile: userDoc })
+  res.json({ profile: formattedProfile })
 }
 
 export const toggleFollow = async (req, res) => {
   const followerId = req.userId
-  const followedId = req.params.id
-  if (!Mongoose.Types.ObjectId.isValid(followedId)) throw new AppError('Invalid followed id', 400)
-  if (!Mongoose.Types.ObjectId.isValid(followerId)) throw new AppError('Invalid follower id', 400)
+  const followedId = req.params.profileId
 
   const followedUser = await User.findById(followedId)
-  if (!followedUser) throw new AppError('Cannot find a followed user', 400)
+  if (!followedUser) throw new AppError('USER_NOT_FOUND', 400)
 
   //determine wheter we follow or unfollow
-  const index = 'Follower' + followerId + 'Followed' + followedId
-  const follow = await Follow.findOne({ index })
+  const followId = 'Follower' + followerId + 'Followed' + followedId
+  const follow = await Follow.findById(followId)
 
   if (!follow) {
     //increment followed user follows
@@ -74,10 +45,9 @@ export const toggleFollow = async (req, res) => {
 
     //create new follow
     const newFollow = new Follow({
-      index,
+      _id: followId,
       followerId,
       followedId,
-      createdAt: new Date(),
     })
 
     await newFollow.save()

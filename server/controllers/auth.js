@@ -26,7 +26,6 @@ export const register = async (req, res) => {
     totalFollows: 0,
     totalUploads: 0,
     uploads: [],
-    createdAt: new Date(),
   })
 
   const savedUser = await newUser.save()

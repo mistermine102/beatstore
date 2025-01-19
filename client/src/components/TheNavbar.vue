@@ -3,6 +3,7 @@ import { storeToRefs } from 'pinia'
 import { useAuthStore } from '../stores/auth'
 import ProfilePopover from './ProfilePopover.vue'
 import { useRoute } from 'vue-router'
+import { HeartIcon } from './icons/index.vine'
 
 const authStore = useAuthStore()
 const route = useRoute()
@@ -28,6 +29,9 @@ const { user } = storeToRefs(authStore)
       </ul>
       <div class="flex justify-end">
         <div class="flex items-center gap-2" v-if="user">
+          <router-link to="/liked" class="mr-16">
+            <HeartIcon />
+          </router-link>
           <p>
             Welcome <span class="text-textPrimary">{{ user.username }}</span>
           </p>

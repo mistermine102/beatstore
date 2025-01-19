@@ -35,6 +35,10 @@ const schema = new Schema({
   playable: Boolean,
   totalLikes: Number,
   totalStreams: Number,
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 })
 
 // Add a text index on the title to allow text search

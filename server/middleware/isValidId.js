@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 import AppError from '../classes/AppError.js'
 
-export default field => {
+const isValidId = field => {
   return (req, res, next) => {
     const id = req.params[field]
 
@@ -9,3 +9,5 @@ export default field => {
     next()
   }
 }
+
+export default isValidId

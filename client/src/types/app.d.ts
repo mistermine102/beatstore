@@ -106,6 +106,7 @@ interface GetTracksFilters {
   genre?: string
   authorId?: string
   phrase?: string
+  liked?: boolean
 }
 
 // Define the filter interfaces

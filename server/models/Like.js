@@ -11,7 +11,10 @@ const schema = new Schema({
     type: Schema.Types.ObjectId,
     refPath: 'trackType',
   },
-  createdAt: Schema.Types.Date,
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 })
 
 const Like = mongoose.model('Like', schema)

@@ -14,8 +14,8 @@ const { id: profileId } = route.params as {
   id: string
 }
 
-const { profile, getProfile, toggleFollow, isLoading } = useProfile()
-const { tracks, toggleLike, getTracks, isMore, isLoadingMore, loadMoreTracks } = useTracks()
+const { profile, getProfile, toggleFollow, isLoading: isLoadingProfile } = useProfile()
+const { tracks, toggleLike, isLoading: isLoadingTracks , getTracks, isMore, isLoadingMore, loadMoreTracks } = useTracks()
 
 getProfile(profileId)
 getTracks('all', { filters: { authorId: profileId } })
@@ -31,7 +31,7 @@ watch(
 
 <template>
   <div>
-    <div v-if="isLoading" class="flex justify-center">
+    <div v-if="isLoadingProfile" class="flex justify-center">
       <div class="loader"></div>
     </div>
     <div v-else-if="!profile">NO PROFILE</div>
@@ -44,7 +44,7 @@ watch(
         >
           <span>Edit</span>
         </button>
-        <img class="image-large rounded-regular" />
+        <img class="image-large rounded-regular" :src="profile.image.url" />
         <div class="ml-4 flex flex-col flex-1">
           <div>
             <h2 class="text-left text-4xl mb-1">{{ profile.username }}</h2>
@@ -73,6 +73,7 @@ watch(
         <h2 class="base-heading mb-4">Uploads</h2>
         <TracksContainer
           :tracks="tracks"
+          :is-loading="isLoadingTracks"
           :is-loading-more="isLoadingMore"
           :is-more="isMore"
           @loaded-more="loadMoreTracks('all', { filters: { authorId: profileId } })"

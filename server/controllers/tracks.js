@@ -161,7 +161,7 @@ export const deleteTrack = async (req, res) => {
   //update author's uploads
   const author = await User.findById(req.userId)
 
-  author.uploads = author.uploads.filter((trackId) => !trackId.equals(track._id))
+  author.uploads = author.uploads.filter(trackId => !trackId.equals(track._id))
   author.totalUploads--
 
   await author.save()
@@ -182,7 +182,10 @@ export const getTracks = async (req, res) => {
   if (authorId) filter.author = authorId
 
   if (liked && req.isAuthenticated) {
-    //find tracks liked by
+    //find ids of tracks liked by a user and add them to the filter
+    const likes = await Like.find({ userId: req.userId })
+    const trackIds = likes.map(el => el.trackId)
+    filter._id = { $in: trackIds }
   }
 
   // Apply phrase-based search if 'phrase' is provided
@@ -207,7 +210,7 @@ export const getTracks = async (req, res) => {
           // Split the values by commas and filter out any empty values
           const values = req.query[key]
             .split(',')
-            .map((val) => val.trim())
+            .map(val => val.trim())
             .filter(Boolean)
           // Apply the filter using $in to match any of the provided values
           filter[key] = { $in: values }
@@ -230,14 +233,14 @@ export const getTracks = async (req, res) => {
 
   //only populate username on author
   const tracks = await Track.find(filter).skip(start).limit(amount).populate('author', 'username')
-  const trackIds = tracks.map((el) => el._id)
+  const trackIds = tracks.map(el => el._id)
 
   //create an object where keys are trackIds and values are whether they're liked
   const likes = await isLiked(req, trackIds)
 
   //promise.all to process tracks in parallel
   const formattedTracks = await Promise.all(
-    tracks.map(async (track) => {
+    tracks.map(async track => {
       const formattedTrack = await formatTrackData(track)
       formattedTrack.isLiked = likes[track._id]
       return formattedTrack

@@ -15,7 +15,10 @@ const schema = new Schema({
       ref: 'Track',
     },
   ],
-  createdAt: Date,
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 })
 const User = mongoose.model('User', schema)
 

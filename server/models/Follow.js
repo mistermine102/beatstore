@@ -2,17 +2,21 @@ import mongoose from 'mongoose'
 import { Schema } from 'mongoose'
 
 const schema = new Schema({
-  index: String,
-  //index = "Follower[followerId]Followed[followedId]"
+  _id: String,
   followerId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
+    required: true,
   },
   followedId: {
     type: Schema.Types.ObjectId,
-    refPath: 'User',
+    ref: 'User',
+    required: true,
   },
-  createdAt: Schema.Types.Date,
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 })
 
 const Follow = mongoose.model('Follow', schema)
