@@ -5,7 +5,7 @@ import Audio from '../classes/Audio.js'
 import getAudioDuration from '../utils/getAudioDuration.js'
 import User from '../models/User.js'
 import Like from '../models/Like.js'
-import isLiked from '../isLiked.js'
+import checkUserInteraction from '../checkUserInteraction.js'
 import Sharp from 'sharp'
 import { getAverageColor } from 'fast-average-color-node'
 import formatTrackData from '../formatTrackData.js'
@@ -236,7 +236,7 @@ export const getTracks = async (req, res) => {
   const trackIds = tracks.map(el => el._id)
 
   //create an object where keys are trackIds and values are whether they're liked
-  const likes = await isLiked(req, trackIds)
+  const likes = await checkUserInteraction(req, trackIds, 'track')
 
   //promise.all to process tracks in parallel
   const formattedTracks = await Promise.all(
@@ -264,7 +264,7 @@ export const getSingleTrack = async (req, res) => {
   const formattedTrack = await formatTrackData(track)
 
   // Determine whether the track is liked by the user
-  formattedTrack.isLiked = await isLiked(req, track._id)
+  formattedTrack.isLiked = await checkUserInteraction(req, track._id, 'track')
 
   // Respond with the track data
   res.json({

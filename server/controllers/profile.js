@@ -4,6 +4,7 @@ import Follow from '../models/Follow.js'
 import Sharp from 'sharp'
 import { getAverageColor } from 'fast-average-color-node'
 import { uploadFileToS3, generateSignedUrl } from '../s3.js'
+import checkUserInteraction from '../checkUserInteraction.js'
 
 export const getSingleProfile = async (req, res) => {
   const { profileId: userId } = req.params
@@ -14,18 +15,53 @@ export const getSingleProfile = async (req, res) => {
   const formattedProfile = { ...user._doc }
 
   //determine if a profile is followed by a user
-  formattedProfile.isFollowed = false
-
-  if (req.isAuthenticated) {
-    const followId = 'Follower' + req.userId + 'Followed' + userId
-    const follow = await Follow.findById(followId)
-    if (follow) formattedProfile.isFollowed = true
-  }
+  formattedProfile.isFollowed = await checkUserInteraction(req, userId, 'profile')
 
   //attach profile image url
   formattedProfile.image.url = await generateSignedUrl(user.image.filename)
 
   res.json({ profile: formattedProfile })
+}
+
+export const getProfiles = async (req, res) => {
+  const start = parseInt(req.query.start) || 0 // Defaults to 0 if not provided
+  const amount = parseInt(req.query.amount) || 10 // Defaults to 10 if not provided
+  const { followed } = req.query
+
+  const filter = {}
+
+  if (followed && req.isAuthenticated) {
+    //find ids of tracks liked by a user and add them to the filter
+    const follows = await Follow.find({ followerId: req.userId })
+    const followsIds = follows.map(el => el.followedId)
+    filter._id = { $in: followsIds }
+  }
+
+  //only populate username on author
+  const profiles = await User.find(filter).skip(start).limit(amount)
+  const profileIds = profiles.map(el => el._id)
+
+  //create an object where keys are profileIds and values are whether they're followed
+  const follows = await checkUserInteraction(req, profileIds, 'profile')
+
+  const formattedProfiles = await Promise.all(
+    profiles.map(async profile => {
+      const formattedProfile = { ...profile._doc }
+
+      //determine if a profile is followed by a user
+      formattedProfile.isFollowed = follows[profile._id]
+
+      //attach profile image url
+      formattedProfile.image.url = await generateSignedUrl(profile.image.filename)
+      return formattedProfile
+    })
+  )
+
+  // Check if there are more tracks available in the database
+  const totalProfilesCount = await User.countDocuments(filter)
+  const isMore = totalProfilesCount > start + amount
+
+  res.json({ profiles: formattedProfiles, isMore })
 }
 
 export const toggleFollow = async (req, res) => {
@@ -36,7 +72,7 @@ export const toggleFollow = async (req, res) => {
   if (!followedUser) throw new AppError('USER_NOT_FOUND', 400)
 
   //determine wheter we follow or unfollow
-  const followId = 'Follower' + followerId + 'Followed' + followedId
+  const followId = 'Follower-' + followerId + 'Followed-' + followedId
   const follow = await Follow.findById(followId)
 
   if (!follow) {
