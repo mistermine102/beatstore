@@ -12,8 +12,8 @@ function useProfile() {
 
   const wrapGetProfile = useAsyncWrap()
 
-  function getProfile(profileId: string) {
-    wrapGetProfile.run(async () => {
+  async function getProfile(profileId: string) {
+    await wrapGetProfile.run(async () => {
       const profileResponse = await appApi.get<{ profile: Profile }>(`/profile/${profileId}`)
       profile.value = profileResponse.data.profile
     })

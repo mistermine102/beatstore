@@ -1,4 +1,5 @@
 import { computed, ref, watch, type Ref } from 'vue'
+import { GENRES, KEYS } from '../constants'
 
 export default function useFilters(trackType: Ref<TrackType>) {
   // Define the filters
@@ -13,52 +14,14 @@ export default function useFilters(trackType: Ref<TrackType>) {
     id: 'key',
     type: 'set',
     label: 'Keys',
-    values: [
-      ['A Major', false],
-      ['A Minor', false],
-      ['A# Major', false],
-      ['A# Minor', false],
-      ['B Major', false],
-      ['B Minor', false],
-      ['C Major', false],
-      ['C Minor', false],
-      ['C# Major', false],
-      ['C# Minor', false],
-      ['D Major', false],
-      ['D Minor', false],
-      ['D# Major', false],
-      ['D# Minor', false],
-      ['E Major', false],
-      ['E Minor', false],
-      ['F Major', false],
-      ['F Minor', false],
-      ['F# Major', false],
-      ['F# Minor', false],
-      ['G Major', false],
-      ['G Minor', false],
-      ['G# Major', false],
-      ['G# Minor', false],
-    ],
+    values: KEYS.map(el => [el, false]),
   })
 
   const genreFilter = ref<Filter>({
     id: 'genre',
     type: 'set',
     label: 'Genres',
-    values: [
-      ['Trap', false],
-      ['BoomBap', false],
-      ['Rage', false],
-      ['Drill', false],
-      ['Hip Hop', false],
-      ['Pop', false],
-      ['Rock', false],
-      ['Jazz', false],
-      ['Classical', false],
-      ['Electronic', false],
-      ['House', false],
-      ['Techno', false],
-    ],
+    values: GENRES.map(el => [el, false]),
   })
 
   // Define filters for each track type
@@ -97,10 +60,10 @@ export default function useFilters(trackType: Ref<TrackType>) {
           }
           break
         case 'set':
-          if (filter.values.find((el) => el[1])) {
+          if (filter.values.find(el => el[1])) {
             filterObject[filter.id] = filter.values
-              .filter((el) => el[1])
-              .map((el) => el[0])
+              .filter(el => el[1])
+              .map(el => el[0])
               .join(',')
           }
           break
@@ -112,7 +75,7 @@ export default function useFilters(trackType: Ref<TrackType>) {
 
   // Function to remove a filter
   function removeFilter(filterId: string, value?: string) {
-    const filter = currentFilters.value.find((el) => el.id === filterId)
+    const filter = currentFilters.value.find(el => el.id === filterId)
     if (!filter) return console.log('NO FILTER FOUND')
 
     switch (filter.type) {
@@ -124,7 +87,7 @@ export default function useFilters(trackType: Ref<TrackType>) {
         filter.value.max = ''
         break
       case 'set':
-        filter.values.find((el) => el[0] === value)![1] = false
+        filter.values.find(el => el[0] === value)![1] = false
         break
     }
   }

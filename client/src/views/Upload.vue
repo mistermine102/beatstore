@@ -7,6 +7,7 @@ import useAsyncWrap from '../composables/useAsyncWrap'
 import appApi from '../api/appApi'
 import { useToastStore } from '../stores/toast'
 import { useRouter } from 'vue-router'
+import { KEYS, GENRES } from '../constants'
 
 interface NewTrack {
   title: string
@@ -32,10 +33,6 @@ interface NewSample extends NewTrack {
 }
 
 interface NewDrumkit extends NewTrack {}
-
-//defining constants
-const KEYS = ['A Minor', 'A# Minor', 'B Minor', 'C Minor', 'C# Minor', 'D Minor', 'D# Minor']
-const GENRES = ['Trap', 'Drill', 'Boombap', 'Jazz rap', 'Rage', 'R&b']
 
 const TRACK_TYPES_BUTTONS = [
   {
@@ -149,7 +146,7 @@ function uploadTrack(e: Event) {
   <div class="mt-16">
     <h1 class="base-heading mb-4">Upload</h1>
     <div class="grid grid-cols-3 gap-x-8">
-      <button v-for="btn in TRACK_TYPES_BUTTONS" @click="uploadType = btn.type" :class="btn.type === uploadType ? 'base-btn' : 'base-btn-alt'">
+      <button  v-for="btn in TRACK_TYPES_BUTTONS" :disabled="btn.type === 'drumkit'" @click="uploadType = btn.type" :class="[btn.type === uploadType ? 'base-btn' : 'base-btn-alt', btn.type === 'drumkit' ? 'opacity-50' : undefined ]">
         {{ btn.title }}
       </button>
     </div>
@@ -157,7 +154,7 @@ function uploadTrack(e: Event) {
       <!-- if a field exists on schema (isn't undefined) then display it's input -->
       <div v-if="newTrack.audio !== undefined">
         <h2 class="mt-8 mb-2 text-lg">Audio file</h2>
-        <UploadFileContainer @file-selected="(file) => newTrack.audio = file" id="audio" max-file-size="25MB" accept="audio/*">
+        <UploadFileContainer @file-selected="file => (newTrack.audio = file ? file : null)" id="audio" max-file-size="25MB" accept="audio/*">
           <template #icon>
             <UploadIcon class="w-[48px]" />
           </template>
@@ -169,9 +166,11 @@ function uploadTrack(e: Event) {
         <input v-if="newTrack.title !== undefined" v-model="newTrack.title" id="title" class="base-input w-full" type="text" placeholder="Title" />
         <input v-if="newTrack.bpm !== undefined" v-model="newTrack.bpm" id="bpm" class="base-input w-full" type="text" placeholder="Bpm" />
         <select v-if="newTrack.key !== undefined" v-model="newTrack.key" id="key" class="base-input w-full">
+          <option value="" disabled selected>Key</option>
           <option v-for="key in KEYS" :value="key">{{ key }}</option>
         </select>
         <select v-if="newTrack.genre !== undefined" v-model="newTrack.genre" id="genre" class="base-input w-full">
+          <option value="" disabled selected>Genre</option>
           <option v-for="genre in GENRES" :value="genre">{{ genre }}</option>
         </select>
       </div>
@@ -180,7 +179,7 @@ function uploadTrack(e: Event) {
         <h2 class="mt-8 mb-2 text-lg">Image</h2>
         <UploadFileContainer
           v-if="newTrack.image !== undefined"
-          @file-selected="file => (newTrack.image = file)"
+          @file-selected="file => (newTrack.image = file ? file : null)"
           class="w-1/3"
           id="image"
           max-file-size="25MB"

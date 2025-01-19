@@ -53,7 +53,7 @@ watch(activeFilters, () => {
         </div>
         <FiltersPanel class="flex gap-x-8 mb-1" :filters="currentFilters" />
         <CurrentFilters :filters="currentFilters" @removeFilter="removeFilter" />
-        <TracksContainer :tracks="tracks" :isLoading="isLoading" :isLoadingMore="isLoadingMore" :isMore="isMore" @likeToggled="toggleLike" @loadedMore="loadMoreTracks(trackType, { filters: activeFilters })" />
+        <TracksContainer class="mt-4" :tracks="tracks" :isLoading="isLoading" :isLoadingMore="isLoadingMore" :isMore="isMore" @likeToggled="toggleLike" @loadedMore="loadMoreTracks(trackType, { filters: activeFilters })" />
       </div>
     </div>
   </div>

@@ -10,7 +10,7 @@ const emit = defineEmits(['likeToggled'])
     <div class="flex gap-x-4 col-span-2">
       <img class="image-thumbnail" :src="track.image.url" alt="Track image" />
       <div>
-        <router-link :to="`/track/${track.type}/${track._id}`">
+        <router-link :to="`/track/${track._id}`">
           <h2 class="whitespace-nowrap text-xl">{{ track.title }}</h2>
         </router-link>
         <p class="text-textLightGrey" v-if="track.playable">{{ track.audio.duration.formatted }}</p>

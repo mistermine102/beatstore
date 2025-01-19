@@ -92,24 +92,15 @@ const addDummyTracks = async () => {
       totalLikes: 0,
       totalStreams: 0,
     })
-
-    const newDrumkit = new Track({
-      title: 'Drumkit ' + i,
-      type: 'drumkit',
-      image: {
-        filename: 'rudimentary-image.png',
-      },
-      author: '6772fc0631d11efd2fe7f72f',
-      totalLikes: 0,
-    })
-    docs.push(newBeat, newSample, newDrumkit)
+    
+    docs.push(newBeat, newSample)
   }
 
   //update author uploads
   const author = await User.findById('6772fc0631d11efd2fe7f72f')
 
   author.uploads.push(...docs.map(el => el._id))
-  author.totalUploads += 150
+  author.totalUploads += 100
 
   await author.save()
 

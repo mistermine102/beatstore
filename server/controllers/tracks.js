@@ -55,6 +55,8 @@ const FILTER_SCHEMAS = {
 export const uploadTrack = async (req, res) => {
   const { type } = req.body
 
+  if(type === 'drumkit') throw new AppError("Drumkits not available yet", 400)
+
   const uploadSchema = UPLOAD_SCHEMAS[type]
   const newTrack = new Track()
 

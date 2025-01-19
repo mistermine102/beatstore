@@ -104,15 +104,13 @@ export const editProfile = async (req, res) => {
   const user = await User.findById(req.userId)
 
   //authorize
-  if (!user._id.equals(req.userId)) {
-    throw new AppError('Not authorized', 403)
-  }
-
+  if (!user._id.equals(req.userId)) throw new AppError('Not authorized', 403)
+  
   //edit user
   const { username, specification } = req.body
 
   user.username = username
-  user.specification = specification
+  user.specification = specification || ''
 
   //save user
   await user.save()
@@ -123,16 +121,10 @@ export const editProfile = async (req, res) => {
 export const uploadProfileImage = async (req, res) => {
   const user = await User.findById(req.userId)
 
-  //authorize
-  if (!user._id.equals(req.userId)) {
-    throw new AppError('Not authorized', 403)
-  }
-
-  //check for image
-  if (!req.file) {
-    throw new AppError('No image found', 400)
-  }
-
+  //authorize and validate
+  if (!user._id.equals(req.userId))  throw new AppError('NOT_AUTHORIZED', 403)
+  if (!req.file) throw new AppError('NO_IMAGE_FOUND', 400)
+  
   const processedBuffer = await Sharp(req.file.buffer).resize(300, 300).toBuffer()
 
   const filename = await uploadFileToS3(processedBuffer)

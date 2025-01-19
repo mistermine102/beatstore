@@ -39,7 +39,7 @@ watch(
       <div class="base-container flex mb-8 relative">
         <button
           v-if="authStore.user && authStore.user._id === profile._id"
-          @click="$router.push('/profile/' + '123' + '/edit')"
+          @click="$router.push(`/profile/${profile._id}/edit`)"
           class="absolute flex items-center gap-1 top-0 right-0 p-4"
         >
           <span>Edit</span>

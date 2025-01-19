@@ -14,7 +14,11 @@ const { user } = storeToRefs(authStore)
 <template>
   <header class="fixed z-[1] top-0 right-0 left-0 bg-darkGrey px-32">
     <nav class="grid grid-cols-4 py-4 px-16 items-center">
-      <div class="flex justify-start">Wavstand</div>
+      <div class="flex justify-start">
+        <router-link to="/">
+          Wavstand
+        </router-link>
+      </div>
       <ul class="col-span-2 flex items-center justify-center gap-8">
         <li>
           <router-link to="/" class="flex gap-1 items-center">
