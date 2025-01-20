@@ -9,8 +9,10 @@ import sharp from 'sharp' // For generating PNG image
  */
 async function parseAudioBuffer(audioBuffer) {
   try {
+    //decode and extract PCM data from audio
     const decodedAudio = await decodeAudio(audioBuffer)
-    return decodedAudio.getChannelData(0) // Use the first channel
+    ;('Access the PCM data for the first channel (left in stereo, or the only one in mono).')
+    return decodedAudio.getChannelData(0)
   } catch (err) {
     throw new Error('Failed to parse audio buffer: ' + err.message)
   }
@@ -67,9 +69,7 @@ async function generateWaveformPng(waveformData, width = 800, height = 200, opti
 
   // Scale the waveform data to match the number of bars
   const scaleFactor = waveformData.length / totalBars
-  const scaledData = Array.from({ length: totalBars }, (_, i) =>
-    Math.max(...waveformData.slice(Math.floor(i * scaleFactor), Math.floor((i + 1) * scaleFactor)))
-  )
+  const scaledData = Array.from({ length: totalBars }, (_, i) => Math.max(...waveformData.slice(Math.floor(i * scaleFactor), Math.floor((i + 1) * scaleFactor))))
 
   // Draw bars
   ctx.fillStyle = barColor
