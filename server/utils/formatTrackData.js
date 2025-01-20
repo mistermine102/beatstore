@@ -1,4 +1,4 @@
-import { generateSignedUrl } from './s3.js'
+import { generateSignedUrl } from '../s3.js'
 
 export default async track => {
   const formattedTrack = { ...track._doc }
@@ -12,6 +12,7 @@ export default async track => {
       ...formattedTrack.audio._doc,
       url: await generateSignedUrl(formattedTrack.audio.filename),
     }
+    formattedTrack.audio.waveform.url = await generateSignedUrl(formattedTrack.audio.waveform.filename)
   }
 
   return formattedTrack

@@ -1,6 +1,6 @@
-import Follow from './models/Follow.js'
-import Like from './models/Like.js'
-import AppError from './classes/AppError.js'
+import Follow from '../models/Follow.js'
+import Like from '../models/Like.js'
+import AppError from '../classes/AppError.js'
 
 const checkUserInteraction = async (req, ids, type = 'track') => {
   try {

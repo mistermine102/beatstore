@@ -59,6 +59,9 @@ const addDummyTracks = async () => {
           seconds: 69,
           formatted: '1m 9s',
         },
+        waveform: {
+          filename: 'ccb77702c9bba78e60abd7e21dae6f5dcecfc2fed6fd815a75fcab6a9ebaaf5c ',
+        },
       },
       author: '6772fc0631d11efd2fe7f72f',
       bpm,
@@ -84,6 +87,9 @@ const addDummyTracks = async () => {
           seconds: 69,
           formatted: '1m 9s',
         },
+        waveform: {
+          filename: 'ccb77702c9bba78e60abd7e21dae6f5dcecfc2fed6fd815a75fcab6a9ebaaf5c ',
+        },
       },
       author: '6772fc0631d11efd2fe7f72f',
       bpm,
@@ -92,7 +98,7 @@ const addDummyTracks = async () => {
       totalLikes: 0,
       totalStreams: 0,
     })
-    
+
     docs.push(newBeat, newSample)
   }
 

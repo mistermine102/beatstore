@@ -4,7 +4,7 @@ import Follow from '../models/Follow.js'
 import Sharp from 'sharp'
 import { getAverageColor } from 'fast-average-color-node'
 import { uploadFileToS3, generateSignedUrl } from '../s3.js'
-import checkUserInteraction from '../checkUserInteraction.js'
+import checkUserInteraction from '../utils/checkUserInteraction.js'
 
 export const getSingleProfile = async (req, res) => {
   const { profileId: userId } = req.params

@@ -52,6 +52,9 @@ interface BasePlayableTrack extends BaseTrack {
       formatted: string
       seconds: number
     }
+    waveform: {
+      url: string
+    }
   }
   totalStreams: number
 }

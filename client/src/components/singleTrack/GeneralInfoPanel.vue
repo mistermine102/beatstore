@@ -25,7 +25,7 @@ const { track } = defineProps<{ track: Track }>()
       <div class="mt-4" v-if="track.playable">
         <div class="flex items-center gap-4 mb-2">
           <PlayPauseBtn :track="track" class="scale-150"></PlayPauseBtn>
-          <div class="w-[600px] h-[100px] bg-background rounded-regular"></div>
+          <img :src="track.audio.waveform.url" class="w-[800px] object-contain">
         </div>
         <p>{{ track.audio.duration.formatted }}</p>
       </div>

@@ -4,6 +4,9 @@ import { Schema } from 'mongoose'
 const audioSchema = new Schema({
   _id: false,
   filename: String,
+  waveform: {
+    filename: String,
+  },
   duration: {
     seconds: Number,
     formatted: String,
@@ -42,7 +45,7 @@ const schema = new Schema({
 })
 
 // Add a text index on the title to allow text search
-schema.index({ title: 'text' });
+schema.index({ title: 'text' })
 
 const Track = mongoose.model('Track', schema)
 

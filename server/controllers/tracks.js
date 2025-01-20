@@ -5,10 +5,11 @@ import Audio from '../classes/Audio.js'
 import getAudioDuration from '../utils/getAudioDuration.js'
 import User from '../models/User.js'
 import Like from '../models/Like.js'
-import checkUserInteraction from '../checkUserInteraction.js'
+import checkUserInteraction from '../utils/checkUserInteraction.js'
 import Sharp from 'sharp'
 import { getAverageColor } from 'fast-average-color-node'
-import formatTrackData from '../formatTrackData.js'
+import formatTrackData from '../utils/formatTrackData.js'
+import generateWaveformPng from '../utils/generateWaveformPng.js'
 
 const UPLOAD_SCHEMAS = {
   beat: {
@@ -55,7 +56,7 @@ const FILTER_SCHEMAS = {
 export const uploadTrack = async (req, res) => {
   const { type } = req.body
 
-  if(type === 'drumkit') throw new AppError("Drumkits not available yet", 400)
+  if (type === 'drumkit') throw new AppError('Drumkits not available yet', 400)
 
   const uploadSchema = UPLOAD_SCHEMAS[type]
   const newTrack = new Track()
@@ -90,6 +91,10 @@ export const uploadTrack = async (req, res) => {
     })
 
     newTrack.audio = audio
+
+    const waveformPngBuffer = await generateWaveformPng(req.file.buffer);
+    const waveformFilename = await uploadFileToS3(waveformPngBuffer)
+    newTrack.audio.waveform.filename = waveformFilename
   }
 
   //save a track
