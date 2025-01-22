@@ -42,6 +42,12 @@ const addDummyTracks = async () => {
 
   let bpm, genre, key
 
+  const waveformSamples = []
+
+  while (waveformSamples.length < 2000) {
+    waveformSamples.push(Math.random() * (Math.random() > 0.5 ? 0.8 : 0.5)) // Random fluctuation
+  }
+
   for (let i = 0; i < 50; i++) {
     bpm = Math.floor(Math.random() * 100) + 90
     genre = GENRES[Math.floor(Math.random() * GENRES.length)]
@@ -60,7 +66,7 @@ const addDummyTracks = async () => {
           formatted: '1m 9s',
         },
         waveform: {
-          filename: 'ccb77702c9bba78e60abd7e21dae6f5dcecfc2fed6fd815a75fcab6a9ebaaf5c ',
+          samples: waveformSamples,
         },
       },
       author: '6772fc0631d11efd2fe7f72f',
@@ -88,7 +94,7 @@ const addDummyTracks = async () => {
           formatted: '1m 9s',
         },
         waveform: {
-          filename: 'ccb77702c9bba78e60abd7e21dae6f5dcecfc2fed6fd815a75fcab6a9ebaaf5c ',
+          samples: waveformSamples,
         },
       },
       author: '6772fc0631d11efd2fe7f72f',

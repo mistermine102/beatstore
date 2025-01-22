@@ -37,7 +37,7 @@ const { user } = storeToRefs(authStore)
             <HeartIcon />
           </router-link>
           <p>
-            Welcome <span class="text-textPrimary">{{ user.username }}</span>
+            Welcome <span class="text-primary">{{ user.username }}</span>
           </p>
           <ProfilePopover />
         </div>

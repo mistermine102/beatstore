@@ -1,8 +1,19 @@
 <script setup lang="ts">
 import PlayPauseBtn from '../PlayPauseBtn.vue'
 import TrackOptionsPopover from './TrackOptionsPopover.vue'
+import InteractiveWaveform from '../InteractiveWaveform.vue'
+import { useAudioPlayerStore } from '../../stores/audioPlayer'
 
 const { track } = defineProps<{ track: Track }>()
+const audioPlayerStore = useAudioPlayerStore()
+
+async function handleWaveformClick(newProgress: number) {
+  if (!audioPlayerStore.track || track._id !== audioPlayerStore.track._id) {
+    audioPlayerStore.setNewTrack(track as PlayableTrack, { progress: newProgress * 100, isPaused: false })
+  } else {
+    audioPlayerStore.setProgress(newProgress * 100)
+  }
+}
 </script>
 
 <template>
@@ -25,9 +36,13 @@ const { track } = defineProps<{ track: Track }>()
       <div class="mt-4" v-if="track.playable">
         <div class="flex items-center gap-4 mb-2">
           <PlayPauseBtn :track="track" class="scale-150"></PlayPauseBtn>
-          <img :src="track.audio.waveform.url" class="w-[800px] object-contain">
         </div>
         <p>{{ track.audio.duration.formatted }}</p>
+        <InteractiveWaveform
+          :waveform-data="track.audio.waveform.samples"
+          :progress="audioPlayerStore.track?._id === track._id ? audioPlayerStore.progress / 100 : 0"
+          @progress-click="handleWaveformClick"
+        />
       </div>
     </div>
   </div>

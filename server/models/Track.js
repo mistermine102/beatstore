@@ -5,7 +5,7 @@ const audioSchema = new Schema({
   _id: false,
   filename: String,
   waveform: {
-    filename: String,
+    samples: [Number],
   },
   duration: {
     seconds: Number,

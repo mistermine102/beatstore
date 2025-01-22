@@ -9,7 +9,6 @@ export default {
         background: 'var(--background)',
         textDarkGrey: 'var(--textDarkGrey)',
         textLightGrey: 'var(--textLightGrey)',
-        textPrimary: 'var(--textPrimary)',
         darkGrey: 'var(--darkGrey)',
       },
       borderRadius: {

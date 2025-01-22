@@ -41,7 +41,7 @@ const formattedFileSize = computed(() => {
       </div>
       <div v-else class="flex flex-col items-center justify-center gap-4">
         <span>{{ file.name }}</span>
-        <span class="text-textPrimary">{{ formattedFileSize }}</span>
+        <span class="text-primary">{{ formattedFileSize }}</span>
         <span class="text-gray-300 text-sm">Max file size is {{ maxFileSize }}</span>
       </div>
     </label>

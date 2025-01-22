@@ -56,15 +56,15 @@ watch(
           <div class="grid grid-cols-3 gap-8">
             <div class="bg-darkGrey p-4 rounded-regular">
               <p>Followers</p>
-              <p class="text-3xl font-semibold text-textPrimary">{{ profile.totalFollows }}</p>
+              <p class="text-3xl font-semibold text-primary">{{ profile.totalFollows }}</p>
             </div>
             <div class="bg-darkGrey p-4 rounded-regular">
               <p>Total uploads</p>
-              <p class="text-3xl font-semibold text-textPrimary">{{ profile.totalUploads }}</p>
+              <p class="text-3xl font-semibold text-primary">{{ profile.totalUploads }}</p>
             </div>
             <div class="bg-darkGrey p-4 rounded-regular">
               <p>Specification</p>
-              <p class="text-3xl font-semibold text-textPrimary">{{ profile.specification || 'None' }}</p>
+              <p class="text-3xl font-semibold text-primary">{{ profile.specification || 'None' }}</p>
             </div>
           </div>
         </div>

@@ -24,6 +24,7 @@ interface BaseTrack {
     username: string
     _id: string
   }
+  createdAt: Date
   price?: {
     currency: string
     value: number
@@ -53,7 +54,7 @@ interface BasePlayableTrack extends BaseTrack {
       seconds: number
     }
     waveform: {
-      url: string
+      samples: number[]
     }
   }
   totalStreams: number

@@ -19,14 +19,32 @@ export const useAudioPlayerStore = defineStore('audioPlayerStore', () => {
     audio.value.paused ? audio.value.play() : audio.value.pause()
   }
 
-  function setNewTrack(newTrack: PlayableTrack) {
+  function setNewTrack(newTrack: PlayableTrack, initialState?: { progress?: number; isPaused?: boolean }) {
     //set new track as the one currently playing
     track.value = newTrack
+
+    //set initial progress before loading data to make it feel smoother
+    if(initialState && initialState.progress) {
+      progress.value = initialState.progress
+    }
 
     //set listeners
     audio.value.onloadeddata = () => {
       // set duration when audio is loaded
       duration.value = audio.value.duration
+
+      //set initial state
+      if (initialState) {
+        const { progress, isPaused } = initialState
+
+        if (progress) {
+          audio.value.currentTime = (progress / 100) * audio.value.duration
+        }
+
+        if (isPaused !== undefined) {
+          isPaused ? audio.value.pause() : audio.value.play()
+        }
+      }
     }
 
     audio.value.ontimeupdate = () => {
@@ -59,7 +77,7 @@ export const useAudioPlayerStore = defineStore('audioPlayerStore', () => {
   }
 
   function setVolume(newVolume: number) {
-    //volume isn't updated with listener beacuse of value differences 
+    //volume isn't updated with listener beacuse of value differences
     //(volume.value is in range 0 to 100, audio.volume is in range 0 to 1)
 
     //update state variable
@@ -85,6 +103,7 @@ export const useAudioPlayerStore = defineStore('audioPlayerStore', () => {
 
     //update audio progress
     const newCurrentTime = (newProgress / 100) * audio.value.duration
+
     audio.value.currentTime = newCurrentTime
 
     // pause for a little bit to prevent stutters

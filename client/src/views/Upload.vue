@@ -137,7 +137,7 @@ function uploadTrack(e: Event) {
     }
 
     toastStore.show({ type: 'success', title: 'Uploaded succesfully' })
-    router.push('/')
+    router.push(`/track/${response.data.trackId}`)
   })
 }
 </script>

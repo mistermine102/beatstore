@@ -12,7 +12,6 @@ export default async track => {
       ...formattedTrack.audio._doc,
       url: await generateSignedUrl(formattedTrack.audio.filename),
     }
-    formattedTrack.audio.waveform.url = await generateSignedUrl(formattedTrack.audio.waveform.filename)
   }
 
   return formattedTrack

@@ -9,7 +9,7 @@ import checkUserInteraction from '../utils/checkUserInteraction.js'
 import Sharp from 'sharp'
 import { getAverageColor } from 'fast-average-color-node'
 import formatTrackData from '../utils/formatTrackData.js'
-import generateWaveformPng from '../utils/generateWaveformPng.js'
+import getWaveformData from '../utils/getWaveformData.js'
 
 const UPLOAD_SCHEMAS = {
   beat: {
@@ -91,10 +91,7 @@ export const uploadTrack = async (req, res) => {
     })
 
     newTrack.audio = audio
-
-    const waveformPngBuffer = await generateWaveformPng(req.file.buffer);
-    const waveformFilename = await uploadFileToS3(waveformPngBuffer)
-    newTrack.audio.waveform.filename = waveformFilename
+    newTrack.audio.waveform.samples = await getWaveformData(req.file.buffer)
   }
 
   //save a track
@@ -239,7 +236,7 @@ export const getTracks = async (req, res) => {
   }
 
   //only populate username on author
-  const tracks = await Track.find(filter).skip(start).limit(amount).populate('author', 'username')
+  const tracks = await Track.find(filter).sort({ createdAt: -1 }).skip(start).limit(amount).populate('author', 'username')
   const trackIds = tracks.map(el => el._id)
 
   //create an object where keys are trackIds and values are whether they're liked
