@@ -6,6 +6,7 @@ import validate from '../middleware/validate.js'
 import { trackUpload, trackImageUpload } from '../multer.js'
 import { getTracks, uploadTrack, streamTrack, toggleTrackLike, uploadTrackImage, getSingleTrack, deleteTrack } from '../controllers/tracks.js'
 import isValidId from '../middleware/isValidId.js'
+import { addComment, deleteComment, toggleCommentScore } from '../controllers/trackComments.js'
 
 const router = express.Router()
 
@@ -41,6 +42,20 @@ const uploadTrackValidators = [
   body('title').exists().withMessage('Title cannot be empty').trim().isString().withMessage('Title must be a string').isLength({ min: 4 }),
 ]
 
+export const addCommentValidators = [
+  body('content')
+    .exists()
+    .withMessage('Content is required')
+    .isString()
+    .withMessage('Content must be a string')
+    .trim()
+    .withMessage('Content cannot have leading or trailing spaces')
+    .notEmpty()
+    .withMessage('Content cannot be empty')
+    .isLength({ min: 1, max: 500 })
+    .withMessage('Content must be between 1 and 500 characters'),
+]
+
 router.get('/:type', getTracksValidators, validate, tryCatch(getTracks))
 
 router.get('/single/:trackId', isValidId('trackId'), tryCatch(getSingleTrack))
@@ -54,5 +69,11 @@ router.post('/:trackId/image', isAuthenticated, isValidId('trackId'), trackImage
 router.post('/:trackId/like', isAuthenticated, isValidId('trackId'), tryCatch(toggleTrackLike))
 
 router.post('/:trackId/stream', isValidId('trackId'), tryCatch(streamTrack))
+
+router.post('/:trackId/comment', isAuthenticated, isValidId('trackId'), addCommentValidators, validate, tryCatch(addComment))
+
+router.delete('/:trackId/comment/:commentId', isAuthenticated, isValidId('trackId'), isValidId('commentId'), tryCatch(deleteComment))
+
+router.patch('/:trackId/comment/:commentId', isAuthenticated, isValidId('trackId'), isValidId('commentId'), tryCatch(toggleCommentScore))
 
 export default router

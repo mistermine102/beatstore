@@ -35,7 +35,7 @@ const emit = defineEmits(['likeToggled'])
       <p v-if="track.genre !== undefined">Genre: {{ track.genre || 'Unknown' }}</p>
     </div>
     <div>
-      <p class="text-sm text-textLightGrey mb-2">{{ moment(track.createdAt).format('LL') }}</p>
+      <p class="text-textLightGrey mb-2">{{ moment(track.createdAt).format('LL') }}</p>
     </div>
   </div>
 </template>

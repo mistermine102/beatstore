@@ -316,3 +316,4 @@ export const streamTrack = async (req, res) => {
 
   res.json({ trackId: track._id })
 }
+

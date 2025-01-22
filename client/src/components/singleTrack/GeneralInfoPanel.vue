@@ -29,7 +29,7 @@ async function handleWaveformClick(newProgress: number) {
     <div class="absolute top-4 right-4">
       <TrackOptionsPopover :track="track" />
     </div>
-    <img v-if="track.image" :src="track.image.url" alt="Track" />
+    <img v-if="track.image" :src="track.image.url" alt="Track" class="object-contain" />
     <div class="py-4">
       <p class="text-xl text-textLightGrey">{{ track.author.username }}</p>
       <h2 class="text-left text-4xl">{{ track.title }}</h2>

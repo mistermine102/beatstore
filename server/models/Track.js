@@ -13,6 +13,30 @@ const audioSchema = new Schema({
   },
 })
 
+const commentSchema = new Schema({
+  content: {
+    type: String,
+    required: true,
+  },
+  score: {
+    type: Number, // Score to track upvotes and downvotes
+    default: 0,
+  },
+  author: {
+    type: Schema.Types.ObjectId,
+    ref: 'User', // Reference to the user who wrote the comment
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
+})
+
 const schema = new Schema({
   title: {
     type: String,
@@ -42,6 +66,10 @@ const schema = new Schema({
     type: Date,
     default: Date.now,
   },
+  comments: {
+    type: [commentSchema],
+    default: [],
+  }, // Add comments array, each comment with content and score
 })
 
 // Add a text index on the title to allow text search
