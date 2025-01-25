@@ -2,7 +2,7 @@
 import appApi from '../../api/appApi'
 import useAsyncWrap from '../../composables/useAsyncWrap'
 import BasePopover from '../base/BasePopover.vue'
-import { MoreVertical } from '../icons/index.vine'
+import { MoreVerticalIcon } from '../icons/index.vine'
 import { useRouter } from 'vue-router'
 
 const { track } = defineProps<{ track: Track }>()
@@ -22,7 +22,7 @@ function deleteTrack() {
 <template>
   <BasePopover>
     <template #popover-button>
-      <MoreVertical />
+      <MoreVerticalIcon />
     </template>
     <template #popover-content>
       <button @click="deleteTrack" class="text-red-500">Delete</button>

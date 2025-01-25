@@ -4,6 +4,9 @@ import { onMounted, useTemplateRef, watch } from 'vue'
 interface Props {
   waveformData: number[]
   progress: number
+  waveformColor?: string
+  progressColor?: string
+  highlightColor?: string
 }
 
 const props = defineProps<Props>()
@@ -13,9 +16,9 @@ const TARGET_CANVAS_WIDTH = 800
 const CANVAS_HEIGHT = 200
 const BAR_WIDTH = 4
 const SPACING = 2
-const waveformColor = '#cccccc'
-const progressColor = window.getComputedStyle(document.documentElement).getPropertyValue('--primary')
-const highlightedBarColor = window.getComputedStyle(document.documentElement).getPropertyValue('--darkPrimary')
+const waveformColor = props.waveformColor || 'rgba(0, 0, 0, 0.5)'
+const progressColor = props.progressColor || 'rgba(0, 0, 0, 0.75)'
+const highlightedBarColor = props.highlightColor || 'rgba(0, 0, 0, 1)'
 
 const CANVAS_WIDTH = Math.floor(TARGET_CANVAS_WIDTH / (BAR_WIDTH + SPACING)) * (BAR_WIDTH + SPACING)
 

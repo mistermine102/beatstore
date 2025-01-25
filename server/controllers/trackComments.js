@@ -1,22 +1,33 @@
 import Track from '../models/Track.js'
 import AppError from '../classes/AppError.js'
 
+// Helper function to find a track and a comment
+const findTrackAndComment = async (trackId, commentId) => {
+  const track = await Track.findById(trackId)
+  if (!track) throw new AppError('TRACK_NOT_FOUND', 404)
+
+  const comment = track.comments.find(el => el._id.equals(commentId))
+  if (!comment) throw new AppError('COMMENT_NOT_FOUND', 404)
+
+  return { track, comment }
+}
+
 export const addComment = async (req, res) => {
   const { content } = req.body
   const { trackId } = req.params
 
-  //find track
+  // Find track
   const track = await Track.findById(trackId)
-  if (!track) throw new AppError('NO_TRACK_FOUND', 404)
+  if (!track) throw new AppError('TRACK_NOT_FOUND', 404)
 
-  //add comment to track comments
+  // Add comment to track
   track.comments.push({
     content,
     score: 0,
     author: req.userId,
   })
 
-  //save track
+  // Save track
   await track.save()
 
   res.json({ trackId })
@@ -25,38 +36,39 @@ export const addComment = async (req, res) => {
 export const deleteComment = async (req, res) => {
   const { trackId, commentId } = req.params
 
-  //find track
-  const track = await Track.findById(trackId)
-  if (!track) throw new AppError('TRACK_NOT_FOUND', 404)
+  // Find track and comment
+  const { track, comment } = await findTrackAndComment(trackId, commentId)
 
-  //find comment
-  const comment = track.comments.find(el => el._id.equals(commentId))
-  if (!comment) throw new AppError('COMMENT_NOT_FOUND', 404)
-
-  //authorize user
+  // Authorize user
   if (!comment.author.equals(req.userId)) throw new AppError('NOT_AUTHORIZED', 401)
 
-  //remove comment from track comments
+  // Remove comment
   track.comments = track.comments.filter(el => !el._id.equals(commentId))
 
-  //save track
+  // Save track
   await track.save()
 
   res.json({ commentId })
 }
 
-export const toggleCommentScore = async (req, res) => {
+export const toggleCommentLike = async (req, res) => {
   const { trackId, commentId } = req.params
 
-  //find track
-  const track = await Track.findById(trackId)
-  if (!track) throw new AppError('TRACK_NOT_FOUND', 404)
+  const { track, comment } = await findTrackAndComment(trackId, commentId)
 
-  //find comment
-  const comment = track.comments.find(el => el._id.equals(commentId))
-  if (!comment) throw new AppError('COMMENT_NOT_FOUND', 404)
+  const like = comment.likes.find(el => el.equals(req.userId))
 
-    //
+  if (!like) {
+    //add a like
+    comment.likes.push(req.userId)
+    comment.totalLikes++
+  } else {
+    //remove a like
+    comment.likes = comment.likes.filter(el => !el.equals(req.userId))
+    comment.totalLikes--
+  }
 
-  res.json({ commentId: comment._id })
+  await track.save()
+
+  res.json({ totalLikes: comment.totalLikes })
 }

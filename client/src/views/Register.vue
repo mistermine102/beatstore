@@ -75,13 +75,13 @@ function register() {
 <template>
   <div class="flex flex-col items-center justify-center mt-16">
     <h2 class="base-heading">Sign up</h2>
-    <form class="flex flex-col p-4 w-1/2 mt-8" @submit.prevent="register">
+    <form class="flex flex-col p-4 w-1/2" @submit.prevent="register">
       <div class="flex flex-col gap-y-4 mb-8">
         <input v-model="email" type="text" placeholder="Email" class="base-input w-full" />
         <input v-model="username" type="text" placeholder="Username" class="base-input w-full" />
         <input v-model="password" type="password" placeholder="Password" class="base-input w-full" />
       </div>
-      <BaseButton :isLoading="wrapRegister.isLoading">Continue</BaseButton>
+      <BaseButton class="w-full" :isLoading="wrapRegister.isLoading">Continue</BaseButton>
     </form>
     <div>
       <p>Already have an account? <router-link class="base-link" to="/login">Log in now</router-link></p>

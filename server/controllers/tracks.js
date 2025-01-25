@@ -1,4 +1,4 @@
-import Track from '../models/Track.js'
+import Track, { UnverifiedTrack } from '../models/Track.js'
 import AppError from '../classes/AppError.js'
 import { uploadFileToS3, deleteFileFromS3 } from '../s3.js'
 import Audio from '../classes/Audio.js'
@@ -10,6 +10,7 @@ import Sharp from 'sharp'
 import { getAverageColor } from 'fast-average-color-node'
 import formatTrackData from '../utils/formatTrackData.js'
 import getWaveformData from '../utils/getWaveformData.js'
+import formatComments from '../utils/formatComments.js'
 
 const UPLOAD_SCHEMAS = {
   beat: {
@@ -59,7 +60,7 @@ export const uploadTrack = async (req, res) => {
   if (type === 'drumkit') throw new AppError('Drumkits not available yet', 400)
 
   const uploadSchema = UPLOAD_SCHEMAS[type]
-  const newTrack = new Track()
+  const newTrack = new UnverifiedTrack()
 
   //attach fields that exists in schema to the new track
   //basically it creates new Track based on a given uploadSchema (UPLOAD_SCHEMAS are defines above)
@@ -114,7 +115,11 @@ export const uploadTrackImage = async (req, res) => {
 
   if (!req.file) throw new AppError('IMAGE_IS_REQUIRED')
 
-  const track = await Track.findById(trackId)
+  const verfiedTrack = await Track.findById(trackId)
+  const unverifiedTrack = await UnverifiedTrack.findById(trackId)
+
+  const track = verfiedTrack ? verfiedTrack : unverifiedTrack
+
   if (!track) throw new AppError('TRACK_NOT_FOUND', 404)
 
   // Process the uploaded image (resize, compress, etc.)
@@ -236,7 +241,10 @@ export const getTracks = async (req, res) => {
   }
 
   //only populate username on author
-  const tracks = await Track.find(filter).sort({ createdAt: -1 }).skip(start).limit(amount).populate('author', 'username')
+  const tracks = await Track.find(filter).sort({ createdAt: -1 }).skip(start).limit(amount).populate('author', 'username').populate({
+    path: 'comments.author', // Populate the author field in comments
+    select: 'username image', // Only select username and profilePic
+  })
   const trackIds = tracks.map(el => el._id)
 
   //create an object where keys are trackIds and values are whether they're liked
@@ -245,8 +253,15 @@ export const getTracks = async (req, res) => {
   //promise.all to process tracks in parallel
   const formattedTracks = await Promise.all(
     tracks.map(async track => {
+      //attach audio and image url
       const formattedTrack = await formatTrackData(track)
+
+      //determine wheter it's liked
       formattedTrack.isLiked = likes[track._id]
+
+      //format the comments (exclude votes array and determine user current vote)
+      formattedTrack.comments = await formatComments(formattedTrack.comments, req.userId)
+
       return formattedTrack
     })
   )
@@ -262,7 +277,12 @@ export const getSingleTrack = async (req, res) => {
   const { trackId } = req.params
 
   // Find the track by ID and populate author details
-  const track = await Track.findById(trackId).populate('author', 'username')
+  const track = await Track.findById(trackId)
+    .populate('author', 'username') // Populate the track author's username
+    .populate({
+      path: 'comments.author', // Populate the author field in comments
+      select: 'username image', // Only select username and profilePic
+    })
   if (!track) throw new AppError('TRACK_NOT_FOUND', 404)
 
   const formattedTrack = await formatTrackData(track)
@@ -270,10 +290,20 @@ export const getSingleTrack = async (req, res) => {
   // Determine whether the track is liked by the user
   formattedTrack.isLiked = await checkUserInteraction(req, track._id, 'track')
 
+  //format the comments (exclude votes array and determine user current vote)
+  formattedTrack.comments = await formatComments(formattedTrack.comments, req.userId)
+
   // Respond with the track data
   res.json({
     track: formattedTrack,
   })
+}
+
+export const getUnverifiedTracks = async (req, res) => {
+  const start = parseInt(req.query.start) || 0 // Defaults to 0 if not provided
+  const amount = parseInt(req.query.amount) || 10 // Defaults to 10 if not provided
+
+  const tracks = await UnverifiedTrack.find({ author: req.userId })
 }
 
 export const toggleTrackLike = async (req, res) => {
@@ -316,4 +346,3 @@ export const streamTrack = async (req, res) => {
 
   res.json({ trackId: track._id })
 }
-

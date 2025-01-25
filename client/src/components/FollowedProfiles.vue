@@ -49,7 +49,7 @@ getProfiles()
       </div>
     </div>
     <div class="w-1/2 mx-auto">
-      <BaseButton @click="loadMoreProfiles" :is-loading="wrapLoadMoreProfiles.isLoading.value" v-if="isMore" alt class="w-fit">Load more</BaseButton>
+      <BaseButton @click="loadMoreProfiles" :is-loading="wrapLoadMoreProfiles.isLoading.value" v-if="isMore" alt class="w-full">Load more</BaseButton>
     </div>
   </div>
 </template>

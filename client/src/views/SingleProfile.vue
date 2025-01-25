@@ -70,7 +70,7 @@ watch(
         </div>
       </div>
       <div class="mt-8">
-        <h2 class="base-heading mb-4">Uploads</h2>
+        <h2 class="base-heading">Uploads</h2>
         <TracksContainer
           :tracks="tracks"
           :is-loading="isLoadingTracks"

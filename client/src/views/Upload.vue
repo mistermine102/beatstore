@@ -144,7 +144,7 @@ function uploadTrack(e: Event) {
 
 <template>
   <div class="mt-16">
-    <h1 class="base-heading mb-4">Upload</h1>
+    <h1 class="base-heading">Upload</h1>
     <div class="grid grid-cols-3 gap-x-8">
       <button  v-for="btn in TRACK_TYPES_BUTTONS" :disabled="btn.type === 'drumkit'" @click="uploadType = btn.type" :class="[btn.type === uploadType ? 'base-btn' : 'base-btn-alt', btn.type === 'drumkit' ? 'opacity-50' : undefined ]">
         {{ btn.title }}
@@ -191,7 +191,7 @@ function uploadTrack(e: Event) {
         </UploadFileContainer>
       </div>
       <div class="w-1/2 mx-auto mt-8">
-        <BaseButton :is-loading="wrapUploadTrack.isLoading">Upload</BaseButton>
+        <BaseButton class="w-full" :is-loading="wrapUploadTrack.isLoading">Upload</BaseButton>
       </div>
     </form>
   </div>

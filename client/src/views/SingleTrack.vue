@@ -8,6 +8,7 @@ import EmptyState from '../components/EmptyState.vue'
 import GeneralInfoPanel from '../components/singleTrack/GeneralInfoPanel.vue'
 import DetailsPanel from '../components/singleTrack/DetailsPanel.vue'
 import AuthorPanel from '../components/singleTrack/AuthorPanel.vue'
+import CommentsPanel from '../components/singleTrack/CommentsPanel.vue'
 
 const route = useRoute()
 const wrapGetTrack = reactive(useAsyncWrap())
@@ -22,10 +23,19 @@ function getTrack() {
   wrapGetTrack.run(async () => {
     const response = await appApi.get<{ track: Track }>(`tracks/single/${trackId}`)
     track.value = response.data.track
+    console.log(track.value)
   })
 }
 
 getTrack()
+
+function toggleCommentLike(commentId: string) {
+  if (!track.value) return
+  const comment = track.value.comments.find(el => el._id === commentId)!
+
+  comment.isLiked ? comment.totalLikes-- : comment.totalLikes++
+  comment.isLiked = !comment.isLiked
+}
 
 const toggleLike = useToggleLike()
 </script>
@@ -37,11 +47,12 @@ const toggleLike = useToggleLike()
       <EmptyState />
     </div>
     <div v-else>
-      <GeneralInfoPanel :track="track" />
-      <div class="grid grid-cols-3 gap-x-8">
+      <GeneralInfoPanel class="mb-16" :track="track" />
+      <div class="grid grid-cols-3 gap-x-8 mb-16">
         <DetailsPanel class="col-span-2" :track="track" @track-like-toggled="toggleLike(track)" />
         <AuthorPanel :profile-id="track.author._id" />
       </div>
+      <CommentsPanel :comments="track.comments" :track="track" @change-comments="getTrack" @toggleLike="toggleCommentLike" />
     </div>
   </div>
 </template>

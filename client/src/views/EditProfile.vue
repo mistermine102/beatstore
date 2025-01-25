@@ -48,7 +48,7 @@ onMounted(async () => {
 </script>
 <template>
   <div>
-    <h1 class="base-heading mb-8">Edit profile</h1>
+    <h1 class="base-heading">Edit profile</h1>
     <div v-if="isLoading" class="flex justify-center">
       <div class="loader"></div>
     </div>
@@ -70,7 +70,7 @@ onMounted(async () => {
         </template>
       </UploadFileContainer>
       <div class="w-1/2 mx-auto mt-8">
-        <BaseButton :is-loading="wrapEditProfile.isLoading.value" class="w-1/2">Edit</BaseButton>
+        <BaseButton :is-loading="wrapEditProfile.isLoading.value" class="w-full">Edit</BaseButton>
       </div>
     </form>
   </div>

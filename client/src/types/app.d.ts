@@ -6,6 +6,22 @@ interface User {
 
 type TrackType = 'beat' | 'sample' | 'drumkit' | 'all'
 
+interface TrackComment {
+  _id: string
+  author: {
+    username: string
+    _id: string
+    image: {
+      url: string
+    }
+  }
+  content: string
+  totalLikes: number
+  isLiked: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
 interface BaseTrack {
   _id: string
   title: string
@@ -25,6 +41,7 @@ interface BaseTrack {
     _id: string
   }
   createdAt: Date
+  comments: TrackComment[]
   price?: {
     currency: string
     value: number

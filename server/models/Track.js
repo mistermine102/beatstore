@@ -18,10 +18,11 @@ const commentSchema = new Schema({
     type: String,
     required: true,
   },
-  score: {
+  totalLikes: {
     type: Number, // Score to track upvotes and downvotes
     default: 0,
   },
+  likes: [Schema.Types.ObjectId],
   author: {
     type: Schema.Types.ObjectId,
     ref: 'User', // Reference to the user who wrote the comment
@@ -62,6 +63,10 @@ const schema = new Schema({
   playable: Boolean,
   totalLikes: Number,
   totalStreams: Number,
+  verified: {
+    type: Boolean,
+    default: false,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -69,12 +74,14 @@ const schema = new Schema({
   comments: {
     type: [commentSchema],
     default: [],
-  }, // Add comments array, each comment with content and score
+  },
 })
 
 // Add a text index on the title to allow text search
 schema.index({ title: 'text' })
 
 const Track = mongoose.model('Track', schema)
+
+export const UnverifiedTrack = mongoose.model('UnverifiedTrack', schema)
 
 export default Track

@@ -70,12 +70,12 @@ async function login() {
 <template>
   <div class="flex flex-col items-center justify-center mt-16">
     <h2 class="base-heading">Sign in</h2>
-    <form class="flex flex-col p-4 w-1/2 mt-8" @submit.prevent="login">
+    <form class="flex flex-col p-4 w-1/2" @submit.prevent="login">
       <div class="flex flex-col gap-y-4 mb-8">
         <input v-model="email" type="text" placeholder="Email" class="base-input w-full" />
         <input v-model="password" type="password" placeholder="Password" class="base-input w-full" />
       </div>
-      <BaseButton :isLoading="wrapLogin.isLoading">Continue</BaseButton>
+      <BaseButton class="w-full" :isLoading="wrapLogin.isLoading">Continue</BaseButton>
     </form>
     <div>
       <p>You don't have an account? <router-link class="base-link" to="/register">Sign up now</router-link></p>

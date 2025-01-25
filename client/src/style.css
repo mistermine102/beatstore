@@ -69,6 +69,11 @@ body {
   color: #166534;
 }
 
+.image-small {
+  width: 80px;
+  height: 80px;
+}
+
 .image-thumbnail {
   width: 120px;
   height: 120px;
@@ -101,6 +106,7 @@ body {
 }
 
 .base-heading {
+  margin-bottom: 2rem;
   font-size: 2rem; /* 36px */
   line-height: 2rem; /* 40px */
   font-family: var(--fontPrimary);

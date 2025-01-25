@@ -22,9 +22,10 @@ export const verifyToken = async (req, res, next) => {
     const payload = jwt.verify(token, process.env.JWT_SECRET)
 
     const user = await User.findById(payload.id)
-    if(!user) throw new AppError("AUTH_FAILED")
+    if (!user) throw new AppError('AUTH_FAILED')
 
     req.userId = mongoose.Types.ObjectId.createFromHexString(payload.id)
+    req.user = user
     req.isAuthenticated = true
     return next()
   } catch (e) {
@@ -34,7 +35,7 @@ export const verifyToken = async (req, res, next) => {
       return res.json({ message: 'TokenExpired' })
     }
 
-    const error = new AppError("AUTH_FAILED", 400)
+    const error = new AppError('AUTH_FAILED', 400)
     req.isAuthenticated = false
     return next(error)
   }
@@ -46,4 +47,9 @@ export const isAuthenticated = (req, res, next) => {
   } else {
     next()
   }
+}
+
+export const hasRole = role => (req, res, next) => {
+  if (!req.user.roles.includes(role)) throw new AppError(`Missing role: ${role}`, 401)
+  next()
 }

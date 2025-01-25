@@ -10,8 +10,8 @@ const selectedTab = ref('uploads')
 <template>
   <div>
     <div class="flex gap-x-8 mb-16">
-      <BaseButton @click="selectedTab = 'uploads'" :alt="selectedTab !== 'uploads'">Liked uploads</BaseButton>
-      <BaseButton @click="selectedTab = 'profiles'" :alt="selectedTab !== 'profiles'">Followed profiles</BaseButton>
+      <BaseButton @click="selectedTab = 'uploads'" :alt="selectedTab !== 'uploads'" class="w-full">Liked uploads</BaseButton>
+      <BaseButton @click="selectedTab = 'profiles'" :alt="selectedTab !== 'profiles'" class="w-full">Followed profiles</BaseButton>
     </div>
     <LikedTracks v-if="selectedTab === 'uploads'" />
     <FollowedProfiles v-else/>

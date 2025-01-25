@@ -13,7 +13,7 @@ getTracks('all', { filters: { phrase } })
 </script>
 <template>
   <div>
-    <h1 class="base-heading mb-8">Search results</h1>
+    <h1 class="base-heading">Search results</h1>
     <TracksContainer :tracks="tracks" :is-loading="isLoading" :is-loading-more="isLoadingMore" :is-more="isMore" @loaded-more="loadMoreTracks('all', { filters: { phrase } })" />
   </div>
 </template>

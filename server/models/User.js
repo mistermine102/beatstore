@@ -15,6 +15,10 @@ const schema = new Schema({
       ref: 'Track',
     },
   ],
+  roles: {
+    type: [String],
+    default: [],
+  },
   createdAt: {
     type: Date,
     default: Date.now,
