@@ -5,17 +5,18 @@ import useTracks from '../composables/useTracks'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import moment from 'moment'
-import { watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 const route = useRoute()
 const authStore = useAuthStore()
+const showUnverified = ref(false)
 
 const { id: profileId } = route.params as {
   id: string
 }
 
 const { profile, getProfile, toggleFollow, isLoading: isLoadingProfile } = useProfile()
-const { tracks, toggleLike, isLoading: isLoadingTracks , getTracks, isMore, isLoadingMore, loadMoreTracks } = useTracks()
+const { tracks, toggleLike, isLoading: isLoadingTracks, getTracks, isMore, isLoadingMore, loadMoreTracks } = useTracks()
 
 getProfile(profileId)
 getTracks('all', { filters: { authorId: profileId } })
@@ -27,6 +28,18 @@ watch(
     getTracks('all', { filters: { authorId: profileId } })
   }
 )
+
+watch(showUnverified, () => {
+  const filters: GetTracksFilters = {
+    unverified: showUnverified.value ? true : undefined,
+  }
+
+  getTracks('all', { filters })
+})
+
+const isOwnProfile = computed(() => {
+  return authStore.user && profile.value && authStore.user._id === profile.value._id
+})
 </script>
 
 <template>
@@ -37,11 +50,7 @@ watch(
     <div v-else-if="!profile">NO PROFILE</div>
     <div v-else>
       <div class="base-container flex mb-8 relative">
-        <button
-          v-if="authStore.user && authStore.user._id === profile._id"
-          @click="$router.push(`/profile/${profile._id}/edit`)"
-          class="absolute flex items-center gap-1 top-0 right-0 p-4"
-        >
+        <button v-if="isOwnProfile" @click="$router.push(`/profile/${profile._id}/edit`)" class="absolute flex items-center gap-1 top-0 right-0 p-4">
           <span>Edit</span>
         </button>
         <img class="image-large rounded-regular" :src="profile.image.url" />
@@ -56,21 +65,24 @@ watch(
           <div class="grid grid-cols-3 gap-8">
             <div class="bg-darkGrey p-4 rounded-regular">
               <p>Followers</p>
-              <p class="text-3xl font-semibold text-primary">{{ profile.totalFollows }}</p>
+              <p class="text-3xl text-primary">{{ profile.totalFollows }}</p>
             </div>
             <div class="bg-darkGrey p-4 rounded-regular">
               <p>Total uploads</p>
-              <p class="text-3xl font-semibold text-primary">{{ profile.totalUploads }}</p>
+              <p class="text-3xl text-primary">{{ profile.totalUploads }}</p>
             </div>
             <div class="bg-darkGrey p-4 rounded-regular">
               <p>Specification</p>
-              <p class="text-3xl font-semibold text-primary">{{ profile.specification || 'None' }}</p>
+              <p class="text-3xl text-primary">{{ profile.specification || 'None' }}</p>
             </div>
           </div>
         </div>
       </div>
       <div class="mt-8">
-        <h2 class="base-heading">Uploads</h2>
+        <div class="flex items-baseline gap-x-2">
+          <h2 class="base-heading">Uploads</h2>
+          <button v-if="isOwnProfile" @click="showUnverified = !showUnverified" class="text-textLightGrey">{{ showUnverified ? 'Hide' : 'Show'}} unverified</button>
+        </div>
         <TracksContainer
           :tracks="tracks"
           :is-loading="isLoadingTracks"

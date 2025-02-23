@@ -2,6 +2,8 @@ interface User {
   _id: string
   email: string
   username: string
+  createdAt: Date
+  roles: string[]
 }
 
 type TrackType = 'beat' | 'sample' | 'drumkit' | 'all'
@@ -42,6 +44,7 @@ interface BaseTrack {
   }
   createdAt: Date
   comments: TrackComment[]
+  verified: boolean
   price?: {
     currency: string
     value: number
@@ -128,6 +131,7 @@ interface GetTracksFilters {
   authorId?: string
   phrase?: string
   liked?: boolean
+  unverified?: boolean
 }
 
 // Define the filter interfaces

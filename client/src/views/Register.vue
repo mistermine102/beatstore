@@ -9,7 +9,7 @@ import { AxiosError } from 'axios'
 import { useRouter } from 'vue-router'
 import validator from 'validator'
 
-const wrapRegister = reactive(useAsyncWrap()) 
+const wrapRegister = reactive(useAsyncWrap())
 const authStore = useAuthStore()
 const toastStore = useToastStore()
 const router = useRouter()
@@ -43,15 +43,11 @@ function register() {
 
   wrapRegister.run(
     async () => {
-      const response = await appApi.post<{ user: User; token: string }>('/register', {
+      await appApi.post('/auth/register', {
         email: email.value,
         username: username.value,
         password: password.value,
       })
-
-      const { user, token } = response.data
-      //set store values and local storage token
-      authStore.setAuth(user, token)
 
       router.push('/')
       toastStore.show({ type: 'success', title: 'Logged in!' })

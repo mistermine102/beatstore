@@ -3,15 +3,22 @@ import appApi from '../api/appApi'
 import useAsyncWrap from '../composables/useAsyncWrap'
 import { HeartIcon, TrashIcon } from './icons/index.vine'
 import { useAuthStore } from '../stores/auth'
+import { useToastStore } from '../stores/toast';
 
 const props = defineProps<{ comment: TrackComment; track: Track }>()
 const emit = defineEmits(['toggleLike', 'deleteComment'])
 
 const authStore = useAuthStore()
+const toastStore = useToastStore()
 
 const wrapChangeVote = useAsyncWrap()
 
 function toggleLike() {
+  if (!authStore.user) {
+    toastStore.show({ type: 'info', title: 'Must be logged in to like a comment!' })
+    return
+  }
+
   wrapChangeVote.run(async () => {
     await appApi.patch(`/tracks/${props.track._id}/comment/${props.comment._id}`)
   })

@@ -9,6 +9,11 @@ import GeneralInfoPanel from '../components/singleTrack/GeneralInfoPanel.vue'
 import DetailsPanel from '../components/singleTrack/DetailsPanel.vue'
 import AuthorPanel from '../components/singleTrack/AuthorPanel.vue'
 import CommentsPanel from '../components/singleTrack/CommentsPanel.vue'
+import { useAuthStore } from '../stores/auth'
+import { useToastStore } from '../stores/toast'
+
+const authStore = useAuthStore()
+const toastStore = useToastStore()
 
 const route = useRoute()
 const wrapGetTrack = reactive(useAsyncWrap())
@@ -23,7 +28,6 @@ function getTrack() {
   wrapGetTrack.run(async () => {
     const response = await appApi.get<{ track: Track }>(`tracks/single/${trackId}`)
     track.value = response.data.track
-    console.log(track.value)
   })
 }
 

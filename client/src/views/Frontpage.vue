@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import FrontpageHero from '../components/FrontpageHero.vue'
-import BaseSearchbar from '../components/base/BaseSearchbar.vue'
+import FrontpageExplore from '../components/FrontpageExplore.vue'
 import TracksContainer from '../components/TracksContainer.vue'
 import useTracks from '../composables/useTracks'
 import useTrackFilters from '../composables/useTrackFilters'
 import FiltersPanel from '../components/FiltersPanel.vue'
 import debounce from '../utils/debounce'
-import { useRouter } from 'vue-router'
 import CurrentFilters from '../components/CurrentFilters.vue'
+import FrontpageTracktypes from '../components/FrontpageTracktypes.vue'
 
 // Track type logic
 const TRACK_TYPES_BUTTONS = [
@@ -17,15 +17,13 @@ const TRACK_TYPES_BUTTONS = [
   { title: 'Drumkits', type: 'drumkit' as TrackType },
 ]
 
-const router = useRouter()
-
 const trackType = ref<TrackType>('beat')
 
 const { tracks, getTracks, isLoading, toggleLike, isMore, loadMoreTracks, isLoadingMore } = useTracks()
 const { currentFilters, activeFilters, removeFilter } = useTrackFilters(trackType)
 
 // Fetch initial tracks
-getTracks(trackType.value)
+// getTracks(trackType.value)
 
 const debouncedGetTracks = debounce(() => {
   getTracks(trackType.value, { filters: activeFilters.value })
@@ -43,8 +41,49 @@ watch(activeFilters, () => {
 <template>
   <div class="h-full">
     <FrontpageHero />
-    <BaseSearchbar @search="(phrase) => router.push(`/search/${phrase}`)" />
-    <div class="flex flex-col gap-8 mt-16">
+    <FrontpageExplore class="relative" />
+    <FrontpageTracktypes />
+    <div class="mt-32">
+      <h2 class="text-[40px] mb-8">Popular right now</h2>
+      <div class="flex gap-x-8">
+        <div class="p-4">
+          <img src="" alt="" class="w-[200px] h-[200px]" />
+          <div>
+            <h3 class="text-2xl">Beat 1</h3>
+            <p>Author</p>
+          </div>
+        </div>
+        <div class="p-4">
+          <img src="" alt="" class="w-[200px] h-[200px]" />
+          <div>
+            <h3 class="text-2xl">Beat 1</h3>
+            <p>Author</p>
+          </div>
+        </div>
+        <div class="p-4">
+          <img src="" alt="" class="w-[200px] h-[200px]" />
+          <div>
+            <h3 class="text-2xl">Beat 1</h3>
+            <p>Author</p>
+          </div>
+        </div>
+        <div class="p-4">
+          <img src="" alt="" class="w-[200px] h-[200px]" />
+          <div>
+            <h3 class="text-2xl">Beat 1</h3>
+            <p>Author</p>
+          </div>
+        </div>
+        <div class="p-4">
+          <img src="" alt="" class="w-[200px] h-[200px]" />
+          <div>
+            <h3 class="text-2xl">Beat 1</h3>
+            <p>Author</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- <div class="flex flex-col gap-8 mt-16">
       <div>
         <div class="grid grid-cols-3 gap-4 mb-2">
           <button v-for="btn in TRACK_TYPES_BUTTONS" @click="trackType = btn.type" :class="[trackType === btn.type ? 'base-btn' : 'base-btn-alt']">
@@ -53,8 +92,16 @@ watch(activeFilters, () => {
         </div>
         <FiltersPanel class="flex gap-x-8 mb-1" :filters="currentFilters" />
         <CurrentFilters :filters="currentFilters" @removeFilter="removeFilter" />
-        <TracksContainer class="mt-4" :tracks="tracks" :isLoading="isLoading" :isLoadingMore="isLoadingMore" :isMore="isMore" @likeToggled="toggleLike" @loadedMore="loadMoreTracks(trackType, { filters: activeFilters })" />
+        <TracksContainer
+          class="mt-4"
+          :tracks="tracks"
+          :isLoading="isLoading"
+          :isLoadingMore="isLoadingMore"
+          :isMore="isMore"
+          @likeToggled="toggleLike"
+          @loadedMore="loadMoreTracks(trackType, { filters: activeFilters })"
+        />
       </div>
-    </div>
+    </div> -->
   </div>
 </template>

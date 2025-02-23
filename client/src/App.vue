@@ -7,18 +7,37 @@ import { onMounted } from 'vue'
 import appApi from './api/appApi'
 import TheAudioPlayer from './components/TheAudioPlayer.vue'
 import { useAudioPlayerStore } from './stores/audioPlayer'
+import useAsyncWrap from './composables/useAsyncWrap'
+import { AxiosError } from 'axios'
+import { useToastStore } from './stores/toast'
 
 const authStore = useAuthStore()
 const audioPlayerStore = useAudioPlayerStore()
+const toastStore = useToastStore()
+
+const wrapLocalLogin = useAsyncWrap()
 
 async function localLogin() {
-  const storedToken = localStorage.getItem('token')
-  if (!storedToken) return
+  wrapLocalLogin.run(
+    async () => {
+      const response = await appApi.post<{ user: User; accessToken: string; message?: string }>('/auth/get-user', {}, { withCredentials: true })
+      if (response.data?.message === 'REFRESH_TOKEN_NOT_PROVIDED') return
 
-  authStore.token = storedToken
-
-  const response = await appApi.get<{ user: User }>('/auth/' + storedToken)
-  authStore.user = response.data.user
+      authStore.user = response.data.user
+      authStore.accessToken = response.data.accessToken
+    },
+    err => {
+      if (err instanceof AxiosError && err.response) {
+        switch (err.response.data.message) {
+          case 'TOKEN_NOT_PROVIDED':
+            break
+          default:
+            //show generic error toast
+            toastStore.show({ type: 'error', title: 'Something went wrong' })
+        }
+      }
+    }
+  )
 }
 
 onMounted(() => {

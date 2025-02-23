@@ -2,33 +2,32 @@
 import dotenv from 'dotenv'
 dotenv.config()
 
-//packages
 import express from 'express'
 import cors from 'cors'
 import mongoose from 'mongoose'
-
-//files imports
 import errorHandling from './middleware/errorHandling.js'
 import invalidRoute from './invalidRoute.js'
-
-//routes imports
 import authRoutes from './routes/auth.js'
 import trackRoutes from './routes/tracks.js'
 import profileRoutes from './routes/profile.js'
+import adminRoutes from './routes/admin.js'
+import cookieParser from 'cookie-parser'
 
 import { verifyToken } from './middleware/auth.js'
 
 const app = express()
 
-app.use(cors())
 app.use(express.json())
+app.use(cookieParser())
+app.use(cors({ credentials: true, origin: 'http://localhost:5173' }))
 
 app.use(verifyToken)
 
 //routes
-app.use(authRoutes)
+app.use('/auth', authRoutes)
 app.use('/tracks', trackRoutes)
 app.use('/profile', profileRoutes)
+app.use('/admin', adminRoutes)
 
 //404 invalid route
 app.all('*', invalidRoute)

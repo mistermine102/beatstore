@@ -11,13 +11,13 @@ import validator from 'validator'
 
 const authStore = useAuthStore()
 const toastStore = useToastStore()
-const wrapLogin = reactive(useAsyncWrap()) 
+const wrapLogin = reactive(useAsyncWrap())
 const router = useRouter()
 
-const email = ref('')
-const password = ref('')
+const email = ref('szymonjarosz102@gmail.com')
+const password = ref('szymon102')
 
-//create this object so we show the same error message regardless of what happens 
+//create this object so we show the same error message regardless of what happens
 //(wheter frontend validation fails or backend validation fails)
 const LOGIN_TOAST_MESSAGE = {
   type: 'error' as ToastType,
@@ -36,15 +36,19 @@ async function login() {
 
   wrapLogin.run(
     async () => {
-      const response = await appApi.post<{ user: User; token: string }>('/login', {
-        email: email.value,
-        password: password.value,
-      })
+      const response = await appApi.post<{ user: User; accessToken: string }>(
+        '/auth/login',
+        {
+          email: email.value,
+          password: password.value,
+        },
+        { withCredentials: true }
+      )
 
-      const { user, token } = response.data
+      const { user, accessToken } = response.data
 
-      //set store values and local storage token
-      authStore.setAuth(user, token)
+      authStore.user = user
+      authStore.accessToken = accessToken
 
       router.push('/')
       toastStore.show({ type: 'success', title: 'Logged in!' })

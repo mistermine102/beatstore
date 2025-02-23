@@ -30,7 +30,8 @@ export const getProfiles = async (req, res) => {
 
   const filter = {}
 
-  if (followed && req.isAuthenticated) {
+  if (followed) {
+    if (!req.isAuthenticated) throw new AppError('NOT_AUTHENTICATED', 401)
     //find ids of tracks liked by a user and add them to the filter
     const follows = await Follow.find({ followerId: req.userId })
     const followsIds = follows.map(el => el.followedId)
@@ -105,7 +106,7 @@ export const editProfile = async (req, res) => {
 
   //authorize
   if (!user._id.equals(req.userId)) throw new AppError('Not authorized', 403)
-  
+
   //edit user
   const { username, specification } = req.body
 
@@ -122,9 +123,9 @@ export const uploadProfileImage = async (req, res) => {
   const user = await User.findById(req.userId)
 
   //authorize and validate
-  if (!user._id.equals(req.userId))  throw new AppError('NOT_AUTHORIZED', 403)
+  if (!user._id.equals(req.userId)) throw new AppError('NOT_AUTHORIZED', 403)
   if (!req.file) throw new AppError('NO_IMAGE_FOUND', 400)
-  
+
   const processedBuffer = await Sharp(req.file.buffer).resize(300, 300).toBuffer()
 
   const filename = await uploadFileToS3(processedBuffer)

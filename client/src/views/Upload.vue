@@ -136,8 +136,8 @@ function uploadTrack(e: Event) {
       })
     }
 
-    toastStore.show({ type: 'success', title: 'Uploaded succesfully' })
-    router.push(`/track/${response.data.trackId}`)
+    toastStore.show({ type: 'success', title: 'Upload is waiting for verification!' })
+    router.push('/')
   })
 }
 </script>

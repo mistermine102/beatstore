@@ -17,12 +17,12 @@ const borderColorStyle = computed(() => {
 </script>
 
 <template>
-  <div v-if="toastStore.isOpen" class="z-[2] fixed flex justify-center top-2 left-0 right-0 pointer-events-none">
-    <div class="bg-grey p-4 w-fit px-16 rounded-regular border-l-4 shadow-xl pointer-events-auto" :class="borderColorStyle">
+  <div v-if="toastStore.isOpen" class="z-20 fixed flex justify-center top-2 left-0 right-0 pointer-events-none">
+    <div @click="toastStore.close" class="bg-grey p-4 w-fit px-16 rounded-regular border-l-4 shadow-xl pointer-events-auto cursor-pointer" :class="borderColorStyle">
       <div class="flex justify-between items-center">
         <h3>{{ toastStore.title }}</h3>
       </div>
-      <p class=" text-textLightGrey">{{ toastStore.message }}</p>
+      <p class="text-textLightGrey">{{ toastStore.message }}</p>
     </div>
   </div>
 </template>

@@ -4,6 +4,8 @@ import { onMounted, useTemplateRef, watch } from 'vue'
 interface Props {
   waveformData: number[]
   progress: number
+  width?: number
+  height?: number
   waveformColor?: string
   progressColor?: string
   highlightColor?: string
@@ -12,8 +14,8 @@ interface Props {
 const props = defineProps<Props>()
 const emit = defineEmits(['progressClick'])
 
-const TARGET_CANVAS_WIDTH = 800
-const CANVAS_HEIGHT = 200
+const TARGET_CANVAS_WIDTH = props.width || 800
+const CANVAS_HEIGHT = props.height || 200
 const BAR_WIDTH = 4
 const SPACING = 2
 const waveformColor = props.waveformColor || 'rgba(0, 0, 0, 0.5)'
@@ -39,7 +41,8 @@ function calucalteBarHeights() {
       sum += props.waveformData[j]
     }
     const avgAmp = sum / Math.floor(SAMPLES_PER_BAR)
-    heights.push(avgAmp * CANVAS_HEIGHT)
+
+    heights.push(Math.max(avgAmp * CANVAS_HEIGHT, 1))
   }
   return heights
 }

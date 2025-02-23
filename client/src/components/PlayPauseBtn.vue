@@ -16,7 +16,7 @@ const wrapCountStream = reactive(useAsyncWrap())
 // Methods
 function playAudio() {
   //count stream
-  if (!currentlyPlayingTrack.value || currentlyPlayingTrack.value._id !== props.track._id) {
+  if ((!currentlyPlayingTrack.value || currentlyPlayingTrack.value._id !== props.track._id) && props.track.verified) {
     wrapCountStream.run(async () => {
       await appApi.post(`/tracks/${props.track._id}/stream`)
     })
@@ -41,10 +41,12 @@ const isThatTrackPlaying = computed(() => {
 </script>
 
 <template>
-  <button v-if="!isThatTrackPlaying" @click="playAudio">
+  <button v-if="!isThatTrackPlaying" @click="playAudio" class="flex gap-x-1 hover:text-primary transition-all duration-100">
     <PlayIcon />
+    <span>Play</span>
   </button>
-  <button v-else @click="pauseAudio">
+  <button v-else @click="pauseAudio" class="flex gap-x-1 hover:text-primary transition-all duration-100">
     <PauseIcon />
+    <span>Pause</span>
   </button>
 </template>

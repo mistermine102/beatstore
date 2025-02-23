@@ -4,16 +4,7 @@ import tryCatch from '../utils/tryCatch.js'
 import { isAuthenticated } from '../middleware/auth.js'
 import validate from '../middleware/validate.js'
 import { trackUpload, trackImageUpload } from '../multer.js'
-import {
-  getTracks,
-  uploadTrack,
-  streamTrack,
-  toggleTrackLike,
-  uploadTrackImage,
-  getSingleTrack,
-  deleteTrack,
-  getUnverifiedTracks,
-} from '../controllers/tracks.js'
+import { getTracks, uploadTrack, streamTrack, toggleTrackLike, uploadTrackImage, getSingleTrack, deleteTrack } from '../controllers/tracks.js'
 import isValidId from '../middleware/isValidId.js'
 import { addComment, deleteComment, toggleCommentLike } from '../controllers/trackComments.js'
 
@@ -64,8 +55,6 @@ export const addCommentValidators = [
     .isLength({ min: 1, max: 500 })
     .withMessage('Content must be between 1 and 500 characters'),
 ]
-
-router.get('/unverified', isAuthenticated, tryCatch(getUnverifiedTracks))
 
 router.get('/:type', getTracksValidators, validate, tryCatch(getTracks))
 

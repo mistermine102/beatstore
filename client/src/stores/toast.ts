@@ -12,7 +12,7 @@ export const useToastStore = defineStore('toastStore', () => {
   let timeoutId: number | null = null
 
   function show(options: { type: ToastType; title: string; message?: string }) {
-    //if toast is opened, don't do anything
+    //if toast is opened, close previous one and reset timeout
     if (isOpen.value && timeoutId) {
       isOpen.value = false
       clearTimeout(timeoutId)
@@ -28,9 +28,14 @@ export const useToastStore = defineStore('toastStore', () => {
     message.value = options.message
 
     timeoutId = setTimeout(() => {
-      isOpen.value = false
+      close()
     }, DURATION)
   }
 
-  return { isOpen, type, title, message, show }
+  function close() {
+    if (timeoutId) clearTimeout(timeoutId)
+    isOpen.value = false
+  }
+
+  return { isOpen, type, title, message, show, close }
 })

@@ -2,24 +2,28 @@
 import PlayPauseBtn from '../PlayPauseBtn.vue'
 import TrackOptionsPopover from './TrackOptionsPopover.vue'
 import InteractiveWaveform from '../InteractiveWaveform.vue'
-import { useAudioPlayerStore } from '../../stores/audioPlayer'
 import { useAuthStore } from '../../stores/auth'
 import getWaveformColors from '../../utils/getWaveformColors'
+import useInteractiveWafeform from '../../composables/useInteractiveWafeform'
 import { computed } from 'vue'
+import { useCssVar } from '@vueuse/core'
 
 const { track } = defineProps<{ track: Track }>()
-const audioPlayerStore = useAudioPlayerStore()
 const authStore = useAuthStore()
 
-async function handleWaveformClick(newProgress: number) {
-  if (!audioPlayerStore.track || track._id !== audioPlayerStore.track._id) {
-    audioPlayerStore.setNewTrack(track as PlayableTrack, { progress: newProgress * 100, isPaused: false })
-  } else {
-    audioPlayerStore.setProgress(newProgress * 100)
-  }
+const { handleWaveformClick, waveformProgress } = useInteractiveWafeform(track)
+
+const colors = {
+  waveformColor: useCssVar('--darkGrey').value,
+  progressColor: useCssVar('--primary').value,
+  highlightColor: useCssVar('--darkPrimary').value,
 }
 
-const { waveformColor, progressColor, highlightColor } = getWaveformColors(track.image.averageColor.hex)
+if (track.image.averageColor) {
+  Object.assign(colors, getWaveformColors(track.image.averageColor.hex))
+}
+
+const { waveformColor, progressColor, highlightColor } = colors
 
 const textColor = computed(() => {
   return progressColor
@@ -30,9 +34,7 @@ const textColor = computed(() => {
   <div
     class="base-container p-4 flex gap-8 relative"
     :style="[
-      track.image && track.image.averageColor
-        ? { background: track.image.averageColor.hex, color: textColor }
-        : { backgroundColor: 'var(--grey)', color: 'black' },
+      track.image.averageColor ? { background: track.image.averageColor.hex, color: textColor } : { backgroundColor: 'var(--grey)', color: 'white' },
     ]"
   >
     <div v-if="track.author._id === authStore.user?._id" class="absolute top-4 right-4">
@@ -52,7 +54,7 @@ const textColor = computed(() => {
           :progress-color="progressColor"
           :highlight-color="highlightColor"
           :waveform-data="track.audio.waveform.samples"
-          :progress="audioPlayerStore.track?._id === track._id ? audioPlayerStore.progress / 100 : 0"
+          :progress="waveformProgress"
           @progress-click="handleWaveformClick"
         />
       </div>

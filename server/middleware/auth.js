@@ -1,6 +1,5 @@
 import jwt from 'jsonwebtoken'
 import AppError from '../classes/AppError.js'
-import mongoose from 'mongoose'
 import User from '../models/User.js'
 
 export const verifyToken = async (req, res, next) => {
@@ -11,34 +10,38 @@ export const verifyToken = async (req, res, next) => {
     return next()
   }
 
-  const token = authHeader.split(' ')[1]
+  const accessToken = authHeader.split(' ')[1]
 
-  if (!token || token == 'null') {
+  if (!accessToken || accessToken == 'null') {
     req.isAuthenticated = false
     return next()
   }
 
-  try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET)
+  jwt.verify(accessToken, process.env.JWT_SECRET, async (err, payload) => {
+    try {
+      if (err) {
+        req.isAuthenticated = false
+        //check if token has expired
+        if (err.name === 'TokenExpiredError') {
+          req.isAuthenticated = false
+          return next()
+        }
+        //other cause of failed token validation
+        throw new AppError('TOKEN_VALIDATION_FAILED', 401)
+      }
 
-    const user = await User.findById(payload.id)
-    if (!user) throw new AppError('AUTH_FAILED')
+      const user = await User.findById(payload.id)
+      if (!user) throw new AppError('TOKEN_VALIDATION_FAILED')
 
-    req.userId = mongoose.Types.ObjectId.createFromHexString(payload.id)
-    req.user = user
-    req.isAuthenticated = true
-    return next()
-  } catch (e) {
-    console.log('Token verification failed')
+      req.userId = user._id
+      req.user = user
+      req.isAuthenticated = true
 
-    if (e instanceof jwt.TokenExpiredError) {
-      return res.json({ message: 'TokenExpired' })
+      return next()
+    } catch (error) {
+      next(error)
     }
-
-    const error = new AppError('AUTH_FAILED', 400)
-    req.isAuthenticated = false
-    return next(error)
-  }
+  })
 }
 
 export const isAuthenticated = (req, res, next) => {

@@ -183,18 +183,27 @@ export const getTracks = async (req, res) => {
   const { type } = req.params // Validated 'type'
   const start = parseInt(req.query.start) || 0 // Defaults to 0 if not provided
   const amount = parseInt(req.query.amount) || 10 // Defaults to 10 if not provided
-  const { authorId, phrase, liked } = req.query
+  const { authorId, phrase, liked, unverified } = req.query
 
   const filterSchema = FILTER_SCHEMAS[type]
+  let Model = Track
   const filter = {}
 
   if (authorId) filter.author = authorId
 
-  if (liked && req.isAuthenticated) {
+  if (liked) {
+    if (!req.isAuthenticated) throw new AppError('NOT_AUTHENTICATED', 401)
     //find ids of tracks liked by a user and add them to the filter
     const likes = await Like.find({ userId: req.userId })
     const trackIds = likes.map(el => el.trackId)
     filter._id = { $in: trackIds }
+  }
+
+  if (unverified) {
+    if (!req.isAuthenticated) throw new AppError('NOT_AUTHENTICATED', 401)
+    filter.author = req.userId
+    filter.verified = false
+    Model = UnverifiedTrack
   }
 
   // Apply phrase-based search if 'phrase' is provided
@@ -241,7 +250,7 @@ export const getTracks = async (req, res) => {
   }
 
   //only populate username on author
-  const tracks = await Track.find(filter).sort({ createdAt: -1 }).skip(start).limit(amount).populate('author', 'username').populate({
+  const tracks = await Model.find(filter).sort({ createdAt: -1 }).skip(start).limit(amount).populate('author', 'username').populate({
     path: 'comments.author', // Populate the author field in comments
     select: 'username image', // Only select username and profilePic
   })
@@ -267,7 +276,7 @@ export const getTracks = async (req, res) => {
   )
 
   // Check if there are more tracks available in the database
-  const totalTracksCount = await Track.countDocuments(filter)
+  const totalTracksCount = await Model.countDocuments(filter)
   const isMore = totalTracksCount > start + amount
 
   res.json({ tracks: formattedTracks, isMore })
@@ -297,13 +306,6 @@ export const getSingleTrack = async (req, res) => {
   res.json({
     track: formattedTrack,
   })
-}
-
-export const getUnverifiedTracks = async (req, res) => {
-  const start = parseInt(req.query.start) || 0 // Defaults to 0 if not provided
-  const amount = parseInt(req.query.amount) || 10 // Defaults to 10 if not provided
-
-  const tracks = await UnverifiedTrack.find({ author: req.userId })
 }
 
 export const toggleTrackLike = async (req, res) => {
