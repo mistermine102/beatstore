@@ -48,7 +48,10 @@ const schema = new Schema({
     required: true,
   },
   image: {
-    filename: String,
+    filename: {
+      type: String,
+      default: 'rudimentary-image.png'
+    },
     averageColor: Object,
   },
   audio: audioSchema,

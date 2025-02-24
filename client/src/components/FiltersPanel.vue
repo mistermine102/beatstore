@@ -10,7 +10,7 @@ const emit = defineEmits(['filtersUpdated', 'removeFilter'])
 </script>
 
 <template>
-  <div>
+  <div class="bg-grey py-3 px-4 flex gap-x-16">
     <BasePopover v-for="filter in props.filters" :key="filter.id">
       <template #popover-button>
         <p>{{ filter.label }}</p>

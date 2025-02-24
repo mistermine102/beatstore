@@ -1,16 +1,15 @@
 import Track, { UnverifiedTrack } from '../models/Track.js'
 import AppError from '../classes/AppError.js'
 import { uploadFileToS3, deleteFileFromS3 } from '../s3.js'
-import Audio from '../classes/Audio.js'
-import getAudioDuration from '../utils/getAudioDuration.js'
 import User from '../models/User.js'
 import Like from '../models/Like.js'
 import checkUserInteraction from '../utils/checkUserInteraction.js'
 import Sharp from 'sharp'
 import { getAverageColor } from 'fast-average-color-node'
 import formatTrackData from '../utils/formatTrackData.js'
-import getWaveformData from '../utils/getWaveformData.js'
+import getWaveformSamples from '../utils/getWaveformSamples.js'
 import formatComments from '../utils/formatComments.js'
+import { getAudioDurationObject } from '../utils/audioDuration.js'
 
 const UPLOAD_SCHEMAS = {
   beat: {
@@ -51,7 +50,11 @@ const FILTER_SCHEMAS = {
     key: 'set',
   },
   drumkit: {},
-  all: {},
+  all: {
+    bpm: 'range',
+    key: 'set',
+    genre: 'set',
+  },
 }
 
 export const uploadTrack = async (req, res) => {
@@ -73,26 +76,20 @@ export const uploadTrack = async (req, res) => {
   //attach author
   newTrack.author = req.userId
 
-  //attach rudimentary image
-  newTrack.image = {
-    filename: 'rudimentary-image.png',
-  }
-
   //process audio
   if (uploadSchema.audio !== undefined) {
     // if schema contains audio field then it is required
     if (!req.file) throw new AppError('AUDIO_IS_REQUIRED', 400)
 
     const filename = await uploadFileToS3(req.file)
-    const duration = Math.floor(await getAudioDuration(req.file.buffer))
+    const duration = getAudioDurationObject(req.file.buffer)
+    const waveformSamples = await getWaveformSamples(req.file.buffer)
 
-    const audio = new Audio({
+    newTrack.audio = {
       filename,
+      waveform: { samples: waveformSamples },
       duration,
-    })
-
-    newTrack.audio = audio
-    newTrack.audio.waveform.samples = await getWaveformData(req.file.buffer)
+    }
   }
 
   //save a track
@@ -211,6 +208,7 @@ export const getTracks = async (req, res) => {
     const formattedPhrase = phrase.trim().toLowerCase()
     // Use $text search if available
     filter.$text = { $search: formattedPhrase }
+    console.log(filter.$text)
   }
 
   //don't add type filter if querying for all tracks

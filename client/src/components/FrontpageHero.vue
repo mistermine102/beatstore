@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import BaseSearchbar from './base/BaseSearchbar.vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
+
+const searchPhrase = ref('')
 </script>
 
 <template>
@@ -13,6 +16,7 @@ const router = useRouter()
         <span class="font-secondary text-[56px] text-primary">Beats, Samples and more</span>
       </h1>
       <BaseSearchbar
+        v-model="searchPhrase"
         @search="phrase => router.push(`/tracks/browse?q=${phrase}`)"
         placeholder="What are you looking for?"
         class="mt-8"

@@ -28,11 +28,13 @@ export default function useFilters(trackType: Ref<TrackType>) {
   const BeatFilters: Filter[] = [bpmFilter.value, keyFilter.value, genreFilter.value]
   const SampleFilters: Filter[] = [bpmFilter.value, keyFilter.value]
   const DrumkitFilters: Filter[] = []
+  const AllFilters: Filter[] = [bpmFilter.value, keyFilter.value, genreFilter.value]
 
   const filters = {
     beat: BeatFilters,
     sample: SampleFilters,
     drumkit: DrumkitFilters,
+    all: AllFilters,
   }
 
   // Reactive reference for the current filters
