@@ -1,5 +1,5 @@
 import { computed, ref, watch, type Ref } from 'vue'
-import { GENRES, KEYS } from '../constants'
+import { GENRES, INSTRUMENTS, KEYS, MOODS } from '../constants'
 
 export default function useFilters(trackType: Ref<TrackType>) {
   // Define the filters
@@ -24,16 +24,32 @@ export default function useFilters(trackType: Ref<TrackType>) {
     values: GENRES.map(el => [el, false]),
   })
 
+  const instrumentsFilter = ref<Filter>({
+    id: 'instruments',
+    type: 'set',
+    label: 'Instruments',
+    values: INSTRUMENTS.map(el => [el, false]),
+  })
+
+  const moodFilter = ref<Filter>({
+    id: 'mood',
+    type: 'set',
+    label: 'Mood',
+    values: MOODS.map(el => [el, false]),
+  })
+
   // Define filters for each track type
-  const BeatFilters: Filter[] = [bpmFilter.value, keyFilter.value, genreFilter.value]
-  const SampleFilters: Filter[] = [bpmFilter.value, keyFilter.value]
+  const AllFilters: Filter[] = [bpmFilter.value, keyFilter.value, genreFilter.value, instrumentsFilter.value, moodFilter.value]
+  const BeatFilters: Filter[] = [bpmFilter.value, keyFilter.value, genreFilter.value, instrumentsFilter.value, moodFilter.value]
+  const SampleFilters: Filter[] = [bpmFilter.value, keyFilter.value, instrumentsFilter.value, moodFilter.value]
+  const LoopFilters: Filter[] = [bpmFilter.value, keyFilter.value, instrumentsFilter.value, moodFilter.value]
   const DrumkitFilters: Filter[] = []
-  const AllFilters: Filter[] = [bpmFilter.value, keyFilter.value, genreFilter.value]
 
   const filters = {
     beat: BeatFilters,
     sample: SampleFilters,
     drumkit: DrumkitFilters,
+    loop: LoopFilters,
     all: AllFilters,
   }
 

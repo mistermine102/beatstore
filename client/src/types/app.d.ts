@@ -6,7 +6,7 @@ interface User {
   roles: string[]
 }
 
-type TrackType = 'beat' | 'sample' | 'drumkit' | 'all'
+type TrackType = 'beat' | 'sample' | 'drumkit' | 'loop' | 'all'
 
 interface TrackComment {
   _id: string
@@ -95,6 +95,13 @@ interface Sample extends BasePlayableTrack {
   bpm?: string
 }
 
+interface Loop extends BasePlayableTrack {
+  type: TrackType = 'loop'
+  playable: true
+  key?: string
+  bpm?: string
+}
+
 interface Drumkit extends BaseTrack {
   type: TrackType = 'drumkit'
   playable: false
@@ -102,9 +109,9 @@ interface Drumkit extends BaseTrack {
   //add directories
 }
 
-type Track = Beat | Sample | Drumkit
+type Track = Beat | Sample | Drumkit | Loop
 
-type PlayableTrack = Beat | Sample
+type PlayableTrack = Beat | Sample | Loop
 
 type ToastType = 'info' | 'error' | 'success'
 

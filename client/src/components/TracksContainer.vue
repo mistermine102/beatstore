@@ -8,6 +8,7 @@ interface Props {
   isMore: boolean
   isLoadingMore: boolean
   isLoading?: boolean
+  columns?: number
 }
 
 interface Emits {
@@ -28,9 +29,11 @@ const emit = defineEmits<Emits>()
       <div v-if="!tracks.length" class="flex justify-left">
         <EmptyState />
       </div>
-      <div v-else class="grid gap-8">
-        <Track v-for="track in tracks" :track="track" :key="track._id" @like-toggled="emit('likeToggled', track)"></Track>
-        <div class="w-1/2 mx-auto">
+      <div v-else>
+        <div class="grid gap-12">
+          <Track v-for="track in tracks" :track="track" @like-toggled="emit('likeToggled', track)"></Track>
+        </div>
+        <div class="w-1/2 mx-auto mt-16">
           <BaseButton v-if="isMore" :is-loading="isLoadingMore" alt @click="emit('loadedMore')" class="w-full">Load more</BaseButton>
         </div>
       </div>

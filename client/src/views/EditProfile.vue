@@ -36,7 +36,7 @@ function editProfile(e: Event) {
       await appApi.postForm('/profile/image', { image: editedProfile.value.image })
     }
 
-    toastStore.show({type: 'success', title: "Profile edited!"})
+    toastStore.show({ type: 'success', title: 'Profile edited!' })
   })
 }
 
@@ -66,7 +66,9 @@ onMounted(async () => {
         accept="image/*"
       >
         <template #icon>
-          <ImageIcon class="w-[48px]" />
+          <div class="w-[48px]">
+            <ImageIcon />
+          </div>
         </template>
       </UploadFileContainer>
       <div class="w-1/2 mx-auto mt-8">

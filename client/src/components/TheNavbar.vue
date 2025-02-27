@@ -2,18 +2,15 @@
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '../stores/auth'
 import ProfilePopover from './ProfilePopover.vue'
-import { useRoute, useRouter } from 'vue-router'
 import { HeartIcon } from './icons/index.vine'
-import BaseSearchbar from './base/BaseSearchbar.vue'
 
 const authStore = useAuthStore()
-const router = useRouter()
 
 const { user } = storeToRefs(authStore)
 </script>
 
 <template>
-  <header class="fixed z-10 top-0 right-0 left-0 bg-darkGrey px-32 shadow-xl">
+  <header class="fixed z-30 top-0 right-0 left-0 bg-darkGrey px-32 shadow-xl">
     <nav class="py-4 px-16 flex items-center justify-between">
       <div class="flex gap-x-32">
         <div class="flex justify-start">

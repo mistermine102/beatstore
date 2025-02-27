@@ -5,7 +5,7 @@ const schema = new Schema({
   username: {
     type: String,
     unique: true,
-    required: true
+    required: true,
   },
   email: {
     type: String,
@@ -57,7 +57,18 @@ const schema = new Schema({
     type: Date,
     default: Date.now,
   },
+  verifiedAt: {
+    type: Date,
+    default: null,
+  },
 })
+
+const unverifiedUserSchema = schema.clone()
+
+unverifiedUserSchema.index({ createdAt: 1 }, { expireAfterSeconds: 3600 })
+
 const User = mongoose.model('User', schema)
+
+export const UnverifiedUser = mongoose.model('UnverifiedUser', unverifiedUserSchema)
 
 export default User

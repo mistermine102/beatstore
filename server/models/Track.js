@@ -50,7 +50,7 @@ const schema = new Schema({
   image: {
     filename: {
       type: String,
-      default: 'rudimentary-image.png'
+      default: 'rudimentary-image.png',
     },
     averageColor: Object,
   },
@@ -62,6 +62,8 @@ const schema = new Schema({
   bpm: Number,
   key: String,
   genre: String,
+  instruments: [String],
+  mood: String,
   price: Object,
   playable: Boolean,
   totalLikes: Number,

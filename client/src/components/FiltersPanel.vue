@@ -6,15 +6,16 @@ import { ChevronDownIcon } from './icons/index.vine'
 // Props for the filters
 const props = defineProps<{ filters: Filter[] }>()
 const emit = defineEmits(['filtersUpdated', 'removeFilter'])
-
 </script>
 
 <template>
   <div class="bg-grey py-3 px-4 flex gap-x-16">
     <BasePopover v-for="filter in props.filters" :key="filter.id">
       <template #popover-button>
-        <p>{{ filter.label }}</p>
-        <ChevronDownIcon />
+        <div class="flex">
+          <p>{{ filter.label }}</p>
+          <ChevronDownIcon />
+        </div>
       </template>
       <template #popover-content>
         <div v-if="filter.type === 'range'" class="flex gap-x-2">

@@ -14,7 +14,7 @@ const getTracksValidators = [
   param('type')
     .exists()
     .withMessage('type is required')
-    .isIn(['beat', 'sample', 'drumkit', 'all'])
+    .isIn(['beat', 'sample', 'drumkit', 'all', 'loop'])
     .withMessage('type must be one of: beat, sample, drumkit, all'),
   query('start')
     .optional() // Allow 'start' to be omitted
@@ -38,7 +38,7 @@ const uploadTrackValidators = [
     .trim()
     .isString()
     .withMessage('Type must be a string')
-    .isIn(['beat', 'sample', 'drumkit']),
+    .isIn(['beat', 'sample', 'drumkit', 'loop']),
   body('title').exists().withMessage('Title cannot be empty').trim().isString().withMessage('Title must be a string').isLength({ min: 4 }),
 ]
 

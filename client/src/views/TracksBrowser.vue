@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import BaseSearchbar from '../components/base/BaseSearchbar.vue'
 import useTrackFilters from '../composables/useTrackFilters'
 import FiltersPanel from '../components/FiltersPanel.vue'
@@ -8,6 +8,7 @@ import useTracks from '../composables/useTracks'
 import CurrentFilters from '../components/CurrentFilters.vue'
 import debounce from '../utils/debounce'
 import { useRoute, useRouter } from 'vue-router'
+import BaseSelect from '../components/base/BaseSelect.vue'
 
 const trackType = ref<TrackType>('all')
 
@@ -50,16 +51,31 @@ watch([activeFilters, searchPhrase], () => {
   isLoading.value = true
   debouncedGetTracks()
 })
+
+const options = [
+  {
+    label: 'All',
+    value: 'all',
+  },
+  {
+    label: 'Beats',
+    value: 'beat',
+  },
+  {
+    label: 'Samples',
+    value: 'sample',
+  },
+  {
+    label: 'Loops',
+    value: 'loop',
+  },
+]
 </script>
 
 <template>
   <div>
     <div class="flex gap-x-8 mb-4">
-      <select v-model="trackType" class="base-input">
-        <option value="all">All</option>
-        <option value="beat">Beats</option>
-        <option value="sample">Samples</option>
-      </select>
+      <BaseSelect v-model="trackType" :options="options" class="w-48" />
       <BaseSearchbar
         @search="phrase => (searchPhrase = phrase)"
         v-model="searchPhrase"
@@ -68,10 +84,9 @@ watch([activeFilters, searchPhrase], () => {
         placeholder="Search"
         class="flex-1"
       />
-      <div></div>
     </div>
     <FiltersPanel :filters="currentFilters" class="mb-2" />
-    <div class="h-8 mb-4">
+    <div class="min-h-8 mb-4">
       <CurrentFilters :filters="currentFilters" @remove-filter="removeFilter" />
     </div>
     <TracksContainer

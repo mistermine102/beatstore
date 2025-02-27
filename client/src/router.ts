@@ -12,6 +12,9 @@ const routes: RouteRecordRaw[] = [
   { path: '/profile/:id/edit', component: () => import('./views/EditProfile.vue') },
   { path: '/admin', component: () => import('./views/Admin.vue') },
   { path: '/tracks/browse', component: () => import('./views/TracksBrowser.vue') },
+  { path: '/verify-user/success', component: () => import('./views/UserVerified.vue') },
+  { path: '/verify-user/link-expired', component: () => import('./views/UserVerifyLinkExpired.vue') },
+  { path: '/verify-user/check-email', component: () => import('./views/CheckEmail.vue') },
 ]
 
 const router = createRouter({

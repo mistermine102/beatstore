@@ -145,8 +145,8 @@ body {
 }
 
 .base-checkbox input::after {
-  content: url('/images/check.svg');
-  transform: translateY(2px);
+  content: url('/check.svg');
+  /* transform: translateY(2px); */
   display: none;
 }
 

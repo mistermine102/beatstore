@@ -18,6 +18,8 @@ const UPLOAD_SCHEMAS = {
     audio: null,
     key: '',
     genre: '',
+    mood: '',
+    instruments: [],
     bpm: '',
     totalLikes: 0,
     totalStreams: 0,
@@ -29,6 +31,8 @@ const UPLOAD_SCHEMAS = {
     audio: null,
     key: '',
     bpm: '',
+    mood: '',
+    instruments: [],
     totalLikes: 0,
     totalStreams: 0,
     playable: true,
@@ -37,6 +41,18 @@ const UPLOAD_SCHEMAS = {
     title: '',
     type: 'drumkit',
   },
+  loop: {
+    title: '',
+    type: 'loop',
+    audio: null,
+    key: '',
+    bpm: '',
+    mood: '',
+    instruments: [],
+    totalLikes: 0,
+    totalStreams: 0,
+    playable: true,
+  },
 }
 
 const FILTER_SCHEMAS = {
@@ -44,16 +60,28 @@ const FILTER_SCHEMAS = {
     bpm: 'range',
     key: 'set',
     genre: 'set',
+    mood: 'set',
+    instruments: 'set',
   },
   sample: {
     bpm: 'range',
     key: 'set',
+    mood: 'set',
+    instruments: 'set',
   },
   drumkit: {},
+  loop: {
+    bpm: 'range',
+    key: 'set',
+    mood: 'set',
+    instruments: 'set',
+  },
   all: {
     bpm: 'range',
     key: 'set',
     genre: 'set',
+    mood: 'set',
+    instruments: 'set',
   },
 }
 
@@ -208,7 +236,6 @@ export const getTracks = async (req, res) => {
     const formattedPhrase = phrase.trim().toLowerCase()
     // Use $text search if available
     filter.$text = { $search: formattedPhrase }
-    console.log(filter.$text)
   }
 
   //don't add type filter if querying for all tracks

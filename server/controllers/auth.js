@@ -2,10 +2,11 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 import Bcrypt from 'bcryptjs'
-import User from '../models/User.js'
+import User, { UnverifiedUser } from '../models/User.js'
 import jwt from 'jsonwebtoken'
 import AppError from '../classes/AppError.js'
 import { UAParser } from 'ua-parser-js'
+import sendVerifyEmail from '../utils/sendVerifyEmail.js'
 
 const ACCESS_TOKEN_EXPIRATION = process.env.ACCESS_TOKEN_EXPIRATION
 const REFRESH_TOKEN_EXPIRATION = process.env.REFRESH_TOKEN_EXPIRATION
@@ -38,13 +39,22 @@ const generateRefreshToken = (user, req) => {
 
 export const register = async (req, res) => {
   const { username, email, password } = req.body
-  const existingUser = await User.findOne({ email })
 
+  //check if email is available
+  const existingUser = await User.findOne({ email })
   if (existingUser) throw new AppError('EMAIL_NOT_AVAILABLE', 400)
 
+  //check if user is in the unverified users collection
+  const unverifiedUser = await UnverifiedUser.findOne({ email })
+  if (unverifiedUser) throw new AppError('USER_NOT_VERIFIED', 400)
+
+  //create new unverified user
   const hashedPassword = await Bcrypt.hash(password, 12)
-  const newUser = new User({ username, email, password: hashedPassword })
+  const newUser = new UnverifiedUser({ username, email, password: hashedPassword })
   await newUser.save()
+
+  //send verify email
+  await sendVerifyEmail(email)
 
   res.json({ message: 'User registered successfully' })
 }
@@ -133,4 +143,31 @@ export const logout = async (req, res) => {
 
   res.clearCookie('refreshToken')
   res.json({ message: 'Logged out successfully' })
+}
+
+export const verifyUser = async (req, res) => {
+  //extract and verify token
+  const { token } = req.params
+
+  jwt.verify(token, process.env.JWT_EMAIL_SECRET, async (err, payload) => {
+    //if token expired return a response
+    if (err && err.name === 'TokenExpiredError') return res.redirect('http://localhost:5173/verify-user/link-expired')
+
+    const { email } = payload
+
+    console.log(email)
+
+    //find unverified user
+    const unverifiedUser = await UnverifiedUser.findOne({ email })
+    if (!unverifiedUser) throw new AppError('UNVERIFIED_USER_NOT_FOUND')
+
+    //create new verified user (just a user)
+    const newUser = new User({ ...unverifiedUser._doc, verifiedAt: Date.now() })
+
+    //save new user and delete unverified user
+    await newUser.save()
+    await unverifiedUser.deleteOne()
+
+    res.redirect('http://localhost:5173/verify-user/success')
+  })
 }

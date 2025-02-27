@@ -14,9 +14,9 @@ const authStore = useAuthStore()
 const toastStore = useToastStore()
 const router = useRouter()
 
-const email = ref('')
-const username = ref('')
-const password = ref('')
+const email = ref('szymonjarosz102@gmail.com')
+const username = ref('mistermine102')
+const password = ref('szymon102')
 
 function validate() {
   //all of toasts in this function will be error toasts with this title
@@ -49,8 +49,7 @@ function register() {
         password: password.value,
       })
 
-      router.push('/')
-      toastStore.show({ type: 'success', title: 'Logged in!' })
+      router.push('/verify-user/check-email')
     },
     err => {
       if (err instanceof AxiosError && err.response) {

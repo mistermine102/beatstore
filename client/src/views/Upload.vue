@@ -7,7 +7,9 @@ import useAsyncWrap from '../composables/useAsyncWrap'
 import appApi from '../api/appApi'
 import { useToastStore } from '../stores/toast'
 import { useRouter } from 'vue-router'
-import { KEYS, GENRES } from '../constants'
+import { KEYS, GENRES, INSTRUMENTS, MOODS } from '../constants'
+import BaseSelect from '../components/base/BaseSelect.vue'
+import BaseCheckboxSelect from '../components/base/BaseCheckboxSelect.vue'
 
 interface NewTrack {
   title: string
@@ -16,6 +18,8 @@ interface NewTrack {
   bpm?: string
   key?: string
   genre?: string
+  mood?: string
+  instruments?: string[]
   audio?: File | null
 }
 
@@ -27,6 +31,12 @@ interface NewBeat extends NewTrack {
 }
 
 interface NewSample extends NewTrack {
+  bpm: string
+  key: string
+  audio: File | null
+}
+
+interface NewLoop extends NewTrack {
   bpm: string
   key: string
   audio: File | null
@@ -44,8 +54,8 @@ const TRACK_TYPES_BUTTONS = [
     type: 'sample' as TrackType,
   },
   {
-    title: 'Drumkit',
-    type: 'drumkit' as TrackType,
+    title: 'Loop',
+    type: 'loop' as TrackType,
   },
 ]
 
@@ -55,7 +65,20 @@ const NEW_BEAT_SCHEMA: NewBeat = {
   type: 'beat',
   bpm: '',
   key: '',
+  mood: '',
+  instruments: [],  
   genre: '',
+  image: null,
+  audio: null,
+}
+
+const NEW_SAMPLE_SCHEMA: NewSample = {
+  title: '',
+  type: 'sample',
+  bpm: '',
+  key: '',
+  mood: '',
+  instruments: [],
   image: null,
   audio: null,
 }
@@ -66,11 +89,13 @@ const NEW_DRUMKIT_SCHEMA: NewDrumkit = {
   image: null,
 }
 
-const NEW_SAMPLE_SCHEMA: NewSample = {
+const NEW_LOOP_SCHEMA: NewLoop = {
   title: '',
-  type: 'sample',
+  type: 'loop',
   bpm: '',
   key: '',
+  mood: '',
+  instruments: [],
   image: null,
   audio: null,
 }
@@ -80,6 +105,7 @@ const SCHEMAS = {
   beat: NEW_BEAT_SCHEMA,
   sample: NEW_SAMPLE_SCHEMA,
   drumkit: NEW_DRUMKIT_SCHEMA,
+  loop: NEW_LOOP_SCHEMA,
 }
 
 const wrapUploadTrack = reactive(useAsyncWrap())
@@ -145,8 +171,13 @@ function uploadTrack(e: Event) {
 <template>
   <div class="mt-16">
     <h1 class="base-heading">Upload</h1>
-    <div class="grid grid-cols-3 gap-x-8">
-      <button  v-for="btn in TRACK_TYPES_BUTTONS" :disabled="btn.type === 'drumkit'" @click="uploadType = btn.type" :class="[btn.type === uploadType ? 'base-btn' : 'base-btn-alt', btn.type === 'drumkit' ? 'opacity-50' : undefined ]">
+    <div class="grid grid-cols-3 gap-x-8 gap-y-4">
+      <button
+        v-for="btn in TRACK_TYPES_BUTTONS"
+        :disabled="btn.type === 'drumkit'"
+        @click="uploadType = btn.type"
+        :class="[btn.type === uploadType ? 'base-btn' : 'base-btn-alt', btn.type === 'drumkit' ? 'opacity-50' : undefined]"
+      >
         {{ btn.title }}
       </button>
     </div>
@@ -156,7 +187,9 @@ function uploadTrack(e: Event) {
         <h2 class="mt-8 mb-2 text-lg">Audio file</h2>
         <UploadFileContainer @file-selected="file => (newTrack.audio = file ? file : null)" id="audio" max-file-size="25MB" accept="audio/*">
           <template #icon>
-            <UploadIcon class="w-[48px]" />
+            <div class="w-[48px]">
+              <UploadIcon />
+            </div>
           </template>
         </UploadFileContainer>
       </div>
@@ -165,14 +198,27 @@ function uploadTrack(e: Event) {
         <!-- if a field exists on schema (isn't undefined) then display it's input -->
         <input v-if="newTrack.title !== undefined" v-model="newTrack.title" id="title" class="base-input w-full" type="text" placeholder="Title" />
         <input v-if="newTrack.bpm !== undefined" v-model="newTrack.bpm" id="bpm" class="base-input w-full" type="text" placeholder="Bpm" />
-        <select v-if="newTrack.key !== undefined" v-model="newTrack.key" id="key" class="base-input w-full">
-          <option value="" disabled selected>Key</option>
-          <option v-for="key in KEYS" :value="key">{{ key }}</option>
-        </select>
-        <select v-if="newTrack.genre !== undefined" v-model="newTrack.genre" id="genre" class="base-input w-full">
-          <option value="" disabled selected>Genre</option>
-          <option v-for="genre in GENRES" :value="genre">{{ genre }}</option>
-        </select>
+        <BaseSelect v-if="newTrack.key !== undefined" v-model="newTrack.key" :options="KEYS.map(k => ({ value: k, label: k }))" placeholder="Key" />
+        <BaseSelect
+          v-if="newTrack.genre !== undefined"
+          v-model="newTrack.genre"
+          :options="GENRES.map(g => ({ value: g, label: g }))"
+          class="base-input px-0"
+          placeholder="Genre"
+        />
+        <BaseCheckboxSelect
+          v-if="newTrack.instruments !== undefined"
+          v-model="newTrack.instruments"
+          :options="INSTRUMENTS.map(i => ({ value: i, label: i }))"
+          placeholder="Instruments"
+        />
+        <BaseSelect
+          v-if="newTrack.mood !== undefined"
+          v-model="newTrack.mood"
+          :options="MOODS.map(m => ({ value: m, label: m }))"
+          class="base-input px-0"
+          placeholder="Mood"
+        />
       </div>
       <!-- if a field exists on schema (isn't undefined) then display it's input -->
       <div>
@@ -186,7 +232,9 @@ function uploadTrack(e: Event) {
           accept="image/*"
         >
           <template #icon>
-            <ImageIcon class="w-[48px]" />
+            <div class="w-[48px]">
+              <ImageIcon />
+            </div>
           </template>
         </UploadFileContainer>
       </div>

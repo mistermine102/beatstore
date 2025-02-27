@@ -3,7 +3,7 @@ import appApi from '../api/appApi'
 import useAsyncWrap from '../composables/useAsyncWrap'
 import { HeartIcon, TrashIcon } from './icons/index.vine'
 import { useAuthStore } from '../stores/auth'
-import { useToastStore } from '../stores/toast';
+import { useToastStore } from '../stores/toast'
 
 const props = defineProps<{ comment: TrackComment; track: Track }>()
 const emit = defineEmits(['toggleLike', 'deleteComment'])
@@ -43,16 +43,16 @@ function deleteComment() {
         <p class="text-textLightGrey">{{ comment.author.username }}</p>
         <p class="mb-2">{{ comment.content }}</p>
         <div class="flex h-fit gap-x-2">
-          <button @click="toggleLike">
-            <HeartIcon :class="comment.isLiked ? 'text-primary' : 'text-textLightGrey'" />
+          <button @click="toggleLike" :class="comment.isLiked ? 'text-primary' : 'text-textLightGrey'">
+            <HeartIcon />
           </button>
           <p class="text-center">{{ comment.totalLikes }}</p>
         </div>
       </div>
     </div>
     <div v-if="comment.author._id === authStore.user?._id" class="opacity-0 group-hover:opacity-100 transition-opacity">
-      <button @click="deleteComment">
-        <TrashIcon class="text-red-500" />
+      <button @click="deleteComment" class="text-red-500">
+        <TrashIcon />
       </button>
     </div>
   </div>

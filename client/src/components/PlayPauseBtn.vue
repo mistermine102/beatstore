@@ -6,14 +6,13 @@ import appApi from '../api/appApi'
 import useAsyncWrap from '../composables/useAsyncWrap'
 import { PlayIcon, PauseIcon } from './icons/index.vine'
 
-const props = defineProps<{ track: PlayableTrack }>()
+const props = defineProps<{ track: PlayableTrack; buttonClass?: string }>()
 
 const audioPlayerStore = useAudioPlayerStore()
 const { track: currentlyPlayingTrack, isPaused } = storeToRefs(audioPlayerStore)
 
 const wrapCountStream = reactive(useAsyncWrap())
 
-// Methods
 function playAudio() {
   //count stream
   if ((!currentlyPlayingTrack.value || currentlyPlayingTrack.value._id !== props.track._id) && props.track.verified) {
@@ -41,11 +40,21 @@ const isThatTrackPlaying = computed(() => {
 </script>
 
 <template>
-  <button v-if="!isThatTrackPlaying" @click="playAudio" class="flex gap-x-1 hover:text-primary transition-all duration-100">
+  <button
+    v-if="!isThatTrackPlaying"
+    @click="playAudio"
+    class="flex justify-center items-center gap-x-1 transition-all duration-100 w-full h-full"
+    :class="buttonClass"
+  >
     <PlayIcon />
     <span>Play</span>
   </button>
-  <button v-else @click="pauseAudio" class="flex gap-x-1 hover:text-primary transition-all duration-100">
+  <button
+    v-else
+    @click="pauseAudio"
+    class="flex justify-center items-center gap-x-1 transition-all duration-100 w-full h-full"
+    :class="buttonClass"
+  >
     <PauseIcon />
     <span>Pause</span>
   </button>
