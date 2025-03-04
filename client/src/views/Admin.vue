@@ -1,78 +1,39 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import appApi from '../api/appApi'
-import useAsyncWrap from '../composables/useAsyncWrap'
+import { useRouter } from 'vue-router'
 import BaseButton from '../components/base/BaseButton.vue'
-import EmptyState from '../components/EmptyState.vue'
-import PlayPauseBtn from '../components/PlayPauseBtn.vue'
 
-const tracks = ref<Track[]>([])
-
-const wrapGetTracks = useAsyncWrap()
-
-function getTracks() {
-  wrapGetTracks.run(async () => {
-    const response = await appApi.get<{ tracks: Track[] }>('/admin/tracks/unverified')
-    tracks.value = response.data.tracks
-  })
-}
-
-const wrapApproveTrack = useAsyncWrap()
-const trackApproved = ref({
-  id: '',
-  approved: false,
-})
-
-async function approveTrack(trackId: string, approve: boolean) {
-  wrapApproveTrack.run(async () => {
-    trackApproved.value.id = trackId
-    trackApproved.value.approved = approve
-    await appApi.post(`/admin/tracks/verify/${trackId}`, {
-      approve,
-    })
-    getTracks()
-  })
-}
-
-getTracks()
+const router = useRouter()
 </script>
 
 <template>
-  <h1 class="base-heading">Uploads to verify</h1>
-  <div v-if="wrapGetTracks.isLoading.value" class="flex justify-center">
-    <div class="loader"></div>
-  </div>
-  <div v-else-if="!tracks.length" class="w-full">
-    <EmptyState />
-  </div>
-  <div v-else class="grid grid-cols-3 gap-y-8 gap-x-16">
-    <div v-for="track in tracks" class="flex flex-col gap-y-4">
-      <div class="flex gap-x-4">
-        <img :src="track.image.url" class="image-medium" />
-        <div>
-          <PlayPauseBtn v-if="track.playable" :track="track" />
-          <p>TYPE: {{ track.type }}</p>
-          <p>TITLE: {{ track.title }}</p>
-          <p>KEY: {{ track.key }}</p>
-          <p>BPM: {{ track.bpm }}</p>
-          <p>GENRE: {{ track.genre }}</p>
+  <div>
+    <h1 class="base-heading text-left">Admin Panel</h1>
+    <div class="grid grid-cols-3 gap-8">
+      <button
+        class="w-full h-64 text-2xl bg-darkGrey hover:translate-y-[-2px] transition-transform duration-150 rounded-regular"
+        @click="router.push('/admin/uploads')"
+      >
+        <div class="flex flex-col justify-center items-center gap-4">
+          <svg class="w-[48px]" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path
+              d="M18 6h2v2h-2V6zm-2 4V8h2v2h-2zm-2 2v-2h2v2h-2zm-2 2h2v-2h-2v2zm-2 2h2v-2h-2v2zm-2 0v2h2v-2H8zm-2-2h2v2H6v-2zm0 0H4v-2h2v2z"
+              fill="currentColor"
+            />
+          </svg>
+          <h2 class="text-2xl">Verify Uploads</h2>
         </div>
-      </div>
-      <div class="flex gap-x-2">
-        <BaseButton
-          class="w-full"
-          @click="approveTrack(track._id, true)"
-          :is-loading="wrapApproveTrack.isLoading.value && track._id === trackApproved.id && trackApproved.approved"
-          >Approve</BaseButton
-        >
-        <BaseButton
-          class="w-full"
-          alt
-          @click="approveTrack(track._id, false)"
-          :is-loading="wrapApproveTrack.isLoading.value && track._id === trackApproved.id && !trackApproved.approved"
-          >Remove</BaseButton
-        >
-      </div>
+      </button>
+      <button
+        class="w-full h-64 text-2xl bg-darkGrey hover:translate-y-[-2px] transition-transform duration-150 rounded-regular"
+        @click="router.push('/admin/reports')"
+      >
+        <div class="flex flex-col justify-center items-center gap-4">
+          <svg class="w-[48px]" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M3 2h10v2h8v14H11v-2H5v6H3V2zm2 12h8v2h6V6h-8V4H5v10z" fill="currentColor" />
+          </svg>
+          <h2 class="text-2xl">Manage Reports</h2>
+        </div>
+      </button>
     </div>
   </div>
 </template>

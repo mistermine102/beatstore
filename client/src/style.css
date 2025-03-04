@@ -1,16 +1,25 @@
 @import url('https://fonts.googleapis.com/css2?family=Tiny5&display=swap');
+@import url('https://vercel.com/font/geist-sans');
+@import './style/animations.css';
 
 :root {
   --primary: #f765b8;
   --darkPrimary: #9f3f7d;
-  --grey: #242424;
-  --darkGrey: #0a0a0a;
+  --grey: #1a1a1a;
+  --darkGrey: hsl(0, 0%, 4%);
+  --midGrey: #2a2a2a;
   --background: #111111;
   --textDarkGrey: #242424;
+  --iconLightGrey: #cccccc;
   --textLightGrey: #a2a2a2;
-  --rounded: 0;
-  --fontPrimary: 'Tiny5', sans-serif;
-  --fontSecondary: 'Tiny5', sans-serif;
+  --rounded: 6px;
+  --fontPrimary: 'Geist Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji';
+  --fontSecondary: 'Tiny5', monospace;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 }
 
 * {
@@ -19,11 +28,18 @@
 
 html {
   overflow-y: scroll;
+  font-size: 14px;
 }
 
 body {
   font-family: var(--fontPrimary);
   color: white;
+  line-height: 1.7;
+  letter-spacing: -0.01em;
+  font-weight: 500;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 .font-primary {
@@ -74,35 +90,6 @@ body {
   width: 300px;
 }
 
-.base-btn {
-  background-color: var(--primary);
-  padding: 0.5rem 2rem;
-  border-radius: var(--rounded);
-  font-family: inherit;
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-}
-
-.base-btn-alt {
-  border: 2px solid var(--primary);
-  padding: 0.5rem 2rem;
-  border-radius: var(--rounded);
-  font-family: inherit;
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-}
-
-.base-heading {
-  margin-bottom: 2rem;
-  font-size: 2rem; /* 36px */
-  line-height: 2rem; /* 40px */
-  font-family: var(--fontPrimary);
-}
-
-.base-input {
-  background-color: var(--grey);
-  padding: 0.75rem 1.5rem;
-  border-radius: var(--rounded);
-}
-
 .base-input:focus {
   outline-color: var(--primary);
   outline-style: groove;
@@ -118,15 +105,6 @@ body {
   font-size: 0.9rem;
 }
 
-.base-container {
-  /* background-color: var(--grey); */
-  /* padding: 1rem; */
-  border-radius: var(--rounded);
-  /* --tw-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-  --tw-shadow-colored: 0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color); */
-  /* box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow); */
-}
-
 .base-checkbox {
   display: flex;
   align-items: center;
@@ -140,29 +118,33 @@ body {
   background-color: #d5d5d5;
   cursor: pointer;
   display: flex;
-  justify-items: center;
+  justify-content: center;
   align-items: center;
+  border-radius: 4px;
+  position: relative;
 }
 
 .base-checkbox input::after {
-  content: url('/check.svg');
-  /* transform: translateY(2px); */
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='white' d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
   display: none;
 }
 
 .base-checkbox input:hover {
-  background-color: #bebebe;
+  background-color: #9d9d9d;
 }
 
 .base-checkbox input:checked {
   background-color: var(--primary);
 }
+
 .base-checkbox input:checked::after {
   display: block;
-}
-
-.icon {
-  width: 24px;
 }
 
 .range-input-bar-container:hover .range-input-thumb {
@@ -175,7 +157,9 @@ body {
   height: 6px;
   width: 100%;
   z-index: 0;
+  border-radius: 9999px;
 }
+
 .range-input-thumb {
   background-color: var(--primary);
   z-index: 2;
@@ -184,7 +168,8 @@ body {
   position: absolute;
   transform: translateY(-3px) translateX(-4px);
   opacity: 0;
-  transition: opacity 100ms ease-in-out;
+  transition: opacity 150ms ease-in-out;
+  border-radius: 9999px;
 }
 
 .range-input-progress {
@@ -193,6 +178,7 @@ body {
   inset: 0;
   z-index: 1;
   pointer-events: none;
+  border-radius: 9999px;
 }
 
 .active-filter-badge {
@@ -201,6 +187,46 @@ body {
   cursor: pointer;
 }
 
+.tippy-box[data-theme~='custom'] {
+  background-color: var(--darkGrey);
+  color: white;
+  border: 1px solid var(--primary);
+  border-radius: var(--rounded);
+  padding: 6px 10px;
+}
+
+/* Remove all arrow styles since we're not using them anymore */
+.tippy-box[data-animation='fade'][data-state='hidden'] {
+  opacity: 0;
+}
+
+@keyframes tippy-fade {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.tippy-box[data-animation='fade'][data-state='visible'] {
+  animation: tippy-fade 150ms ease-out;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  .panel {
+    @apply bg-grey p-8 rounded-xl border border-white/[0.02] shadow-lg;
+  }
+
+  .base-heading {
+    @apply text-2xl mb-8;
+  }
+
+  .base-input {
+    @apply bg-grey rounded-regular px-4 py-2 text-white border border-white/[0.02] hover:border-white/[0.1] focus:outline-none focus:border-white/[0.1] transition-colors duration-150 ease-in-out;
+  }
+}

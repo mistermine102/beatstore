@@ -1,6 +1,6 @@
 import express from 'express'
 import { body } from 'express-validator'
-import { register, login, refreshToken, logout, getUser, verifyUser } from '../controllers/auth.js'
+import { register, login, refreshToken, logout, getUser, verifyUser, resendVerification } from '../controllers/auth.js'
 import tryCatch from '../utils/tryCatch.js'
 import validate from '../middleware/validate.js'
 
@@ -18,5 +18,6 @@ router.post('/refresh', tryCatch(refreshToken))
 router.post('/get-user', tryCatch(getUser))
 router.post('/logout', tryCatch(logout))
 router.get('/verify/:token', tryCatch(verifyUser))
+router.post('/resend-verification', tryCatch(resendVerification))
 
 export default router

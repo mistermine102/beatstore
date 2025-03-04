@@ -23,7 +23,12 @@ appApi.interceptors.response.use(
   async error => {
     const originalRequest = error.config
 
-    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+    // Only attempt refresh if we get ACCESS_TOKEN_EXPIRED message
+    if (
+      error.response?.status === 401 && 
+      error.response?.data?.message === 'ACCESS_TOKEN_EXPIRED' && 
+      !originalRequest._retry
+    ) {
       originalRequest._retry = true // Prevent infinite loop of retrying
       
       try {

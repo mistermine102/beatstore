@@ -1,17 +1,17 @@
 import appApi from '../api/appApi'
 import useAsyncWrap from './useAsyncWrap'
 import { useAuthStore } from '../stores/auth'
-import { useToastStore } from '../stores/toast'
+import { ref } from 'vue'
 
 function useToggleLike() {
   const wrapToggleLike = useAsyncWrap()
   const authStore = useAuthStore()
-  const toastStore = useToastStore()
+  const showLoginPrompt = ref(false)
 
   function toggleLike(track: Track) {
     //check if user is authenticated
     if (!authStore.user) {
-      toastStore.show({ type: 'info', title: 'Must be logged in to leave a like!' })
+      showLoginPrompt.value = true
       return
     }
 
@@ -24,7 +24,10 @@ function useToggleLike() {
       await appApi.post(`/tracks/${track._id}/like`)
     })
   }
-  return toggleLike
+  return {
+    toggleLike,
+    showLoginPrompt
+  }
 }
 
 export default useToggleLike

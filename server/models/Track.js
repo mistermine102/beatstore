@@ -47,6 +47,11 @@ const schema = new Schema({
     type: String,
     required: true,
   },
+  description: {
+    type: String,
+    maxLength: 500,
+    default: '',
+  },
   image: {
     filename: {
       type: String,

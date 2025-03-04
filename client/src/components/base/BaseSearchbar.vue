@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { defineProps, defineEmits, ref, computed } from 'vue'
+import { defineProps, defineEmits, computed } from 'vue'
 import { SearchIcon } from '../icons/index.vine'
+import BaseButton from './BaseButton.vue'
 
 interface Props {
   modelValue?: string
@@ -30,19 +31,19 @@ function onSubmit(e: Event) {
 <template>
   <form @submit="onSubmit" class="flex items-center gap-4">
     <slot name="customInput">
-      <div class="w-full flex items-center bg-grey" :class="containerClass">
-        <span v-if="showIcon" class="flex items-center p-2 text-textLightGrey">
+      <div class="w-full flex items-center bg-grey rounded-regular" :class="containerClass">
+        <span v-if="showIcon" class="flex items-center p-2 text-iconLightGrey">
           <SearchIcon />
         </span>
         <input
           v-model="phrase"
-          class="w-full h-full base-input px-2 py-3 text-white focus:outline-0"
+          class="w-full h-full px-2 py-3 text-textLightGrey/90 focus:outline-0 bg-transparent"
           :class="inputClass"
           :placeholder="placeholder"
           type="text"
         />
       </div>
     </slot>
-    <button v-if="showButton" class="base-btn-alt w-fit" :class="buttonClass">Search</button>
+    <BaseButton v-if="showButton" :alt="true" :class="buttonClass" type="submit">Search</BaseButton>
   </form>
 </template>

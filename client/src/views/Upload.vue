@@ -14,6 +14,7 @@ import BaseCheckboxSelect from '../components/base/BaseCheckboxSelect.vue'
 interface NewTrack {
   title: string
   type: TrackType
+  description: string
   image: File | null
   bpm?: string
   key?: string
@@ -63,6 +64,7 @@ const TRACK_TYPES_BUTTONS = [
 const NEW_BEAT_SCHEMA: NewBeat = {
   title: '',
   type: 'beat',
+  description: '',
   bpm: '',
   key: '',
   mood: '',
@@ -75,6 +77,7 @@ const NEW_BEAT_SCHEMA: NewBeat = {
 const NEW_SAMPLE_SCHEMA: NewSample = {
   title: '',
   type: 'sample',
+  description: '',
   bpm: '',
   key: '',
   mood: '',
@@ -86,12 +89,14 @@ const NEW_SAMPLE_SCHEMA: NewSample = {
 const NEW_DRUMKIT_SCHEMA: NewDrumkit = {
   title: '',
   type: 'drumkit',
+  description: '',
   image: null,
 }
 
 const NEW_LOOP_SCHEMA: NewLoop = {
   title: '',
   type: 'loop',
+  description: '',
   bpm: '',
   key: '',
   mood: '',
@@ -133,6 +138,11 @@ function validate() {
     return false
   }
 
+  if (newTrack.value.description.length > 500) {
+    toastStore.show({ type, title, message: 'Description must be less than 500 characters' })
+    return false
+  }
+
   if (newTrack.value.audio !== undefined) {
     //playable track, must contain audio
     if (!newTrack.value.audio) {
@@ -171,15 +181,17 @@ function uploadTrack(e: Event) {
 <template>
   <div class="mt-16">
     <h1 class="base-heading">Upload</h1>
-    <div class="grid grid-cols-3 gap-x-8 gap-y-4">
-      <button
+    <div class="flex gap-x-8 mb-8">
+      <BaseButton
         v-for="btn in TRACK_TYPES_BUTTONS"
-        :disabled="btn.type === 'drumkit'"
+        :key="btn.type"
         @click="uploadType = btn.type"
-        :class="[btn.type === uploadType ? 'base-btn' : 'base-btn-alt', btn.type === 'drumkit' ? 'opacity-50' : undefined]"
+        :alt="btn.type !== uploadType"
+        :disabled="btn.type === 'drumkit'"
+        :class="btn.type === 'drumkit' ? 'opacity-50' : undefined"
       >
         {{ btn.title }}
-      </button>
+      </BaseButton>
     </div>
     <form @submit="uploadTrack">
       <!-- if a field exists on schema (isn't undefined) then display it's input -->
@@ -203,7 +215,6 @@ function uploadTrack(e: Event) {
           v-if="newTrack.genre !== undefined"
           v-model="newTrack.genre"
           :options="GENRES.map(g => ({ value: g, label: g }))"
-          class="base-input px-0"
           placeholder="Genre"
         />
         <BaseCheckboxSelect
@@ -216,10 +227,20 @@ function uploadTrack(e: Event) {
           v-if="newTrack.mood !== undefined"
           v-model="newTrack.mood"
           :options="MOODS.map(m => ({ value: m, label: m }))"
-          class="base-input px-0"
           placeholder="Mood"
         />
       </div>
+
+      <div class="mt-8">
+        <h2 class="mb-2 text-lg">Description</h2>
+        <textarea 
+          v-model="newTrack.description" 
+          class="base-input w-full h-32 resize-none" 
+          placeholder="Describe your track (max 500 characters)"
+          maxlength="500"
+        ></textarea>
+      </div>
+
       <!-- if a field exists on schema (isn't undefined) then display it's input -->
       <div>
         <h2 class="mt-8 mb-2 text-lg">Image</h2>

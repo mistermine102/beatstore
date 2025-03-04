@@ -63,8 +63,14 @@ export const login = async (req, res) => {
   const { email, password } = req.body
   const user = await User.findOne({ email })
 
+  // Check if user exists in UnverifiedUsers collection
+  const unverifiedUser = await UnverifiedUser.findOne({ email })
+  if (unverifiedUser) {
+    throw new AppError('USER_NOT_VERIFIED', 400)
+  }
+
   if (!user || !(await Bcrypt.compare(password, user.password))) {
-    throw new AppError('Invalid email or password', 401)
+    throw new AppError('INVALID_CREDENTIALS', 401)
   }
 
   //generate tokens
@@ -88,6 +94,7 @@ export const login = async (req, res) => {
 }
 
 export const refreshToken = async (req, res) => {
+  console.log('Attempting to refresh token...')
   const { refreshToken } = req.cookies
   if (!refreshToken) throw new AppError('Refresh token not provided', 403)
 
@@ -155,8 +162,6 @@ export const verifyUser = async (req, res) => {
 
     const { email } = payload
 
-    console.log(email)
-
     //find unverified user
     const unverifiedUser = await UnverifiedUser.findOne({ email })
     if (!unverifiedUser) throw new AppError('UNVERIFIED_USER_NOT_FOUND')
@@ -170,4 +175,17 @@ export const verifyUser = async (req, res) => {
 
     res.redirect('http://localhost:5173/verify-user/success')
   })
+}
+
+export const resendVerification = async (req, res) => {
+  const { email } = req.body
+
+  // Check if user exists in UnverifiedUsers collection
+  const unverifiedUser = await UnverifiedUser.findOne({ email })
+  if (!unverifiedUser) throw new AppError('USER_NOT_FOUND', 404)
+
+  // Send new verification email
+  await sendVerifyEmail(email)
+
+  res.json({ message: 'Verification email sent' })
 }

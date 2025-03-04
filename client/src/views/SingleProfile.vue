@@ -2,10 +2,13 @@
 import TracksContainer from '../components/TracksContainer.vue'
 import useProfile from '../composables/useProfile'
 import useTracks from '../composables/useTracks'
+import useToggleLike from '../composables/useToggleLike'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import moment from 'moment'
 import { computed, ref, watch } from 'vue'
+import LoginPromptModal from '../components/LoginPromptModal.vue'
+import BaseButton from '../components/base/BaseButton.vue'
 
 const route = useRoute()
 const authStore = useAuthStore()
@@ -15,8 +18,13 @@ const { id: profileId } = route.params as {
   id: string
 }
 
-const { profile, getProfile, toggleFollow, isLoading: isLoadingProfile } = useProfile()
-const { tracks, toggleLike, isLoading: isLoadingTracks, getTracks, isMore, isLoadingMore, loadMoreTracks } = useTracks()
+const { profile, getProfile, toggleFollow, isLoading: isLoadingProfile, showLoginPrompt: followLoginPrompt, isFollowLoading } = useProfile()
+const { tracks, isLoading: isLoadingTracks, getTracks, isMore, isLoadingMore, loadMoreTracks } = useTracks()
+const { toggleLike, showLoginPrompt: likeLoginPrompt } = useToggleLike()
+
+function handleLike(track: Track) {
+  toggleLike(track)
+}
 
 getProfile(profileId)
 getTracks('all', { filters: { authorId: profileId } })
@@ -58,9 +66,9 @@ const isOwnProfile = computed(() => {
           <div>
             <h2 class="text-left text-4xl mb-1">{{ profile.username }}</h2>
             <p class="mb-4 text-textLightGrey">Joined {{ moment(profile.createdAt).format('LL') }}</p>
-            <button @click="toggleFollow" class="base-btn mb-8" :class="[profile.isFollowed ? 'bg-textLightGrey' : '']">
+            <BaseButton @click="toggleFollow" :is-loading="isFollowLoading" class="mb-8" :alt="profile.isFollowed">
               {{ profile.isFollowed ? 'Unfollow' : 'Follow' }}
-            </button>
+            </BaseButton>
           </div>
           <div class="grid grid-cols-3 gap-8">
             <div class="bg-darkGrey p-4 rounded-regular">
@@ -81,7 +89,9 @@ const isOwnProfile = computed(() => {
       <div class="mt-8">
         <div class="flex items-baseline gap-x-2">
           <h2 class="base-heading">Uploads</h2>
-          <button v-if="isOwnProfile" @click="showUnverified = !showUnverified" class="text-textLightGrey">{{ showUnverified ? 'Hide' : 'Show'}} unverified</button>
+          <button v-if="isOwnProfile" @click="showUnverified = !showUnverified" class="text-textLightGrey">
+            {{ showUnverified ? 'Hide' : 'Show' }} unverified
+          </button>
         </div>
         <TracksContainer
           :tracks="tracks"
@@ -90,9 +100,13 @@ const isOwnProfile = computed(() => {
           :is-more="isMore"
           @loaded-more="loadMoreTracks('all', { filters: { authorId: profileId } })"
           heading="Uploads"
-          @like-toggled="toggleLike"
+          @like-toggled="handleLike"
         />
       </div>
     </div>
+
+    <LoginPromptModal :is-open="followLoginPrompt" message="Log in to follow this profile" @close="followLoginPrompt = false" />
+
+    <LoginPromptModal :is-open="likeLoginPrompt" message="Log in to like the track" @close="likeLoginPrompt = false" />
   </div>
 </template>

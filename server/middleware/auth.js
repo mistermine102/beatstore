@@ -3,6 +3,11 @@ import AppError from '../classes/AppError.js'
 import User from '../models/User.js'
 
 export const verifyToken = async (req, res, next) => {
+  // Skip token verification for refresh endpoint
+  if (req.path === '/auth/refresh') {
+    return next()
+  }
+
   const authHeader = req.headers['authorization']
 
   if (!authHeader) {
@@ -24,7 +29,7 @@ export const verifyToken = async (req, res, next) => {
         //check if token has expired
         if (err.name === 'TokenExpiredError') {
           req.isAuthenticated = false
-          return next()
+          throw new AppError('ACCESS_TOKEN_EXPIRED', 401)
         }
         //other cause of failed token validation
         throw new AppError('TOKEN_VALIDATION_FAILED', 401)

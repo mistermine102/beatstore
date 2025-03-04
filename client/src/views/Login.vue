@@ -8,6 +8,7 @@ import { AxiosError } from 'axios'
 import appApi from '../api/appApi'
 import { useRouter } from 'vue-router'
 import validator from 'validator'
+import ResendVerificationModal from '../components/ResendVerificationModal.vue'
 
 const authStore = useAuthStore()
 const toastStore = useToastStore()
@@ -15,7 +16,8 @@ const wrapLogin = reactive(useAsyncWrap())
 const router = useRouter()
 
 const email = ref('szymonjarosz102@gmail.com')
-const password = ref('szymon102')
+const password = ref('123456')
+const showVerificationModal = ref(false)
 
 //create this object so we show the same error message regardless of what happens
 //(wheter frontend validation fails or backend validation fails)
@@ -61,6 +63,9 @@ async function login() {
             //show invalid email or password toast
             toastStore.show(LOGIN_TOAST_MESSAGE)
             break
+          case 'USER_NOT_VERIFIED':
+            showVerificationModal.value = true
+            break
           default:
             //show generic error toast
             toastStore.show({ type: 'error', title: 'Something went wrong' })
@@ -79,10 +84,16 @@ async function login() {
         <input v-model="email" type="text" placeholder="Email" class="base-input w-full" />
         <input v-model="password" type="password" placeholder="Password" class="base-input w-full" />
       </div>
-      <BaseButton class="w-full" :isLoading="wrapLogin.isLoading">Continue</BaseButton>
+      <BaseButton class="w-full" :is-loading="wrapLogin.isLoading">Continue</BaseButton>
     </form>
     <div>
       <p>You don't have an account? <router-link class="base-link" to="/register">Sign up now</router-link></p>
     </div>
   </div>
+
+  <ResendVerificationModal 
+    :is-open="showVerificationModal" 
+    :email="email"
+    @close="showVerificationModal = false"
+  />
 </template>

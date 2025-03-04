@@ -50,7 +50,7 @@ watch(
 </script>
 <template>
   <Popover class="relative">
-    <PopoverButton class="focus:outline-none flex justify-between items-center bg-grey h-full px-4 min-w-32 w-full">
+    <PopoverButton class="base-input w-full flex justify-between">
       <span v-if="!selectedOptions.length" class="text-textLightGrey">{{ placeholder }} </span>
       <div v-else>
         <span>{{ selectedOptions[0].label }}</span>
@@ -58,7 +58,7 @@ watch(
           {{ selectedOptions.length - 1 }} more</span
         >
       </div>
-      <ChevronDownIcon />
+      <ChevronDownIcon class="ml-2" :size="20" />
     </PopoverButton>
     <transition
       enter-active-class="transition duration-200 ease-out"

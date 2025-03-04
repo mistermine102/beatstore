@@ -35,13 +35,13 @@ function selectOption(option: Option, close: any) {
 </script>
 <template>
   <Popover class="relative">
-    <PopoverButton class="focus:outline-none flex justify-between items-center bg-grey h-full px-4 min-w-32 w-full">
-      <span v-if="selectedOption">{{ selectedOption.label }}</span>
-      <span v-else class="text-textLightGrey">{{ placeholder }}</span>
-      <ChevronDownIcon />
+    <PopoverButton class="base-input w-full h-full flex justify-between">
+      <span v-if="selectedOption" class="text-textLightGrey/90">{{ selectedOption.label }}</span>
+      <span v-else class="text-textLightGrey/90">{{ placeholder }}</span>
+      <ChevronDownIcon class="text-textLightGrey/90" :size="20" />
     </PopoverButton>
     <transition
-      enter-active-class="transition duration-200 ease-out"
+      enter-active-class="transition duration-150 ease-out"
       enter-from-class="translate-y-1 opacity-0"
       enter-to-class="translate-y-0 opacity-100"
       leave-active-class="transition duration-150 ease-in"
@@ -55,7 +55,7 @@ function selectOption(option: Option, close: any) {
         <div
           v-for="option in options"
           @click="selectOption(option, close)"
-          class="hover:bg-grey px-4 py-2 cursor-pointer"
+          class="hover:bg-grey px-4 py-2 cursor-pointer rounded-regular"
           :class="selectedOption?.value === option.value ? 'text-primary' : ''"
         >
           <span>{{ option.label }}</span>

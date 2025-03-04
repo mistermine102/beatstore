@@ -42,9 +42,12 @@ function calucalteBarHeights() {
     }
     const avgAmp = sum / Math.floor(SAMPLES_PER_BAR)
 
-    heights.push(Math.max(avgAmp * CANVAS_HEIGHT, 1))
+    heights.push(avgAmp)
   }
-  return heights
+
+  // Normalize heights so highest bar is 100% of canvas height
+  const maxHeight = Math.max(...heights)
+  return heights.map(height => (height / maxHeight) * CANVAS_HEIGHT)
 }
 
 //global bar heigths variable

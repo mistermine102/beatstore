@@ -1,0 +1,50 @@
+<script setup lang="ts">
+const props = defineProps<{
+  isOpen: boolean
+}>()
+
+defineEmits<{
+  (e: 'close'): void
+}>()
+</script>
+
+<template>
+  <Teleport to="body">
+    <Transition name="fade">
+      <div v-if="isOpen" class="fixed inset-0 flex items-center justify-center z-50">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/80" @click="$emit('close')"></div>
+        
+        <!-- Modal -->
+        <Transition name="modal">
+          <div class="bg-background w-[500px] h-[300px] relative z-10 rounded-xl p-8">
+            <slot></slot>
+          </div>
+        </Transition>
+      </div>
+    </Transition>
+  </Teleport>
+</template>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-active,
+.modal-leave-active {
+  transition: all 0.2s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
+}
+</style> 

@@ -4,12 +4,15 @@ import TrackComment from '../TrackComment.vue'
 import { ref } from 'vue'
 import useAsyncWrap from '../../composables/useAsyncWrap'
 import appApi from '../../api/appApi'
+import { useAuthStore } from '../../stores/auth'
+import { useRouter } from 'vue-router'
 
 const props = defineProps<{ comments: TrackComment[]; track: Track }>()
 const emit = defineEmits(['changeComments', 'toggleLike'])
 
+const authStore = useAuthStore()
+const router = useRouter()
 const newComment = ref('')
-
 const wrapAddComment = useAsyncWrap()
 
 function addComment() {
@@ -25,12 +28,16 @@ function addComment() {
 </script>
 
 <template>
-  <div>
-    <h2 class="base-heading">Comments</h2>
+  <div class="panel">
+    <h2 class="base-heading">Comments <span class="text-textLightGrey">{{ track.comments.length }}</span></h2>
     <div class="w-full">
-      <div class="flex gap-x-4 mb-8">
-        <textarea v-model="newComment" class="base-input w-full" rows="1" name="" id="" placeholder="Leave a comment">{{ newComment }}</textarea>
+      <div v-if="authStore.user" class="flex gap-x-4 mb-8">
+        <textarea v-model="newComment" class="base-input w-full bg-background" rows="1" placeholder="Leave a comment">{{ newComment }}</textarea>
         <BaseButton :disabled="!newComment" @click="addComment" :is-loading="wrapAddComment.isLoading.value">Send</BaseButton>
+      </div>
+      <div v-else class="flex items-center justify-center gap-4 mb-8 py-6 bg-background rounded-regular">
+        <span class="text-textLightGrey">Want to leave a comment?</span>
+        <BaseButton @click="router.push('/login')" class="w-fit">Log in</BaseButton>
       </div>
       <div class="flex flex-col gap-y-8">
         <TrackComment

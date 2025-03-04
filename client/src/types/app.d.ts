@@ -27,6 +27,7 @@ interface TrackComment {
 interface BaseTrack {
   _id: string
   title: string
+  description: string
   image: {
     url: string
     averageColor: {
@@ -64,6 +65,8 @@ interface BaseTrack {
   key?: string
   genre?: string
   bpm?: string
+  instruments?: string[]
+  mood?: string
 }
 
 interface BasePlayableTrack extends BaseTrack {

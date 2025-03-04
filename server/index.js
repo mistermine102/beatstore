@@ -11,6 +11,7 @@ import authRoutes from './routes/auth.js'
 import trackRoutes from './routes/tracks.js'
 import profileRoutes from './routes/profile.js'
 import adminRoutes from './routes/admin.js'
+import reportRoutes from './routes/reports.js'
 import cookieParser from 'cookie-parser'
 
 import { verifyToken } from './middleware/auth.js'
@@ -28,6 +29,7 @@ app.use('/auth', authRoutes)
 app.use('/tracks', trackRoutes)
 app.use('/profile', profileRoutes)
 app.use('/admin', adminRoutes)
+app.use('/reports', reportRoutes)
 
 //404 invalid route
 app.all('*', invalidRoute)

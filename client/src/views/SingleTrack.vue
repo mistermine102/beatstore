@@ -11,6 +11,10 @@ import AuthorPanel from '../components/singleTrack/AuthorPanel.vue'
 import CommentsPanel from '../components/singleTrack/CommentsPanel.vue'
 import { useAuthStore } from '../stores/auth'
 import { useToastStore } from '../stores/toast'
+import { FlagIcon } from '../components/icons/index.vine'
+import BaseButton from '../components/base/BaseButton.vue'
+import BaseModal from '../components/base/BaseModal.vue'
+import LoginPromptModal from '../components/LoginPromptModal.vue'
 
 const authStore = useAuthStore()
 const toastStore = useToastStore()
@@ -41,7 +45,57 @@ function toggleCommentLike(commentId: string) {
   comment.isLiked = !comment.isLiked
 }
 
-const toggleLike = useToggleLike()
+const { toggleLike } = useToggleLike()
+
+const showReportModal = ref(false)
+const showLoginPrompt = ref(false)
+const reportMessage = ref('')
+const wrapReport = reactive(useAsyncWrap())
+
+async function submitReport() {
+  if (!track.value || !authStore.user) return
+  
+  try {
+    await wrapReport.run(async () => {
+      const trackId = track.value?._id
+      if (!trackId) {
+        toastStore.show({ 
+          type: 'error', 
+          title: 'Error', 
+          message: 'Could not find track ID' 
+        })
+        return
+      }
+
+      await appApi.post('/reports', {
+        trackId,
+        message: reportMessage.value
+      })
+      
+      showReportModal.value = false
+      reportMessage.value = ''
+      toastStore.show({ 
+        type: 'success', 
+        title: 'Report submitted', 
+        message: 'Thank you for your report. Our team will review it shortly.' 
+      })
+    })
+  } catch (error: any) {
+    toastStore.show({ 
+      type: 'error', 
+      title: 'Could not submit report', 
+      message: error.response?.data?.message || 'Please try again later'
+    })
+  }
+}
+
+function openReportModal() {
+  if (!authStore.user) {
+    showLoginPrompt.value = true
+    return
+  }
+  showReportModal.value = true
+}
 </script>
 
 <template>
@@ -51,12 +105,58 @@ const toggleLike = useToggleLike()
       <EmptyState />
     </div>
     <div v-else>
-      <GeneralInfoPanel class="mb-16" :track="track" />
       <div class="grid grid-cols-3 gap-x-8 mb-16">
-        <DetailsPanel class="col-span-2" :track="track" @track-like-toggled="toggleLike(track)" />
-        <AuthorPanel :profile-id="track.author._id" />
+        <div class="col-span-2">
+          <GeneralInfoPanel class="mb-8" :track="track" />
+          <CommentsPanel :comments="track.comments" :track="track" @change-comments="getTrack" @toggleLike="toggleCommentLike" />
+          <button 
+            class="mt-4 text-textLightGrey hover:text-white duration-150 flex gap-x-2 items-center" 
+            @click="openReportModal"
+            v-if="authStore.user?._id !== track.author._id"
+          >
+            <FlagIcon :size="20" />
+            <span>Report</span>
+          </button>
+        </div>
+        <div>
+          <DetailsPanel class="col-span-2" :track="track" @track-like-toggled="toggleLike(track)" />
+          <AuthorPanel :profile-id="track.author._id" />
+        </div>
       </div>
-      <CommentsPanel :comments="track.comments" :track="track" @change-comments="getTrack" @toggleLike="toggleCommentLike" />
+
+      <!-- Report Modal -->
+      <BaseModal :is-open="showReportModal" @close="showReportModal = false">
+        <h2 class="text-xl mb-4">Report Track</h2>
+        <p class="text-textLightGrey mb-4">Please describe why you're reporting this track:</p>
+        <textarea
+          v-model="reportMessage"
+          class="base-input w-full h-32 resize-none mb-4"
+          placeholder="Enter your report message (max 500 characters)"
+          maxlength="500"
+        ></textarea>
+        <div class="flex justify-end gap-x-4">
+          <BaseButton 
+            @click="showReportModal = false" 
+            :alt="true"
+          >
+            Cancel
+          </BaseButton>
+          <BaseButton
+            @click="submitReport"
+            :is-loading="wrapReport.isLoading"
+            :disabled="!reportMessage.trim()"
+          >
+            Submit Report
+          </BaseButton>
+        </div>
+      </BaseModal>
+
+      <!-- Login Prompt Modal -->
+      <LoginPromptModal 
+        :is-open="showLoginPrompt" 
+        message="Log in to report this track" 
+        @close="showLoginPrompt = false" 
+      />
     </div>
   </div>
 </template>

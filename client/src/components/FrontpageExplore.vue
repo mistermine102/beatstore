@@ -1,3 +1,10 @@
+<script setup lang="ts">
+import { useRouter } from 'vue-router'
+import BaseButton from './base/BaseButton.vue'
+
+const router = useRouter()
+</script>
+
 <template>
   <div class="mt-32">
     <h2 class="text-[40px] mb-4">Explore</h2>
@@ -10,7 +17,7 @@
               <p class="text-2xl mt-2">Synth Madness</p>
               <p class="text-textLightGrey">MisterMine102</p>
             </div>
-            <button class="base-btn h-fit mt-2">See more</button>
+            <BaseButton class="h-fit mt-2">See more</BaseButton>
           </div>
         </div>
         <div>
@@ -20,7 +27,7 @@
               <p class="text-2xl mt-2">Synth Madness</p>
               <p class="text-textLightGrey">MisterMine102</p>
             </div>
-            <button class="base-btn h-fit mt-2">See more</button>
+            <BaseButton class="h-fit mt-2">See more</BaseButton>
           </div>
         </div>
         <div>
@@ -30,7 +37,7 @@
               <p class="text-2xl mt-2">Synth Madness</p>
               <p class="text-textLightGrey">MisterMine102</p>
             </div>
-            <button class="base-btn h-fit mt-2">See more</button>
+            <BaseButton class="h-fit mt-2">See more</BaseButton>
           </div>
         </div>
       </div>

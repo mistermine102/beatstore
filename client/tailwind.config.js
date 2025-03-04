@@ -5,11 +5,14 @@ export default {
     extend: {
       colors: {
         primary: 'var(--primary)',
+        darkPrimary: 'var(--darkPrimary)',
         grey: 'var(--grey)',
+        midGrey: 'var(--midGrey)',
+        darkGrey: 'var(--darkGrey)',
         background: 'var(--background)',
         textDarkGrey: 'var(--textDarkGrey)',
         textLightGrey: 'var(--textLightGrey)',
-        darkGrey: 'var(--darkGrey)',
+        iconLightGrey: 'var(--iconLightGrey)',
       },
       borderRadius: {
         regular: 'var(--rounded)',

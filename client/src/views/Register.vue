@@ -16,7 +16,7 @@ const router = useRouter()
 
 const email = ref('szymonjarosz102@gmail.com')
 const username = ref('mistermine102')
-const password = ref('szymon102')
+const password = ref('123456')
 
 function validate() {
   //all of toasts in this function will be error toasts with this title

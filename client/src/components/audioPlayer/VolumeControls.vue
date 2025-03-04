@@ -9,9 +9,9 @@ const audioPlayerStore = useAudioPlayerStore()
 <template>
   <div>
     <div class="flex justify-center items-center gap-4">
-      <button @click="audioPlayerStore.toggleMute">
-        <Volume2Icon v-if="audioPlayerStore.volume" />
-        <VolumeXIcon v-else />
+      <button @click="audioPlayerStore.toggleMute" class="group relative">
+        <Volume2Icon v-if="audioPlayerStore.volume" class="relative transform group-hover:scale-110 transition-transform duration-150" />
+        <VolumeXIcon v-else class="relative transform group-hover:scale-110 transition-transform duration-150" />
       </button>
       <BaseRangeInput :value="audioPlayerStore.volume" @change="audioPlayerStore.setVolume" />
     </div>

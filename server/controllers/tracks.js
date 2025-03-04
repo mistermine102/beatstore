@@ -15,6 +15,7 @@ const UPLOAD_SCHEMAS = {
   beat: {
     title: '',
     type: 'beat',
+    description: '',
     audio: null,
     key: '',
     genre: '',
@@ -28,6 +29,7 @@ const UPLOAD_SCHEMAS = {
   sample: {
     title: '',
     type: 'sample',
+    description: '',
     audio: null,
     key: '',
     bpm: '',
@@ -40,10 +42,12 @@ const UPLOAD_SCHEMAS = {
   drumkit: {
     title: '',
     type: 'drumkit',
+    description: '',
   },
   loop: {
     title: '',
     type: 'loop',
+    description: '',
     audio: null,
     key: '',
     bpm: '',

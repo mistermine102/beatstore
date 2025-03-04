@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 
 export const useAudioPlayerStore = defineStore('audioPlayerStore', () => {
   const track = ref<PlayableTrack | null>(null)
@@ -12,9 +12,30 @@ export const useAudioPlayerStore = defineStore('audioPlayerStore', () => {
   const duration = ref(0)
   const currentTime = ref(0)
 
+  function handleKeyPress(e: KeyboardEvent) {
+    // Don't trigger if typing in an input
+    if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+      return
+    }
+    
+    // Space bar for play/pause
+    if (e.code === 'Space' && track.value) {
+      e.preventDefault() // Prevent page scroll
+      toggle()
+    }
+  }
+
+  // Add keyboard listeners
+  onMounted(() => {
+    window.addEventListener('keydown', handleKeyPress)
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener('keydown', handleKeyPress)
+  })
+
   //audio player is implemented with listeners on audio HTMLelement
   //for example: toggle method plays audio -> onplay listener updates state
-
   async function toggle() {
     audio.value.paused ? audio.value.play() : audio.value.pause()
   }
@@ -71,6 +92,11 @@ export const useAudioPlayerStore = defineStore('audioPlayerStore', () => {
       isPaused.value = true
     }
 
+    audio.value.onended = () => {
+      audio.value.currentTime = 0
+      audio.value.play()
+    }
+
     //change source
     audio.value.src = newTrack.audio.url
     setVolume(volume.value)
@@ -117,5 +143,18 @@ export const useAudioPlayerStore = defineStore('audioPlayerStore', () => {
     }
   }
 
-  return { track, isPaused, audio, duration, currentTime, progress, volume, toggle, setNewTrack, setVolume, toggleMute, setProgress }
+  return { 
+    track, 
+    isPaused, 
+    audio, 
+    duration, 
+    currentTime, 
+    progress, 
+    volume,
+    toggle, 
+    setNewTrack, 
+    setVolume, 
+    toggleMute, 
+    setProgress
+  }
 })

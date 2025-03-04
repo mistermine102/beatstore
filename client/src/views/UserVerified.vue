@@ -6,5 +6,11 @@
       fill="currentColor"
     />
   </svg>
-  <router-link to="/login" class="base-btn w-fit mx-auto">Login now!</router-link>
+  <div class="flex justify-center">
+    <BaseButton @click="$router.push('/login')">Login now!</BaseButton>
+  </div>
 </template>
+
+<script setup lang="ts">
+import BaseButton from '../components/base/BaseButton.vue'
+</script>

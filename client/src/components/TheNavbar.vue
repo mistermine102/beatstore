@@ -3,6 +3,7 @@ import { storeToRefs } from 'pinia'
 import { useAuthStore } from '../stores/auth'
 import ProfilePopover from './ProfilePopover.vue'
 import { HeartIcon } from './icons/index.vine'
+import BaseButton from './base/BaseButton.vue'
 
 const authStore = useAuthStore()
 
@@ -31,7 +32,7 @@ const { user } = storeToRefs(authStore)
           </p>
           <ProfilePopover />
         </div>
-        <router-link v-else class="base-btn px-16 text-center" to="/login">Login</router-link>
+        <BaseButton v-else @click="$router.push('/login')">Login</BaseButton>
       </div>
     </nav>
   </header>

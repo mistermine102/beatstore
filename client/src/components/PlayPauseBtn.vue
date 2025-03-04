@@ -6,7 +6,7 @@ import appApi from '../api/appApi'
 import useAsyncWrap from '../composables/useAsyncWrap'
 import { PlayIcon, PauseIcon } from './icons/index.vine'
 
-const props = defineProps<{ track: PlayableTrack; buttonClass?: string }>()
+const props = defineProps<{ track: PlayableTrack; buttonClass?: string; iconSize?: number }>()
 
 const audioPlayerStore = useAudioPlayerStore()
 const { track: currentlyPlayingTrack, isPaused } = storeToRefs(audioPlayerStore)
@@ -43,19 +43,19 @@ const isThatTrackPlaying = computed(() => {
   <button
     v-if="!isThatTrackPlaying"
     @click="playAudio"
-    class="flex justify-center items-center gap-x-1 transition-all duration-100 w-full h-full"
+    class="play-pause-btn flex justify-center items-center gap-x-1 transition-all duration-150 w-full h-full"
     :class="buttonClass"
   >
-    <PlayIcon />
-    <span>Play</span>
+    <PlayIcon :fill="true" :size="iconSize" />
+    <span class="play-pause-text">Play</span>
   </button>
   <button
     v-else
     @click="pauseAudio"
-    class="flex justify-center items-center gap-x-1 transition-all duration-100 w-full h-full"
+    class="play-pause-btn flex justify-center items-center gap-x-1 transition-all duration-150 w-full h-full"
     :class="buttonClass"
   >
-    <PauseIcon />
-    <span>Pause</span>
+    <PauseIcon :fill="true" :size="iconSize" />
+    <span class="play-pause-text">Pause</span>
   </button>
 </template>
