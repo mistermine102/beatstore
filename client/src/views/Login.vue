@@ -9,6 +9,7 @@ import appApi from '../api/appApi'
 import { useRouter } from 'vue-router'
 import validator from 'validator'
 import ResendVerificationModal from '../components/ResendVerificationModal.vue'
+import { GENERIC_ERROR_TOAST } from '../constants'
 
 const authStore = useAuthStore()
 const toastStore = useToastStore()
@@ -39,7 +40,7 @@ async function login() {
   wrapLogin.run(
     async () => {
       const response = await appApi.post<{ user: User; accessToken: string }>(
-        '/auth/login',
+        '/auth/signin',
         {
           email: email.value,
           password: password.value,
@@ -68,7 +69,7 @@ async function login() {
             break
           default:
             //show generic error toast
-            toastStore.show({ type: 'error', title: 'Something went wrong' })
+            toastStore.show(GENERIC_ERROR_TOAST)
         }
       }
     }
@@ -77,23 +78,26 @@ async function login() {
 </script>
 
 <template>
-  <div class="flex flex-col items-center justify-center mt-16">
-    <h2 class="base-heading">Sign in</h2>
-    <form class="flex flex-col p-4 w-1/2" @submit.prevent="login">
+  <div class="panel w-full md:w-[600px] mx-auto bg-background">
+    <h2 class="text-2xl font-bold mb-8 text-center">Welcome Back</h2>
+    <form class="flex flex-col" @submit.prevent="login">
       <div class="flex flex-col gap-y-4 mb-8">
-        <input v-model="email" type="text" placeholder="Email" class="base-input w-full" />
-        <input v-model="password" type="password" placeholder="Password" class="base-input w-full" />
+        <div class="relative">
+          <input v-model="email" type="text" placeholder="Email" class="base-input w-full" />
+        </div>
+        <div class="relative">
+          <input v-model="password" type="password" placeholder="Password" class="base-input w-full" />
+        </div>
       </div>
-      <BaseButton class="w-full" :is-loading="wrapLogin.isLoading">Continue</BaseButton>
+      <BaseButton class="w-full" :is-loading="wrapLogin.isLoading">Sign In</BaseButton>
     </form>
-    <div>
-      <p>You don't have an account? <router-link class="base-link" to="/register">Sign up now</router-link></p>
+    <div class="mt-6 text-center">
+      <p class="text-textLightGrey">
+        Don't have an account?
+        <router-link class="text-primary hover:text-darkPrimary" to="/signup"> Sign up now </router-link>
+      </p>
     </div>
   </div>
 
-  <ResendVerificationModal 
-    :is-open="showVerificationModal" 
-    :email="email"
-    @close="showVerificationModal = false"
-  />
+  <ResendVerificationModal :is-open="showVerificationModal" :email="email" @close="showVerificationModal = false" />
 </template>

@@ -29,11 +29,11 @@ const scaleValues = {
 
 <template>
   <button
-    class="w-fit relative transition-all duration-150 ease-in-out rounded-regular inline-flex items-center justify-center origin-center hover:-translate-y-[1px] will-change-transform"
+    class="relative transition-all duration-150 ease-in-out rounded-regular flex items-center justify-center origin-center hover:-translate-y-[1px] will-change-transform"
     :class="[
-      isDisabled ? 'opacity-50 cursor-not-allowed' : undefined,
+      isDisabled ? 'opacity-50 cursor-not-allowed hover:-translate-y-0' : undefined,
       sizeClasses[buttonSize],
-      alt ? 'bg-darkGrey border border-white/[0.02] hover:border-white/[0.1]' : 'bg-primary hover:bg-darkPrimary border border-transparent',
+      alt ? 'bg-darkGrey border border-white/[0.1] hover:border-white/[0.3]' : 'bg-primary hover:bg-darkPrimary border border-primary hover:border-darkPrimary',
     ]"
     :disabled="isDisabled"
   >

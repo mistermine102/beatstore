@@ -22,6 +22,7 @@ interface NewTrack {
   mood?: string
   instruments?: string[]
   audio?: File | null
+  licenseId: string | null
 }
 
 interface NewBeat extends NewTrack {
@@ -68,10 +69,11 @@ const NEW_BEAT_SCHEMA: NewBeat = {
   bpm: '',
   key: '',
   mood: '',
-  instruments: [],  
+  instruments: [],
   genre: '',
   image: null,
   audio: null,
+  licenseId: null,
 }
 
 const NEW_SAMPLE_SCHEMA: NewSample = {
@@ -84,6 +86,7 @@ const NEW_SAMPLE_SCHEMA: NewSample = {
   instruments: [],
   image: null,
   audio: null,
+  licenseId: null,
 }
 
 const NEW_DRUMKIT_SCHEMA: NewDrumkit = {
@@ -91,6 +94,7 @@ const NEW_DRUMKIT_SCHEMA: NewDrumkit = {
   type: 'drumkit',
   description: '',
   image: null,
+  licenseId: null,
 }
 
 const NEW_LOOP_SCHEMA: NewLoop = {
@@ -103,6 +107,7 @@ const NEW_LOOP_SCHEMA: NewLoop = {
   instruments: [],
   image: null,
   audio: null,
+  licenseId: null,
 }
 
 //schemas keys are the values of TrackType so we can use dynamic
@@ -133,6 +138,30 @@ function validate() {
   const type: ToastType = 'error'
   const title = "Can't upload"
 
+  if (newTrack.value.audio !== undefined) {
+    //playable track, must contain audio
+    if (!newTrack.value.audio) {
+      toastStore.show({ type, title, message: 'Audio file is required' })
+      return false
+    }
+
+    //validate if audio file isn't larger than max size
+    const maxSizeInBytes = 50 * 1024 * 1024 // 50MB in bytes
+    if (newTrack.value.audio && newTrack.value.audio.size > maxSizeInBytes) {
+      toastStore.show({
+        type,
+        title,
+        message: `Audio file is too large. Maximum size is ${(maxSizeInBytes / (1024 * 1024)).toFixed(0)}MB.`,
+      })
+      return false
+    }
+  }
+
+  if (!newTrack.value.licenseId) {
+    toastStore.show({ type, title, message: 'Terms are required' })
+    return false
+  }
+
   if (newTrack.value.title.length < 4) {
     toastStore.show({ type, title, message: 'Title must be at least 4 characters long' })
     return false
@@ -143,19 +172,10 @@ function validate() {
     return false
   }
 
-  if (newTrack.value.audio !== undefined) {
-    //playable track, must contain audio
-    if (!newTrack.value.audio) {
-      toastStore.show({ type, title, message: 'Audio file is required' })
-      return false
-    }
-  }
-
   return true
 }
 
 function uploadTrack(e: Event) {
-  console.log(newTrack.value)
   e.preventDefault()
   if (!validate()) return
 
@@ -176,92 +196,159 @@ function uploadTrack(e: Event) {
     router.push('/')
   })
 }
+
+//licenses
+const licenses = ref<License[]>([])
+
+const wrapGetLicenses = useAsyncWrap()
+
+function getLicenses() {
+  wrapGetLicenses.run(async () => {
+    const response = await appApi.get('/licenses')
+    licenses.value = response.data.licenses
+  })
+}
+
+getLicenses()
 </script>
 
 <template>
-  <div class="mt-16">
-    <h1 class="base-heading">Upload</h1>
-    <div class="flex gap-x-8 mb-8">
-      <BaseButton
-        v-for="btn in TRACK_TYPES_BUTTONS"
-        :key="btn.type"
-        @click="uploadType = btn.type"
-        :alt="btn.type !== uploadType"
-        :disabled="btn.type === 'drumkit'"
-        :class="btn.type === 'drumkit' ? 'opacity-50' : undefined"
-      >
-        {{ btn.title }}
-      </BaseButton>
-    </div>
-    <form @submit="uploadTrack">
-      <!-- if a field exists on schema (isn't undefined) then display it's input -->
-      <div v-if="newTrack.audio !== undefined">
-        <h2 class="mt-8 mb-2 text-lg">Audio file</h2>
-        <UploadFileContainer @file-selected="file => (newTrack.audio = file ? file : null)" id="audio" max-file-size="25MB" accept="audio/*">
-          <template #icon>
-            <div class="w-[48px]">
-              <UploadIcon />
-            </div>
-          </template>
-        </UploadFileContainer>
-      </div>
-      <h2 class="mt-8 mb-2 text-lg">Basic information</h2>
-      <div class="grid grid-cols-3 gap-4">
-        <!-- if a field exists on schema (isn't undefined) then display it's input -->
-        <input v-if="newTrack.title !== undefined" v-model="newTrack.title" id="title" class="base-input w-full" type="text" placeholder="Title" />
-        <input v-if="newTrack.bpm !== undefined" v-model="newTrack.bpm" id="bpm" class="base-input w-full" type="text" placeholder="Bpm" />
-        <BaseSelect v-if="newTrack.key !== undefined" v-model="newTrack.key" :options="KEYS.map(k => ({ value: k, label: k }))" placeholder="Key" />
-        <BaseSelect
-          v-if="newTrack.genre !== undefined"
-          v-model="newTrack.genre"
-          :options="GENRES.map(g => ({ value: g, label: g }))"
-          placeholder="Genre"
-        />
-        <BaseCheckboxSelect
-          v-if="newTrack.instruments !== undefined"
-          v-model="newTrack.instruments"
-          :options="INSTRUMENTS.map(i => ({ value: i, label: i }))"
-          placeholder="Instruments"
-        />
-        <BaseSelect
-          v-if="newTrack.mood !== undefined"
-          v-model="newTrack.mood"
-          :options="MOODS.map(m => ({ value: m, label: m }))"
-          placeholder="Mood"
-        />
-      </div>
+  <div class="">
+    <div class="panel mb-8">
+      <h1 class="text-4xl font-secondary mb-4">Upload</h1>
+      <p class="text-textLightGrey">Choose the type</p>
 
-      <div class="mt-8">
-        <h2 class="mb-2 text-lg">Description</h2>
-        <textarea 
-          v-model="newTrack.description" 
-          class="base-input w-full h-32 resize-none" 
-          placeholder="Describe your track (max 500 characters)"
-          maxlength="500"
-        ></textarea>
-      </div>
-
-      <!-- if a field exists on schema (isn't undefined) then display it's input -->
-      <div>
-        <h2 class="mt-8 mb-2 text-lg">Image</h2>
-        <UploadFileContainer
-          v-if="newTrack.image !== undefined"
-          @file-selected="file => (newTrack.image = file ? file : null)"
-          class="w-1/3"
-          id="image"
-          max-file-size="25MB"
-          accept="image/*"
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
+        <BaseButton
+          v-for="btn in TRACK_TYPES_BUTTONS"
+          :key="btn.type"
+          @click="uploadType = btn.type"
+          :alt="btn.type !== uploadType"
+          :disabled="btn.type === 'drumkit'"
+          :class="['h-24 w-full', btn.type === 'drumkit' ? 'opacity-50' : undefined, uploadType === btn.type ? 'hover:bg-primary' : '']"
         >
-          <template #icon>
-            <div class="w-[48px]">
-              <ImageIcon />
-            </div>
-          </template>
-        </UploadFileContainer>
+          <div class="w-full flex sm:flex-col gap-x-2 items-center">
+            <UploadIcon :size="32" class="hidden sm:block" />
+            <UploadIcon class="block sm:hidden" />
+            <span class="text-lg">{{ btn.title }}</span>
+          </div>
+        </BaseButton>
       </div>
-      <div class="w-1/2 mx-auto mt-8">
-        <BaseButton class="w-full" :is-loading="wrapUploadTrack.isLoading">Upload</BaseButton>
+    </div>
+
+    <form @submit="uploadTrack">
+      <div class="grid grid-cols-3 gap-8">
+        <!-- Audio Upload Panel -->
+        <div v-if="newTrack.audio !== undefined" class="panel col-span-3 lg:col-span-2">
+          <h2 class="text-2xl mb-4">Audio File</h2>
+          <UploadFileContainer
+            @file-selected="file => (newTrack.audio = file ? file : null)"
+            id="audio"
+            max-file-size="50MB"
+            accept="audio/*"
+            class="border-2 border-dashed border-white/[0.1] hover:border-primary transition-colors duration-150"
+          >
+            <template #icon>
+              <UploadIcon :size="48" />
+            </template>
+          </UploadFileContainer>
+        </div>
+        <div class="col-span-3 lg:col-span-1 panel">
+          <h2 class="text-2xl mb-4">Cover Image</h2>
+          <UploadFileContainer
+            v-if="newTrack.image !== undefined"
+            @file-selected="file => (newTrack.image = file ? file : null)"
+            class="border-2 border-dashed border-white/[0.1] hover:border-primary transition-colors duration-150"
+            accept="image/*"
+            max-file-size="25MB"
+            id="image"
+          >
+            <template #icon>
+              <ImageIcon :size="48" />
+            </template>
+          </UploadFileContainer>
+        </div>
+
+        <div class="panel col-span-3">
+          <h2 class="text-2xl mb-6">Terms</h2>
+          <BaseSelect
+            v-model="newTrack.licenseId"
+            :options="licenses.map(l => ({ value: l._id, label: l.title }))"
+            class="[&>.popover-button]:bg-background"
+            placeholder="Select terms"
+          />
+          <div v-if="newTrack.licenseId !== null">
+            <p class="text-lg mt-4">{{ licenses.find(l => l._id === newTrack.licenseId)?.shortDescription }}</p>
+            <p class="mt-2 text-textLightGrey">{{ licenses.find(l => l._id === newTrack.licenseId)?.longDescription }}</p>
+          </div>
+        </div>
+
+        <!-- Basic Information Panel -->
+        <div class="panel col-span-3">
+          <h2 class="text-2xl mb-6">Basic Information</h2>
+          <div class="grid grid-cols-2 gap-4">
+            <input
+              v-if="newTrack.title !== undefined"
+              v-model="newTrack.title"
+              id="title"
+              class="base-input bg-background col-span-2"
+              type="text"
+              placeholder="Title"
+            />
+            <input
+              v-if="newTrack.bpm !== undefined"
+              v-model="newTrack.bpm"
+              id="bpm"
+              class="base-input w-full bg-background"
+              type="text"
+              placeholder="BPM"
+            />
+            <BaseSelect
+              v-if="newTrack.key !== undefined"
+              v-model="newTrack.key"
+              :options="KEYS.map(k => ({ value: k, label: k }))"
+              placeholder="Key"
+              class="[&>.popover-button]:bg-background"
+            />
+            <BaseSelect
+              v-if="newTrack.genre !== undefined"
+              v-model="newTrack.genre"
+              :options="GENRES.map(g => ({ value: g, label: g }))"
+              placeholder="Genre"
+              class="col-span-2 [&>.popover-button]:bg-background"
+            />
+            <BaseSelect
+              v-if="newTrack.mood !== undefined"
+              v-model="newTrack.mood"
+              :options="MOODS.map(m => ({ value: m, label: m }))"
+              placeholder="Mood"
+              class="col-span-2 bg-background [&>.popover-button]:bg-background"
+            />
+            <BaseCheckboxSelect
+              v-if="newTrack.instruments !== undefined"
+              v-model="newTrack.instruments"
+              :options="INSTRUMENTS.map(i => ({ value: i, label: i }))"
+              placeholder="Select instruments"
+              class="col-span-2 [&>.popover-button]:bg-background"
+            />
+          </div>
+        </div>
+        <div class="panel col-span-3">
+          <h2 class="text-2xl mb-4">Description</h2>
+          <textarea
+            v-model="newTrack.description"
+            class="base-input bg-background w-full h-32 resize-none"
+            placeholder="Describe your upload (max 500 characters)"
+            maxlength="500"
+          ></textarea>
+        </div>
       </div>
+      <BaseButton type="submit" :is-loading="wrapUploadTrack.isLoading" class="mt-8 w-full sm:w-1/2 mx-auto">
+        <div class="flex items-center justify-center gap-2">
+          <UploadIcon :size="20" />
+          <span>Upload</span>
+        </div>
+      </BaseButton>
     </form>
   </div>
 </template>

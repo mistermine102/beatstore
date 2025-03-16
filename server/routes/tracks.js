@@ -1,7 +1,7 @@
 import express from 'express'
 import { body, query, param } from 'express-validator'
 import tryCatch from '../utils/tryCatch.js'
-import { isAuthenticated } from '../middleware/auth.js'
+import { hasRole, isAuthenticated } from '../middleware/auth.js'
 import validate from '../middleware/validate.js'
 import { trackUpload, trackImageUpload } from '../multer.js'
 import { getTracks, uploadTrack, streamTrack, toggleTrackLike, uploadTrackImage, getSingleTrack, deleteTrack } from '../controllers/tracks.js'
@@ -40,6 +40,7 @@ const uploadTrackValidators = [
     .withMessage('Type must be a string')
     .isIn(['beat', 'sample', 'drumkit', 'loop']),
   body('title').exists().withMessage('Title cannot be empty').trim().isString().withMessage('Title must be a string').isLength({ min: 4 }),
+  body('licenseId').exists().withMessage('License cannot be empty').trim().isString().withMessage('License ID must be a string'),
 ]
 
 export const addCommentValidators = [

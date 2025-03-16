@@ -4,13 +4,12 @@ import BaseButton from '../components/base/BaseButton.vue'
 import { useToastStore } from '../stores/toast'
 import useAsyncWrap from '../composables/useAsyncWrap'
 import appApi from '../api/appApi'
-import { useAuthStore } from '../stores/auth'
 import { AxiosError } from 'axios'
 import { useRouter } from 'vue-router'
 import validator from 'validator'
+import { GENERIC_ERROR_TOAST } from '../constants'
 
 const wrapRegister = reactive(useAsyncWrap())
-const authStore = useAuthStore()
 const toastStore = useToastStore()
 const router = useRouter()
 
@@ -31,6 +30,10 @@ function validate() {
     toastStore.show({ type, title, message: 'Username must be at least 4 characters long' })
     return false
   }
+  if (!validator.isLength(username.value, { max: 25 })) {
+    toastStore.show({ type, title, message: 'Username must be less than 25 characters long' })
+    return false
+  }
   if (!validator.isLength(password.value, { min: 6 })) {
     toastStore.show({ type, title, message: 'Password must be at least 6 characters long' })
     return false
@@ -43,7 +46,7 @@ function register() {
 
   wrapRegister.run(
     async () => {
-      await appApi.post('/auth/register', {
+      await appApi.post('/auth/signup', {
         email: email.value,
         username: username.value,
         password: password.value,
@@ -55,11 +58,11 @@ function register() {
       if (err instanceof AxiosError && err.response) {
         switch (err.response.data.message) {
           case 'EMAIL_NOT_AVAILABLE':
-            toastStore.show({ type: 'error', title: 'Email not available!' })
+            toastStore.show({ type: 'error', title: "Can't sign up", message: 'Email not available' })
             break
           default:
             //show generic error toast
-            toastStore.show({ type: 'error', title: 'Something went wrong' })
+            toastStore.show(GENERIC_ERROR_TOAST)
         }
       }
     }
@@ -68,18 +71,27 @@ function register() {
 </script>
 
 <template>
-  <div class="flex flex-col items-center justify-center mt-16">
-    <h2 class="base-heading">Sign up</h2>
-    <form class="flex flex-col p-4 w-1/2" @submit.prevent="register">
+  <div class="panel w-full md:w-[600px] mx-auto bg-background">
+    <h2 class="text-2xl font-bold mb-8 text-center">Create Account</h2>
+    <form class="flex flex-col" @submit.prevent="register">
       <div class="flex flex-col gap-y-4 mb-8">
-        <input v-model="email" type="text" placeholder="Email" class="base-input w-full" />
-        <input v-model="username" type="text" placeholder="Username" class="base-input w-full" />
-        <input v-model="password" type="password" placeholder="Password" class="base-input w-full" />
+        <div class="relative">
+          <input v-model="email" type="text" placeholder="Email" class="base-input w-full" />
+        </div>
+        <div class="relative">
+          <input v-model="username" type="text" placeholder="Username" class="base-input w-full" />
+        </div>
+        <div class="relative">
+          <input v-model="password" type="password" placeholder="Password" class="base-input w-full" />
+        </div>
       </div>
-      <BaseButton class="w-full" :isLoading="wrapRegister.isLoading">Continue</BaseButton>
+      <BaseButton class="w-full" :isLoading="wrapRegister.isLoading">Sign Up</BaseButton>
     </form>
-    <div>
-      <p>Already have an account? <router-link class="base-link" to="/login">Log in now</router-link></p>
+    <div class="mt-6 text-center">
+      <p class="text-textLightGrey">
+        Already have an account?
+        <router-link class="text-primary hover:text-darkPrimary" to="/signin"> Sign in now </router-link>
+      </p>
     </div>
   </div>
 </template>

@@ -1,10 +1,11 @@
 import { ref } from 'vue'
 import { useToastStore } from '../stores/toast'
+import { GENERIC_ERROR_TOAST } from '../constants'
 
 function useAsyncWrap() {
   const isLoading = ref(false)
   const error = ref<Error | null>(null)
-  
+
   const toastStore = useToastStore()
 
   async function run(fn: () => any, errorHandler?: (err: any) => void) {
@@ -16,7 +17,7 @@ function useAsyncWrap() {
         errorHandler(err)
       } else {
         //show generic notification
-        toastStore.show({ title: 'Something went wrong', type: 'error' })
+        toastStore.show(GENERIC_ERROR_TOAST)
       }
     } finally {
       isLoading.value = false

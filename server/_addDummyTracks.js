@@ -4,6 +4,7 @@ dotenv.config()
 import mongoose from 'mongoose'
 import Track from './models/Track.js'
 import User from './models/User.js'
+import License from './models/License.js'
 import fs from 'fs/promises'
 import getWaveformSamples from './utils/getWaveformSamples.js'
 import { getAudioDurationObject } from './utils/audioDuration.js'
@@ -36,8 +37,6 @@ const KEYS = [
   'G Major',
   'G# Major',
 ]
-
-const AUTHOR = '67b8aef37fbb24cd3ae56b33'
 
 const BEATS = [
   {
@@ -101,6 +100,9 @@ const addDummyTracks = async () => {
   await Track.deleteMany()
   console.log('Deleted tracks')
 
+  const AUTHOR = (await User.findOne({ roles: 'admin' }))._id
+  const LICENSE = await License.findById('1')
+
   const NUM_OF_TRACKS = 10
 
   const tracksDocs = []
@@ -131,6 +133,9 @@ const addDummyTracks = async () => {
       bpm: getRandomBpm(),
       key: getRandomKey(),
       genre: getRandomGenre(),
+      instruments: [],
+      mood: '',
+      license: LICENSE,
       playable: true,
       totalLikes: 0,
       totalStreams: 0,
@@ -164,6 +169,9 @@ const addDummyTracks = async () => {
       author: AUTHOR,
       bpm: getRandomBpm(),
       key: getRandomKey(),
+      instruments: [],
+      mood: '',
+      license: LICENSE,
       playable: true,
       totalLikes: 0,
       totalStreams: 0,

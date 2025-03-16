@@ -12,6 +12,7 @@ import trackRoutes from './routes/tracks.js'
 import profileRoutes from './routes/profile.js'
 import adminRoutes from './routes/admin.js'
 import reportRoutes from './routes/reports.js'
+import licenseRoutes from './routes/licenses.js'
 import cookieParser from 'cookie-parser'
 
 import { verifyToken } from './middleware/auth.js'
@@ -30,6 +31,7 @@ app.use('/tracks', trackRoutes)
 app.use('/profile', profileRoutes)
 app.use('/admin', adminRoutes)
 app.use('/reports', reportRoutes)
+app.use('/licenses', licenseRoutes)
 
 //404 invalid route
 app.all('*', invalidRoute)

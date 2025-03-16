@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import { Schema } from 'mongoose'
+import { licenseSchema } from './License.js'
 
 const audioSchema = new Schema({
   _id: false,
@@ -12,6 +13,7 @@ const audioSchema = new Schema({
     formatted: String,
   },
 })
+
 
 const commentSchema = new Schema({
   content: {
@@ -84,6 +86,10 @@ const schema = new Schema({
   comments: {
     type: [commentSchema],
     default: [],
+  },
+  license: {
+    type: licenseSchema,
+    required: true
   },
 })
 

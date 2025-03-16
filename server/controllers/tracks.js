@@ -10,6 +10,8 @@ import formatTrackData from '../utils/formatTrackData.js'
 import getWaveformSamples from '../utils/getWaveformSamples.js'
 import formatComments from '../utils/formatComments.js'
 import { getAudioDurationObject } from '../utils/audioDuration.js'
+import License from '../models/License.js'
+import { sendTrackLikedEmail, sendTrackPendingEmail } from '../emails/emails.js'
 
 const UPLOAD_SCHEMAS = {
   beat: {
@@ -124,16 +126,16 @@ export const uploadTrack = async (req, res) => {
     }
   }
 
+  //attach license
+  const license = await License.findById(req.body.licenseId)
+  if (!license) throw new AppError('LICENSE_NOT_FOUND', 404)
+  newTrack.license = license
+
   //save a track
   await newTrack.save()
 
-  //update author uploads
-  const author = await User.findById(req.userId)
-
-  author.uploads.push(newTrack._id)
-  author.totalUploads++
-
-  await author.save()
+  //send email to admins that track is waiting for verification
+  await sendTrackPendingEmail()
 
   //send response
   res.json({ trackId: newTrack._id })
@@ -343,7 +345,7 @@ export const toggleTrackLike = async (req, res) => {
   const likeId = `User-${req.userId}Track-${trackId}`
 
   const foundLike = await Like.findById(likeId)
-  const foundTrack = await Track.findById(trackId)
+  const foundTrack = await Track.findById(trackId).populate('author', 'email')
 
   if (!foundLike) {
     foundTrack.totalLikes++
@@ -354,8 +356,10 @@ export const toggleTrackLike = async (req, res) => {
       trackId,
       userId: req.userId,
     })
-
     await newLike.save()
+
+    //send email
+    await sendTrackLikedEmail(foundTrack.author.email, foundTrack)
   } else {
     foundTrack.totalLikes--
     await foundLike.deleteOne()

@@ -10,6 +10,7 @@ import { useAudioPlayerStore } from './stores/audioPlayer'
 import useAsyncWrap from './composables/useAsyncWrap'
 import { AxiosError } from 'axios'
 import { useToastStore } from './stores/toast'
+import { GENERIC_ERROR_TOAST } from './constants'
 
 const authStore = useAuthStore()
 const audioPlayerStore = useAudioPlayerStore()
@@ -33,7 +34,7 @@ async function localLogin() {
             break
           default:
             //show generic error toast
-            toastStore.show({ type: 'error', title: 'Something went wrong' })
+            toastStore.show(GENERIC_ERROR_TOAST)
         }
       }
     }

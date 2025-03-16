@@ -9,23 +9,35 @@ import CurrentFilters from '../components/CurrentFilters.vue'
 import debounce from '../utils/debounce'
 import { useRoute, useRouter } from 'vue-router'
 import BaseSelect from '../components/base/BaseSelect.vue'
-
-const trackType = ref<TrackType>('all')
-
-const { currentFilters, activeFilters, removeFilter } = useTrackFilters(trackType)
-const { tracks, getTracks, loadMoreTracks, isLoading, isLoadingMore, isMore, toggleLike } = useTracks()
+import { TRACK_TYPES } from '../constants'
+import useToggleLike from '../composables/useToggleLike'
+import LoginPromptModal from '../components/LoginPromptModal.vue'
 
 const route = useRoute()
 const router = useRouter()
 
-const query = route.query as { q?: string }
+const query = route.query as { q?: string; type?: TrackType }
 
-//initialize search phrase with whatever is in url query or empty string
+//initialize search phrase and track type with whatever is in url query or default value
 const searchPhrase = ref(query.q || '')
+const trackType = ref<TrackType>(query.type && TRACK_TYPES.includes(query.type) ? query.type : 'all')
 
-//update query string in url when search term changes
-watch(searchPhrase, newValue => {
-  router.replace({ query: { ...route.query, q: newValue || undefined } })
+const { currentFilters, activeFilters, removeFilter } = useTrackFilters(trackType)
+const { tracks, getTracks, loadMoreTracks, isLoading, isLoadingMore, isMore } = useTracks()
+const { toggleLike, showLoginPrompt } = useToggleLike()
+
+//update query string in url and trigger search when either search phrase or track type changes
+watch([searchPhrase, trackType], ([newSearchPhrase, newTrackType]) => {
+  router.replace({
+    query: {
+      ...route.query,
+      q: newSearchPhrase || undefined,
+      type: newTrackType === 'all' ? undefined : newTrackType,
+    },
+  })
+
+  isLoading.value = true
+  debouncedGetTracks()
 })
 
 //wrapper for getTracks
@@ -42,12 +54,7 @@ const debouncedGetTracks = debounce(() => {
 getTracksWithFilters()
 
 // Watch for filter changes
-watch([activeFilters, searchPhrase], () => {
-  //set isloading to true before deboune so spinner is shown when function is waiting for execution
-  //no need to set it back to false as getTracks will do that for us
-
-  route.query
-
+watch([activeFilters], () => {
   isLoading.value = true
   debouncedGetTracks()
 })
@@ -73,9 +80,10 @@ const options = [
 </script>
 
 <template>
+  <LoginPromptModal :is-open="showLoginPrompt" message="Log in to leave a like" @close="showLoginPrompt = false" />
   <div>
-    <div class="flex gap-x-8 mb-4">
-      <BaseSelect v-model="trackType" :options="options" class="w-48" />
+    <div class="flex flex-col gap-y-4 sm:flex-row sm:gap-x-8 mb-4">
+      <BaseSelect v-model="trackType" :options="options" class="w-full sm:w-48" />
       <BaseSearchbar
         @search="phrase => (searchPhrase = phrase)"
         v-model="searchPhrase"
@@ -85,7 +93,7 @@ const options = [
         class="flex-1"
       />
     </div>
-    <FiltersPanel :filters="currentFilters" class="mb-2" />
+    <FiltersPanel :filters="currentFilters" />
     <div class="min-h-8 mb-4">
       <CurrentFilters :filters="currentFilters" @remove-filter="removeFilter" />
     </div>

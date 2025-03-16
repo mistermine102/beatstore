@@ -52,7 +52,7 @@ getReports()
     </div>
     <div v-else class="grid grid-cols-1 gap-4">
       <div v-for="report in reports" :key="report._id" class="base-container p-8">
-        <div class="flex gap-8">
+        <div class="flex flex-col md:flex-row gap-8">
           <div class="min-w-[200px]">
             <h3 class="text-xl mb-1">{{ report.track.title }}</h3>
             <p class="text-gray-400">Reported by {{ report.reporter.username }}</p>

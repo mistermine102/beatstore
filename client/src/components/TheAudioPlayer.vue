@@ -4,9 +4,9 @@ import DurationControls from './audioPlayer/DurationControls.vue'
 import VolumeControls from './audioPlayer/VolumeControls.vue'
 </script>
 <template>
-  <div class="grid grid-cols-4 fixed bottom-0 w-full h-[100px] bg-darkGrey items-center z-20">
+  <div class="grid grid-cols-6 lg:grid-cols-4 fixed bottom-0 w-full h-[100px] bg-darkGrey items-center z-20">
     <TrackInformation />
-    <DurationControls class="col-span-2" />
+    <DurationControls class="col-span-4 lg:col-span-2" />
     <VolumeControls />
   </div>
 </template>

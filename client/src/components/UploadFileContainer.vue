@@ -37,7 +37,7 @@ const formattedFileSize = computed(() => {
     <label :for="id" class="cursor-pointer w-full h-full p-8">
       <div v-if="!file" class="flex flex-col items-center justify-center">
         <slot name="icon"></slot>
-        <p class="mt-4">Drag and drop or <span class="base-link">select a file</span></p>
+        <p class="mt-4">Select a file</p>
       </div>
       <div v-else class="flex flex-col items-center justify-center gap-4">
         <span>{{ file.name }}</span>

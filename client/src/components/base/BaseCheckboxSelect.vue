@@ -50,7 +50,7 @@ watch(
 </script>
 <template>
   <Popover class="relative">
-    <PopoverButton class="base-input w-full flex justify-between">
+    <PopoverButton class="popover-button base-input w-full flex justify-between">
       <span v-if="!selectedOptions.length" class="text-textLightGrey">{{ placeholder }} </span>
       <div v-else>
         <span>{{ selectedOptions[0].label }}</span>

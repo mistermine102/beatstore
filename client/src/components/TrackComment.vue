@@ -3,7 +3,6 @@ import appApi from '../api/appApi'
 import useAsyncWrap from '../composables/useAsyncWrap'
 import { TrashIcon } from './icons/index.vine'
 import { useAuthStore } from '../stores/auth'
-import { useToastStore } from '../stores/toast'
 import LikeButton from './LikeButton.vue'
 import LoginPromptModal from './LoginPromptModal.vue'
 import { ref } from 'vue'
@@ -12,7 +11,6 @@ const props = defineProps<{ comment: TrackComment; track: Track }>()
 const emit = defineEmits(['toggleLike', 'deleteComment'])
 
 const authStore = useAuthStore()
-const toastStore = useToastStore()
 const showLoginPrompt = ref(false)
 
 const wrapChangeVote = useAsyncWrap()
@@ -44,7 +42,7 @@ function deleteComment() {
     <div class="flex gap-x-4">
       <img :src="comment.author.image.url" alt="" class="image-small" />
       <div>
-        <p class="text-textLightGrey">{{ comment.author.username }}</p>
+        <router-link :to="`/profile/${comment.author._id}`" class="text-textLightGrey">{{ comment.author.username }}</router-link>
         <p class="mb-2">{{ comment.content }}</p>
         <div class="flex h-fit gap-x-2">
           <LikeButton 

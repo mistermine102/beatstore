@@ -54,37 +54,37 @@ const wrapReport = reactive(useAsyncWrap())
 
 async function submitReport() {
   if (!track.value || !authStore.user) return
-  
+
   try {
     await wrapReport.run(async () => {
       const trackId = track.value?._id
       if (!trackId) {
-        toastStore.show({ 
-          type: 'error', 
-          title: 'Error', 
-          message: 'Could not find track ID' 
+        toastStore.show({
+          type: 'error',
+          title: 'Error',
+          message: 'Could not find track ID',
         })
         return
       }
 
       await appApi.post('/reports', {
         trackId,
-        message: reportMessage.value
+        message: reportMessage.value,
       })
-      
+
       showReportModal.value = false
       reportMessage.value = ''
-      toastStore.show({ 
-        type: 'success', 
-        title: 'Report submitted', 
-        message: 'Thank you for your report. Our team will review it shortly.' 
+      toastStore.show({
+        type: 'success',
+        title: 'Report submitted',
+        message: 'Thank you for your report. Our team will review it shortly.',
       })
     })
   } catch (error: any) {
-    toastStore.show({ 
-      type: 'error', 
-      title: 'Could not submit report', 
-      message: error.response?.data?.message || 'Please try again later'
+    toastStore.show({
+      type: 'error',
+      title: 'Could not submit report',
+      message: error.response?.data?.message || 'Please try again later',
     })
   }
 }
@@ -105,22 +105,23 @@ function openReportModal() {
       <EmptyState />
     </div>
     <div v-else>
-      <div class="grid grid-cols-3 gap-x-8 mb-16">
+      <div class="grid grid-cols-1 xl:grid-cols-3 xl:gap-x-8 mb-16">
         <div class="col-span-2">
-          <GeneralInfoPanel class="mb-8" :track="track" />
-          <CommentsPanel :comments="track.comments" :track="track" @change-comments="getTrack" @toggleLike="toggleCommentLike" />
-          <button 
-            class="mt-4 text-textLightGrey hover:text-white duration-150 flex gap-x-2 items-center" 
+          <GeneralInfoPanel :track="track" />
+          <button
+            class="mt-4 text-textLightGrey hover:text-white duration-150 flex gap-x-2 items-center"
             @click="openReportModal"
             v-if="authStore.user?._id !== track.author._id"
           >
             <FlagIcon :size="20" />
             <span>Report</span>
           </button>
+          <CommentsPanel class="hidden xl:block" :comments="track.comments" :track="track" @change-comments="getTrack" @toggleLike="toggleCommentLike" />
         </div>
         <div>
-          <DetailsPanel class="col-span-2" :track="track" @track-like-toggled="toggleLike(track)" />
+          <DetailsPanel :track="track" @track-like-toggled="toggleLike(track)" />
           <AuthorPanel :profile-id="track.author._id" />
+          <CommentsPanel class="block xl:hidden" :comments="track.comments" :track="track" @change-comments="getTrack" @toggleLike="toggleCommentLike" />
         </div>
       </div>
 
@@ -135,28 +136,13 @@ function openReportModal() {
           maxlength="500"
         ></textarea>
         <div class="flex justify-end gap-x-4">
-          <BaseButton 
-            @click="showReportModal = false" 
-            :alt="true"
-          >
-            Cancel
-          </BaseButton>
-          <BaseButton
-            @click="submitReport"
-            :is-loading="wrapReport.isLoading"
-            :disabled="!reportMessage.trim()"
-          >
-            Submit Report
-          </BaseButton>
+          <BaseButton @click="showReportModal = false" :alt="true"> Cancel </BaseButton>
+          <BaseButton @click="submitReport" :is-loading="wrapReport.isLoading" :disabled="!reportMessage.trim()"> Submit Report </BaseButton>
         </div>
       </BaseModal>
 
       <!-- Login Prompt Modal -->
-      <LoginPromptModal 
-        :is-open="showLoginPrompt" 
-        message="Log in to report this track" 
-        @close="showLoginPrompt = false" 
-      />
+      <LoginPromptModal :is-open="showLoginPrompt" message="Log in to report this track" @close="showLoginPrompt = false" />
     </div>
   </div>
 </template>

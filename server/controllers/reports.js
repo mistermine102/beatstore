@@ -1,10 +1,11 @@
 import Report from '../models/Report.js'
 import Track from '../models/Track.js'
 import AppError from '../classes/AppError.js'
+import User from '../models/User.js'
 
 export const createReport = async (req, res) => {
   const { trackId, message } = req.body
-  
+
   // Check if track exists
   const track = await Track.findById(trackId)
   if (!track) throw new AppError('Track not found', 404)
@@ -15,12 +16,12 @@ export const createReport = async (req, res) => {
   }
 
   // Check if user hasn't already reported this track
-  const existingReport = await Report.findOne({ 
+  const existingReport = await Report.findOne({
     track: trackId,
     reporter: req.userId,
-    status: 'pending'
+    status: 'pending',
   })
-  
+
   if (existingReport) {
     throw new AppError('You have already reported this track', 400)
   }
@@ -29,7 +30,7 @@ export const createReport = async (req, res) => {
   const report = new Report({
     track: trackId,
     reporter: req.userId,
-    message
+    message,
   })
 
   await report.save()
@@ -38,22 +39,24 @@ export const createReport = async (req, res) => {
 
 // For admin panel
 export const getReports = async (req, res) => {
-  const reports = await Report.find()
-    .populate('track', 'title')
-    .populate('reporter', 'username')
-    .sort('-createdAt')
-    .lean()
-  
+  const reports = await Report.find().populate('track', 'title').populate('reporter', 'username').sort('-createdAt').lean()
+
   // Handle deleted tracks
   reports.forEach(report => {
     if (!report.track) {
       report.track = {
         _id: 'deleted',
-        title: '[Deleted Track]'
+        title: '[Deleted Track]',
+      }
+    }
+    if (!report.reporter) {
+      report.reporter = {
+        _id: 'deleted',
+        username: '[Deleted User]',
       }
     }
   })
-  
+
   res.json({ reports })
 }
 
@@ -65,15 +68,9 @@ export const updateReportStatus = async (req, res) => {
     throw new AppError('Invalid status', 400)
   }
 
-  const report = await Report.findByIdAndUpdate(
-    reportId,
-    { status },
-    { new: true }
-  )
-    .populate('track', 'title')
-    .populate('reporter', 'username')
+  const report = await Report.findByIdAndUpdate(reportId, { status }, { new: true }).populate('track', 'title').populate('reporter', 'username')
 
   if (!report) throw new AppError('Report not found', 404)
 
   res.json({ report })
-} 
+}

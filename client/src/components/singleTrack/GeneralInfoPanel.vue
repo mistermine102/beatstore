@@ -8,7 +8,7 @@ import { useCssVar } from '@vueuse/core'
 import { HeartIcon, PlayIcon } from '../icons/index.vine'
 import PlayPauseBtn from '../PlayPauseBtn.vue'
 import useToggleLike from '../../composables/useToggleLike'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import LoginPromptModal from '../../components/LoginPromptModal.vue'
 
 const props = defineProps<{ track: Track }>()
@@ -24,7 +24,7 @@ function handleLike() {
   toggleLike(props.track)
   isAnimating.value = true
   emit('likeToggled')
-  
+
   // Reset animation state after animation completes
   setTimeout(() => {
     isAnimating.value = false
@@ -42,6 +42,34 @@ const defaultColors = {
 const colors = track.image.averageColor ? getWaveformColors(track.image.averageColor.hex) : defaultColors
 
 const { waveformColor, progressColor, highlightColor } = colors
+
+const waveformWidth = computed(() => {
+  switch (true) {
+    case window.innerWidth > 1800:
+      return 500
+    case window.innerWidth > 1650:
+      return 400
+    case window.innerWidth > 1536:
+      return 320
+    case window.innerWidth > 1280:
+      return 400
+    case window.innerWidth > 1024:
+      return 500
+    case window.innerWidth > 768:
+      return 400
+    default:
+      return 400
+  }
+})
+
+const waveformHeight = computed(() => {
+  switch (true) {
+    case waveformWidth.value > 380:
+      return 80
+    default:
+      return 60
+  }
+})
 </script>
 
 <template>
@@ -66,21 +94,16 @@ const { waveformColor, progressColor, highlightColor } = colors
             />
           </div>
           <div class="flex justify-center gap-x-8 mt-4">
-            <button 
-              @click="handleLike"
-              class="flex gap-x-2 items-center group cursor-pointer"
-            >
-              <HeartIcon 
+            <button @click="handleLike" class="flex gap-x-2 items-center group cursor-pointer">
+              <HeartIcon
                 :fill="track.isLiked"
                 class="w-8 transition-all duration-150 shrink-0"
-                :class="[
-                  isAnimating && 'animate-like',
-                  track.isLiked ? 'text-primary' : 'text-iconLightGrey group-hover:text-primary'
-                ]"
+                :class="[isAnimating && 'animate-like', track.isLiked ? 'text-primary' : 'text-iconLightGrey group-hover:text-primary']"
               />
-              <p class="text-lg transition-colors duration-150" :class="[
-                track.isLiked ? 'text-primary' : 'text-textLightGrey group-hover:text-primary'
-              ]">
+              <p
+                class="text-lg transition-colors duration-150"
+                :class="[track.isLiked ? 'text-primary' : 'text-textLightGrey group-hover:text-primary']"
+              >
                 {{ track.totalLikes }}
               </p>
             </button>
@@ -91,23 +114,25 @@ const { waveformColor, progressColor, highlightColor } = colors
           </div>
         </div>
 
-        <div class="flex flex-col">
-          <p class="text-lg text-textLightGrey">{{ track.author.username }}</p>
-          <h2 class="font-secondary text-[48px] text-white -mt-4 mb-4">{{ track.title }}</h2>
-          <div v-if="track.playable" class="flex gap-x-8 items-center justify-center">
+        <div class="flex flex-col min-w-0 max-w-full flex-1">
+          <router-link :to="`/profile/${track.author._id}`" class="text-lg text-textLightGrey truncate block">
+            {{ track.author.username }}
+          </router-link>
+          <h2 class="font-secondary text-[48px] text-white -mt-2 mb-4 truncate">{{ track.title }}</h2>
+          <div v-if="track.playable" class="flex gap-x-8 items-center justify-start sm:justify-center">
             <div class="w-fit group" :style="{ color: progressColor }">
-              <PlayPauseBtn 
-                :track="track" 
+              <PlayPauseBtn
+                :track="track"
                 :icon-size="32"
                 class="[&>.play-pause-text]:hidden relative"
                 button-class="hover:scale-105 transition-transform duration-150"
               />
             </div>
-            <div class="space-y-2 w-full h-full">
+            <div class="space-y-2 w-full h-full hidden sm:block">
               <p class="text-xs font-medium opacity-75">{{ track.audio.duration.formatted }}</p>
               <InteractiveWaveform
-                :width="400"
-                :height="80"
+                :width="waveformWidth"
+                :height="waveformHeight"
                 :waveform-color="waveformColor"
                 :progress-color="progressColor"
                 :highlight-color="highlightColor"
@@ -120,6 +145,10 @@ const { waveformColor, progressColor, highlightColor } = colors
         </div>
       </div>
     </div>
+    <div class="mb-16">
+      <h2 class="base-heading mb-2">{{ track.license.shortDescription }}</h2>
+      <p class="text-textLightGrey">{{ track.license.longDescription }}</p>
+    </div>
     <div class="mb-8">
       <h2 class="base-heading mb-4">Description</h2>
       <p v-if="track.description" class="overflow-hidden text-textLightGrey">{{ track.description }}</p>
@@ -127,9 +156,5 @@ const { waveformColor, progressColor, highlightColor } = colors
     </div>
   </div>
 
-  <LoginPromptModal 
-    :is-open="showLoginPrompt"
-    message="Log in to like the track"
-    @close="showLoginPrompt = false"
-  />
+  <LoginPromptModal :is-open="showLoginPrompt" message="Log in to leave a like" @close="showLoginPrompt = false" />
 </template>

@@ -15,7 +15,7 @@ const emit = defineEmits<{
 const router = useRouter()
 
 function goToLogin() {
-  router.push('/login')
+  router.push('/signin')
   emit('close')
 }
 </script>

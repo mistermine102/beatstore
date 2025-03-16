@@ -10,7 +10,7 @@ interface Option {
 
 interface Props {
   options: Option[]
-  modelValue: string
+  modelValue: string | null
   placeholder?: string
 }
 
@@ -35,7 +35,7 @@ function selectOption(option: Option, close: any) {
 </script>
 <template>
   <Popover class="relative">
-    <PopoverButton class="base-input w-full h-full flex justify-between">
+    <PopoverButton class="popover-button base-input w-full h-full flex justify-between">
       <span v-if="selectedOption" class="text-textLightGrey/90">{{ selectedOption.label }}</span>
       <span v-else class="text-textLightGrey/90">{{ placeholder }}</span>
       <ChevronDownIcon class="text-textLightGrey/90" :size="20" />

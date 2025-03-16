@@ -17,7 +17,7 @@ defineEmits<{
         
         <!-- Modal -->
         <Transition name="modal">
-          <div class="bg-background w-[500px] h-[300px] relative z-10 rounded-xl p-8">
+          <div class="modal-body bg-background w-[90%] sm:min-w-[500px] sm:min-h-[300px] relative z-10 rounded-xl p-8">
             <slot></slot>
           </div>
         </Transition>

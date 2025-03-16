@@ -49,6 +49,16 @@ const schema = new Schema({
     ],
     default: [],
   },
+  socialLinks: {
+    type: [
+      {
+        _id: false,
+        platform: String,
+        url: String,
+      },
+    ],
+    default: [],
+  },
   roles: {
     type: [String],
     default: [],

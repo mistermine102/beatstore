@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import { HeartIcon } from '../icons/index.vine'
-
 defineProps<{ track: Track }>()
-const emit = defineEmits(['trackLikeToggled'])
 </script>
 
 <template>

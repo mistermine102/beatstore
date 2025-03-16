@@ -6,6 +6,13 @@ interface User {
   roles: string[]
 }
 
+interface License {
+  _id: string
+  title: string
+  shortDescription: string
+  longDescription: string
+}
+
 type TrackType = 'beat' | 'sample' | 'drumkit' | 'loop' | 'all'
 
 interface TrackComment {
@@ -43,6 +50,7 @@ interface BaseTrack {
     username: string
     _id: string
   }
+  license: License
   createdAt: Date
   comments: TrackComment[]
   verified: boolean
@@ -118,6 +126,13 @@ type PlayableTrack = Beat | Sample | Loop
 
 type ToastType = 'info' | 'error' | 'success'
 
+type Platform = 'facebook' | 'instagram' | 'soundcloud' | 'youtube' | 'twitter' | 'tiktok' | 'other'
+
+interface SocialLink {
+  platform: Platform
+  url: string
+}
+
 interface Profile {
   createdAt: Date
   username: string
@@ -129,6 +144,7 @@ interface Profile {
   image: {
     url: string
   }
+  socialLinks: SocialLink[]
 }
 
 interface GetTracksFilters {

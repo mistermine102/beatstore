@@ -9,8 +9,8 @@ import FrontpageTracktypes from '../components/FrontpageTracktypes.vue'
     <FrontpageHero />
     <FrontpageExplore class="relative" />
     <FrontpageTracktypes />
-    <div class="mt-32">
-      <h2 class="text-[40px] mb-8">Popular right now</h2>
+    <div class="mt-48">
+      <h2 class="text-[40px] mb-8 font-secondary">Popular right now</h2>
       <div class="flex gap-x-8">
         <div class="p-4">
           <img src="" alt="" class="w-[200px] h-[200px]" />

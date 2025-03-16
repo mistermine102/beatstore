@@ -14,15 +14,13 @@ function formatTime(seconds: number) {
 <template>
   <div class="col-span-2">
     <div class="flex flex-col items-center">
-      <div class="flex items-center gap-4">
-        <button @click="audioPlayerStore.toggle" class="group relative">
-          <PlayIcon v-if="audioPlayerStore.isPaused" :fill="true" class="relative transform group-hover:scale-110 transition-transform duration-150" />
-          <PauseIcon v-else :fill="true" class="relative transform group-hover:scale-110 transition-transform duration-150" />
-        </button>
-      </div>
-      <div class="flex items-center">
+      <button @click="audioPlayerStore.toggle" class="clickable-icon">
+        <PlayIcon v-if="audioPlayerStore.isPaused" :fill="true" />
+        <PauseIcon v-else :fill="true" />
+      </button>
+      <div class="flex items-center w-full lg:w-auto">
         <span class="w-[50px] flex justify-center">{{ formatTime(audioPlayerStore.currentTime) }}</span>
-        <div class="w-[500px]">
+        <div class="w-full lg:w-[500px]">
           <BaseRangeInput :value="audioPlayerStore.progress" @change="audioPlayerStore.setProgress" />
         </div>
         <span class="w-[50px] flex justify-center">{{ formatTime(audioPlayerStore.duration) }}</span>

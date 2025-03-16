@@ -6,7 +6,7 @@ import User, { UnverifiedUser } from '../models/User.js'
 import jwt from 'jsonwebtoken'
 import AppError from '../classes/AppError.js'
 import { UAParser } from 'ua-parser-js'
-import sendVerifyEmail from '../utils/sendVerifyEmail.js'
+import { sendVerifyEmail } from '../emails/emails.js'
 
 const ACCESS_TOKEN_EXPIRATION = process.env.ACCESS_TOKEN_EXPIRATION
 const REFRESH_TOKEN_EXPIRATION = process.env.REFRESH_TOKEN_EXPIRATION

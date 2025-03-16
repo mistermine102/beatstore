@@ -27,9 +27,7 @@ function logout() {
 <template>
   <BasePopover v-if="user">
     <template #popover-button>
-      <div class="flex justify-center items-center">
-        <UserIcon />
-      </div>
+      <UserIcon class="clickable-icon" />
     </template>
     <template #popover-content>
       <div class="flex flex-col divide-y-2 divide-lightGray">

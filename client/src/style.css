@@ -33,7 +33,7 @@ html {
 
 body {
   font-family: var(--fontPrimary);
-  color: white;
+  color: rgb(238, 238, 238);
   line-height: 1.7;
   letter-spacing: -0.01em;
   font-weight: 500;
@@ -78,22 +78,22 @@ body {
 .image-thumbnail {
   width: 120px;
   height: 120px;
+  min-width: 120px;
+  min-height: 120px;
 }
 
 .image-medium {
   height: 150px;
   width: 150px;
+  min-width: 150px;
+  min-height: 150px;
 }
 
 .image-large {
   height: 300px;
   width: 300px;
-}
-
-.base-input:focus {
-  outline-color: var(--primary);
-  outline-style: groove;
-  outline-width: 2px;
+  min-width: 300px;
+  min-height: 300px;
 }
 
 .base-link {
@@ -214,10 +214,12 @@ body {
 }
 
 @tailwind base;
-@tailwind components;
-@tailwind utilities;
 
-@layer components {
+@layer base {
+  .base-input {
+    @apply bg-grey rounded-regular px-4 py-3 text-white border border-white/[0.02] hover:border-white/[0.1] focus:outline-none focus:border-white/[0.1] transition-colors duration-150 ease-in-out;
+  }
+
   .panel {
     @apply bg-grey p-8 rounded-xl border border-white/[0.02] shadow-lg;
   }
@@ -226,7 +228,18 @@ body {
     @apply text-2xl mb-8;
   }
 
-  .base-input {
-    @apply bg-grey rounded-regular px-4 py-2 text-white border border-white/[0.02] hover:border-white/[0.1] focus:outline-none focus:border-white/[0.1] transition-colors duration-150 ease-in-out;
+  .clickable-icon {
+    @apply text-iconLightGrey hover:text-white transition-colors duration-150 cursor-pointer;
+  }
+
+  .base-link {
+    @apply text-primary;
+  }
+
+  .base-error-msg {
+    @apply text-red-500 text-sm;
   }
 }
+
+@tailwind components;
+@tailwind utilities;

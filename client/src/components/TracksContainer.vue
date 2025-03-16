@@ -33,7 +33,7 @@ const emit = defineEmits<Emits>()
         <div class="grid gap-12">
           <Track v-for="track in tracks" :track="track" @like-toggled="emit('likeToggled', track)"></Track>
         </div>
-        <div class="w-1/2 mx-auto mt-16">
+        <div class="sm:w-1/2 mx-auto mt-16">
           <BaseButton v-if="isMore" :is-loading="isLoadingMore" alt @click="emit('loadedMore')" class="w-full">Load more</BaseButton>
         </div>
       </div>

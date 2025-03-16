@@ -38,7 +38,7 @@ getProfiles()
     <div class="grid grid-cols-2">
       <div v-for="profile in profiles">
         <div class="flex gap-x-4">
-          <img :src="profile.image.url" class="image-thumbnail" alt="Profile image" />
+          <img :src="profile.image.url" class="image-thumbnail rounded-regular" alt="Profile image" />
           <div>
             <router-link :to="`profile/${profile._id}`">
               <h2 class="whitespace-nowrap text-xl">{{ profile.username }}</h2>

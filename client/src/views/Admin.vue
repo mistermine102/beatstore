@@ -8,11 +8,8 @@ const router = useRouter()
 <template>
   <div>
     <h1 class="base-heading text-left">Admin Panel</h1>
-    <div class="grid grid-cols-3 gap-8">
-      <button
-        class="w-full h-64 text-2xl bg-darkGrey hover:translate-y-[-2px] transition-transform duration-150 rounded-regular"
-        @click="router.push('/admin/uploads')"
-      >
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <BaseButton alt class="w-full h-64 text-2xl" @click="router.push('/admin/uploads')">
         <div class="flex flex-col justify-center items-center gap-4">
           <svg class="w-[48px]" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <path
@@ -22,18 +19,23 @@ const router = useRouter()
           </svg>
           <h2 class="text-2xl">Verify Uploads</h2>
         </div>
-      </button>
-      <button
-        class="w-full h-64 text-2xl bg-darkGrey hover:translate-y-[-2px] transition-transform duration-150 rounded-regular"
-        @click="router.push('/admin/reports')"
-      >
+      </BaseButton>
+      <BaseButton alt class="w-full h-64 text-2xl" @click="router.push('/admin/reports')">
         <div class="flex flex-col justify-center items-center gap-4">
           <svg class="w-[48px]" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <path d="M3 2h10v2h8v14H11v-2H5v6H3V2zm2 12h8v2h6V6h-8V4H5v10z" fill="currentColor" />
           </svg>
           <h2 class="text-2xl">Manage Reports</h2>
         </div>
-      </button>
+      </BaseButton>
+      <BaseButton alt class="w-full h-64 text-2xl" @click="router.push('/admin/featured')">
+        <div class="flex flex-col justify-center items-center gap-4">
+          <svg class="w-[48px]" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M3 3h8v2H3v12h8V5h2v12h8V5h-8V3h10v16H13v2h-2v-2H1V3h2zm16 7h-4v2h4v-2zm-4-3h4v2h-4V7zm2 6h-2v2h2v-2z" fill="currentColor" />
+          </svg>
+          <h2 class="text-2xl">Manage Featured Profiles</h2>
+        </div>
+      </BaseButton>
     </div>
   </div>
 </template>

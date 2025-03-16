@@ -37,7 +37,7 @@ function addComment() {
       </div>
       <div v-else class="flex items-center justify-center gap-4 mb-8 py-6 bg-background rounded-regular">
         <span class="text-textLightGrey">Want to leave a comment?</span>
-        <BaseButton @click="router.push('/login')" class="w-fit">Log in</BaseButton>
+        <BaseButton @click="router.push('/signin')" class="w-fit">Log in</BaseButton>
       </div>
       <div class="flex flex-col gap-y-8">
         <TrackComment

@@ -21,12 +21,14 @@ const progressStyles = computed(() => {
 
 function handlePercentageChange(e: MouseEvent) {
   if (!bar.value) return
-  
-  let percentage = 0
 
-  const leftBound = bar.value.offsetLeft
-  const rightBound = bar.value.offsetLeft + bar.value.offsetWidth
-  const durationBarWidth = bar.value.offsetWidth
+  // Get fresh values for the bar position
+  const barRect = bar.value.getBoundingClientRect()
+  const leftBound = barRect.left
+  const rightBound = barRect.right
+  const durationBarWidth = barRect.width
+
+  let percentage = 0
 
   if (e.clientX >= leftBound && e.clientX <= rightBound) {
     percentage = ((e.clientX - leftBound) / durationBarWidth) * 100

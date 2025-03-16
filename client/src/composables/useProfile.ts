@@ -1,4 +1,4 @@
-import { ref, type Ref } from 'vue'
+import { ref } from 'vue'
 import appApi from '../api/appApi'
 import useAsyncWrap from './useAsyncWrap'
 import { useAuthStore } from '../stores/auth'
@@ -13,8 +13,8 @@ function useProfile() {
 
   async function getProfile(profileId: string) {
     await wrapGetProfile.run(async () => {
-      const profileResponse = await appApi.get<{ profile: Profile }>(`/profile/${profileId}`)
-      profile.value = profileResponse.data.profile
+      const response = await appApi.get<{ profile: Profile }>(`/profile/${profileId}`)
+      profile.value = response.data.profile
     })
   }
 

@@ -1,5 +1,6 @@
 import { h } from 'vue'
 import {
+  PhList,
   PhUser,
   PhUploadSimple,
   PhHouse,
@@ -15,15 +16,25 @@ import {
   PhMinus,
   PhTrash,
   PhMagnifyingGlass,
-  PhList,
   PhTable,
   PhFlag,
-  PhCheck
+  PhCheck,
+  PhPencilSimple,
+  PhX,
+  PhFunnel
 } from '@phosphor-icons/vue'
 
 interface IconProps {
   size?: number
   fill?: boolean
+}
+
+export function FilterIcon(props: IconProps = {}) {
+  return h(PhFunnel, { weight: props.fill ? 'fill' : 'bold', size: props.size || 24 })
+}
+
+export function XIcon(props: IconProps = {}) {
+  return h(PhX, { weight: props.fill ? 'fill' : 'bold', size: props.size || 24 })
 }
 
 export function UserIcon(props: IconProps = {}) {
@@ -100,4 +111,8 @@ export function FlagIcon(props: IconProps = {}) {
 
 export function CheckIcon(props: IconProps = {}) {
   return h(PhCheck, { weight: props.fill ? 'fill' : 'bold', size: props.size || 24 })
+}
+
+export function PencilIcon(props: IconProps = {}) {
+  return h(PhPencilSimple, { weight: props.fill ? 'fill' : 'bold', size: props.size || 24 })
 }
