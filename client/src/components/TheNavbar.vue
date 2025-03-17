@@ -2,20 +2,12 @@
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '../stores/auth'
 import ProfilePopover from './ProfilePopover.vue'
-import { HeartIcon, ListIcon, XIcon } from './icons/index.vine'
+import { HeartIcon, ListIcon } from './icons/index.vine'
 import BaseButton from './base/BaseButton.vue'
-import { ref } from 'vue'
 import BasePopover from './base/BasePopover.vue'
 
 const authStore = useAuthStore()
 const { user } = storeToRefs(authStore)
-
-//mobile menu
-const mobileMenuOpen = ref(false)
-
-const toggleMobileMenu = () => {
-  mobileMenuOpen.value = !mobileMenuOpen.value
-}
 </script>
 
 <template>
@@ -23,15 +15,17 @@ const toggleMobileMenu = () => {
     <nav class="py-4 px-4 sm:px-16 flex items-center justify-between">
       <div class="flex gap-x-16 lg:gap-x-32 items-center">
         <div class="flex justify-start">
-          <router-link to="/" class="text-[18px] text-textLightGrey">wavsMarket</router-link>
+          <router-link to="/" class="text-[18px] text-primary font-secondary">WavsMarket</router-link>
         </div>
         <div class="items-start hidden sm:flex gap-x-8 lg:gap-x-16">
           <router-link to="/tracks/browse">Browse</router-link>
           <router-link to="/upload">Upload</router-link>
         </div>
       </div>
-
-      <div class="flex items-center gap-x-8 md:gap-x-16">
+      <div v-if="authStore.isLoading" class="scale-50">
+        <div class="loader"></div>
+      </div>
+      <div v-else class="flex items-center gap-x-8 md:gap-x-16">
         <router-link v-if="user" to="/liked" class="clickable-icon">
           <HeartIcon />
         </router-link>

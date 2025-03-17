@@ -94,6 +94,17 @@ const waveformWidth = computed(() => {
     </div>
     <div>
       <p v-if="!track.verified" class="text-orange-500">Unverified</p>
+      <p
+        class="inline-block px-3 py-1 rounded-regular text-sm font-semibold shadow-md"
+        :class="{
+          'bg-indigo-700': track.type === 'beat',
+          'bg-fuchsia-700': track.type === 'sample',
+          'bg-yellow-700': track.type === 'drumkit',
+          'bg-emerald-700': track.type === 'loop',
+        }"
+      >
+        {{ track.type === 'beat' ? 'Beat' : track.type === 'sample' ? 'Sample' : track.type === 'drumkit' ? 'Drumkit' : 'Loop' }}
+      </p>
     </div>
   </div>
 </template>

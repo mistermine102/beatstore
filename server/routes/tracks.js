@@ -1,12 +1,13 @@
 import express from 'express'
 import { body, query, param } from 'express-validator'
 import tryCatch from '../utils/tryCatch.js'
-import { hasRole, isAuthenticated } from '../middleware/auth.js'
+import { isAuthenticated } from '../middleware/auth.js'
 import validate from '../middleware/validate.js'
 import { trackUpload, trackImageUpload } from '../multer.js'
 import { getTracks, uploadTrack, streamTrack, toggleTrackLike, uploadTrackImage, getSingleTrack, deleteTrack } from '../controllers/tracks.js'
 import isValidId from '../middleware/isValidId.js'
 import { addComment, deleteComment, toggleCommentLike } from '../controllers/trackComments.js'
+import { KEYS, MOODS, GENRES, INSTRUMENTS } from '../constants.js'
 
 const router = express.Router()
 
@@ -39,8 +40,74 @@ const uploadTrackValidators = [
     .isString()
     .withMessage('Type must be a string')
     .isIn(['beat', 'sample', 'drumkit', 'loop']),
-  body('title').exists().withMessage('Title cannot be empty').trim().isString().withMessage('Title must be a string').isLength({ min: 4 }),
+  body('title')
+    .exists()
+    .withMessage('Title cannot be empty')
+    .trim()
+    .isString()
+    .withMessage('Title must be a string')
+    .isLength({ min: 4, max: 100 })
+    .withMessage('Title must be between 4 and 100 characters'),
   body('licenseId').exists().withMessage('License cannot be empty').trim().isString().withMessage('License ID must be a string'),
+  body('bpm')
+    .optional()
+    .custom(value => {
+      // Accept empty string
+      if (value === '') {
+        return true
+      }
+
+      // Convert to number and check if it's valid
+      const bpm = Number(value)
+
+      // Check if it's a valid number (not NaN)
+      if (isNaN(bpm)) {
+        throw new Error('BPM must be a valid number')
+      }
+
+      // Check if it's a whole number
+      if (!Number.isInteger(bpm)) {
+        throw new Error('BPM must be a whole number')
+      }
+
+      // Check if it's within the valid range
+      if (bpm < 0 || bpm > 999) {
+        throw new Error('BPM must be between 0 and 999')
+      }
+
+      return true
+    }),
+  body('key')
+    .optional()
+    .isIn([...KEYS, ''])
+    .withMessage('Key must be one of the valid keys'),
+  body('mood')
+    .optional()
+    .isIn([...MOODS, ''])
+    .withMessage('Mood must be one of the valid moods'),
+  body('genre')
+    .optional()
+    .isIn([...GENRES, ''])
+    .withMessage('Genre must be one of the valid genres'),
+  body('instruments')
+    .optional()
+    .isArray()
+    .withMessage('Instruments must be an array')
+    .custom(instruments => {
+      // Check if all instruments are in the allowed set
+      const validInstruments = instruments.every(instrument => INSTRUMENTS.includes(instrument))
+      if (!validInstruments) {
+        throw new Error('All instruments must be from the valid instrument list')
+      }
+
+      // Check for duplicates
+      const uniqueInstruments = new Set(instruments)
+      if (uniqueInstruments.size !== instruments.length) {
+        throw new Error('Duplicate instruments are not allowed')
+      }
+
+      return true
+    }),
 ]
 
 export const addCommentValidators = [

@@ -52,7 +52,7 @@ const waveformWidth = computed(() => {
     case window.innerWidth > 1536:
       return 320
     case window.innerWidth > 1280:
-      return 400
+      return 350
     case window.innerWidth > 1024:
       return 500
     case window.innerWidth > 768:
@@ -118,7 +118,20 @@ const waveformHeight = computed(() => {
           <router-link :to="`/profile/${track.author._id}`" class="text-lg text-textLightGrey truncate block">
             {{ track.author.username }}
           </router-link>
-          <h2 class="font-secondary text-[48px] text-white -mt-2 mb-4 truncate">{{ track.title }}</h2>
+          <div class="flex justify-between items-center">
+            <h2 class="font-secondary text-[48px] text-white -mt-2 mb-4 truncate">{{ track.title }}</h2>
+            <p
+              class="inline-block px-3 py-1 rounded-regular text-sm font-semibold shadow-md h-fit mb-4"
+              :class="{
+                'bg-indigo-700': track.type === 'beat',
+                'bg-fuchsia-700': track.type === 'sample',
+                'bg-yellow-700': track.type === 'drumkit',
+                'bg-emerald-700': track.type === 'loop',
+              }"
+            >
+              {{ track.type === 'beat' ? 'Beat' : track.type === 'sample' ? 'Sample' : track.type === 'drumkit' ? 'Drumkit' : 'Loop' }}
+            </p>
+          </div>
           <div v-if="track.playable" class="flex gap-x-8 items-center justify-start sm:justify-center">
             <div class="w-fit group" :style="{ color: progressColor }">
               <PlayPauseBtn
@@ -128,8 +141,7 @@ const waveformHeight = computed(() => {
                 button-class="hover:scale-105 transition-transform duration-150"
               />
             </div>
-            <div class="space-y-2 w-full h-full hidden sm:block">
-              <p class="text-xs font-medium opacity-75">{{ track.audio.duration.formatted }}</p>
+            <div class="space-y-4 w-full h-full hidden sm:block">
               <InteractiveWaveform
                 :width="waveformWidth"
                 :height="waveformHeight"

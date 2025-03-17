@@ -25,7 +25,7 @@ const bgColor = computed(() => {
     leave-from-class="transform translate-y-0 opacity-100"
     leave-to-class="transform -translate-y-2 opacity-0"
   >
-    <div v-if="toastStore.isOpen" class="z-40 fixed flex justify-center top-2 left-0 right-0 pointer-events-none">
+    <div v-if="toastStore.isOpen" class="z-50 fixed flex justify-center top-2 left-0 right-0 pointer-events-none">
       <div
         @click="toastStore.close"
         class="pointer-events-auto px-6 py-4 rounded-regular border cursor-pointer bg-background"

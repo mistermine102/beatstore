@@ -60,6 +60,9 @@ function register() {
           case 'EMAIL_NOT_AVAILABLE':
             toastStore.show({ type: 'error', title: "Can't sign up", message: 'Email not available' })
             break
+          case 'USERNAME_NOT_AVAILABLE':
+            toastStore.show({ type: 'error', title: "Can't sign up", message: 'Username not available' })
+            break
           default:
             //show generic error toast
             toastStore.show(GENERIC_ERROR_TOAST)

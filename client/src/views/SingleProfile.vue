@@ -58,7 +58,7 @@ const isOwnProfile = computed(() => {
     <div v-if="isLoadingProfile" class="flex justify-center">
       <div class="loader"></div>
     </div>
-    <div v-else-if="!profile">NO PROFILE</div>
+    <EmptyState v-else-if="!profile" />
     <div v-else>
       <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 mb-8">
         <div class="panel flex relative lg:col-span-3">

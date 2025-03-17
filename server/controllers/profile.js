@@ -119,6 +119,9 @@ export const editProfile = async (req, res) => {
 
   const { username, specification, socialLinks } = req.body
 
+  const existingUser = await User.findOne({ username })
+  if (existingUser && !existingUser._id.equals(req.userId)) throw new AppError('USERNAME_NOT_AVAILABLE', 400)
+
   //check for duplicate social links urls
   if (hasDuplicate(socialLinks.map(l => l.url))) throw new AppError('Duplicate url in social links', 400)
 

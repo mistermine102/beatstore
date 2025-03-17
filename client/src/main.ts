@@ -9,6 +9,7 @@ import 'tippy.js/dist/tippy.css'
 const pinia = createPinia()
 const app = createApp(App)
 
+app.use(pinia)
 app.use(router)
 
 app.use(VueTippy, {
@@ -17,9 +18,8 @@ app.use(VueTippy, {
     arrow: false,
     animation: 'fade',
     duration: 200,
-    offset: [0, 8]
-  }
+    offset: [0, 8],
+  },
 })
 
-app.use(pinia)
 app.mount('#app')

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import BaseModal from './base/BaseModal.vue'
 import BaseButton from './base/BaseButton.vue'
-import { ref } from 'vue'
 import appApi from '../api/appApi'
 import useAsyncWrap from '../composables/useAsyncWrap'
 import { useToastStore } from '../stores/toast'
@@ -19,16 +18,11 @@ const toastStore = useToastStore()
 const wrapResend = useAsyncWrap()
 
 async function resendVerification() {
-  wrapResend.run(
-    async () => {
-      await appApi.post('/auth/resend-verification', { email: props.email })
-      toastStore.show({ type: 'success', title: 'Verification email sent!' })
-      emit('close')
-    },
-    err => {
-      toastStore.show({ type: 'error', title: 'Failed to send verification email' })
-    }
-  )
+  wrapResend.run(async () => {
+    await appApi.post('/auth/resend-verification', { email: props.email })
+    toastStore.show({ type: 'success', title: 'Verification email sent!' })
+    emit('close')
+  })
 }
 </script>
 

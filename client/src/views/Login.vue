@@ -9,6 +9,7 @@ import appApi from '../api/appApi'
 import { useRouter } from 'vue-router'
 import validator from 'validator'
 import ResendVerificationModal from '../components/ResendVerificationModal.vue'
+import ForgotPasswordModal from '../components/ForgotPasswordModal.vue'
 import { GENERIC_ERROR_TOAST } from '../constants'
 
 const authStore = useAuthStore()
@@ -19,6 +20,7 @@ const router = useRouter()
 const email = ref('szymonjarosz102@gmail.com')
 const password = ref('123456')
 const showVerificationModal = ref(false)
+const showForgotPasswordModal = ref(false)
 
 //create this object so we show the same error message regardless of what happens
 //(wheter frontend validation fails or backend validation fails)
@@ -31,6 +33,10 @@ function validate() {
   if (!validator.isEmail(email.value)) return false
   if (!validator.isLength(password.value, { min: 6 })) return false
   return true
+}
+
+function openForgotPasswordModal() {
+  showForgotPasswordModal.value = true
 }
 
 async function login() {
@@ -87,6 +93,9 @@ async function login() {
         </div>
         <div class="relative">
           <input v-model="password" type="password" placeholder="Password" class="base-input w-full" />
+          <button type="button" class="w-fit text-textLightGrey hover:text-white transition-colors mt-2" @click="openForgotPasswordModal">
+            Forgot password?
+          </button>
         </div>
       </div>
       <BaseButton class="w-full" :is-loading="wrapLogin.isLoading">Sign In</BaseButton>
@@ -100,4 +109,5 @@ async function login() {
   </div>
 
   <ResendVerificationModal :is-open="showVerificationModal" :email="email" @close="showVerificationModal = false" />
+  <ForgotPasswordModal :is-open="showForgotPasswordModal" :email="email" @close="showForgotPasswordModal = false" />
 </template>

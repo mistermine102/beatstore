@@ -96,6 +96,11 @@ export const uploadTrack = async (req, res) => {
 
   if (type === 'drumkit') throw new AppError('Drumkits not available yet', 400)
 
+  //check if title is available
+  const foundTrack = await Track.findOne({ title: req.body.title })
+  const foundUnverifiedTrack = await UnverifiedTrack.findOne({ title: req.body.title })
+  if (foundTrack || foundUnverifiedTrack) throw new AppError('TITLE_NOT_AVAILABLE', 400)
+
   const uploadSchema = UPLOAD_SCHEMAS[type]
   const newTrack = new UnverifiedTrack()
 
@@ -359,7 +364,7 @@ export const toggleTrackLike = async (req, res) => {
     await newLike.save()
 
     //send email
-    await sendTrackLikedEmail(foundTrack.author.email, foundTrack)
+    sendTrackLikedEmail(foundTrack.author.email, foundTrack)
   } else {
     foundTrack.totalLikes--
     await foundLike.deleteOne()

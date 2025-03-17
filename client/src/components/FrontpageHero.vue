@@ -35,7 +35,7 @@ const searchPhrase = ref('')
         </button>
       </div>
     </div>
-    <div class="flex items-end justify-center w-full h-[600px] relative">
+    <div class="flex items-end justify-center w-full h-[500px] relative">
       <img src="/pixel-art-hero.png" alt="" class="w-full h-full object-contain" />
       <div class="absolute inset-0 z-0 flex justify-center items-end mb-16">
         <div class="bg-primary w-[150px] h-[200px] absolute blur-[200px]"></div>

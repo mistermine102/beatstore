@@ -7,7 +7,7 @@ import useAsyncWrap from '../composables/useAsyncWrap'
 import appApi from '../api/appApi'
 import { useToastStore } from '../stores/toast'
 import { useRouter } from 'vue-router'
-import { KEYS, GENRES, INSTRUMENTS, MOODS } from '../constants'
+import { KEYS, GENRES, INSTRUMENTS, MOODS, GENERIC_ERROR_TOAST } from '../constants'
 import BaseSelect from '../components/base/BaseSelect.vue'
 import BaseCheckboxSelect from '../components/base/BaseCheckboxSelect.vue'
 
@@ -167,6 +167,16 @@ function validate() {
     return false
   }
 
+  if (newTrack.value.title.length > 100) {
+    toastStore.show({ type, title, message: 'Title must be less than 100 characters' })
+    return false
+  }
+
+  if (newTrack.value.bpm && (parseInt(newTrack.value.bpm) > 999 || parseInt(newTrack.value.bpm) < 0)) {
+    toastStore.show({ type, title, message: 'Bpm must between 0 and 999' })
+    return false
+  }
+
   if (newTrack.value.description.length > 500) {
     toastStore.show({ type, title, message: 'Description must be less than 500 characters' })
     return false
@@ -179,22 +189,29 @@ function uploadTrack(e: Event) {
   e.preventDefault()
   if (!validate()) return
 
-  wrapUploadTrack.run(async () => {
-    //set image field to null so backend doesn't complain it got an unexpected field (issue only with file fields)
-    const response = await appApi.postForm<{ trackId: string }>('/tracks', {
-      ...newTrack.value,
-      image: null,
-    })
-
-    if (newTrack.value.image) {
-      await appApi.postForm(`tracks/${response.data.trackId}/image`, {
-        image: newTrack.value.image,
+  wrapUploadTrack.run(
+    async () => {
+      //set image field to null so backend doesn't complain it got an unexpected field (issue only with file fields)
+      const response = await appApi.postForm<{ trackId: string }>('/tracks', {
+        ...newTrack.value,
+        image: null,
       })
-    }
 
-    toastStore.show({ type: 'success', title: 'Upload is waiting for verification!' })
-    router.push('/')
-  })
+      if (newTrack.value.image) {
+        await appApi.postForm(`tracks/${response.data.trackId}/image`, {
+          image: newTrack.value.image,
+        })
+      }
+
+      toastStore.show({ type: 'success', title: 'Upload is waiting for verification!' })
+      router.push('/')
+    },
+    err => {
+      if (err.response.data.message === 'TITLE_NOT_AVAILABLE')
+        return toastStore.show({ type: 'error', title: "Can't upload", message: 'Title not available' })
+      return toastStore.show(GENERIC_ERROR_TOAST)
+    }
+  )
 }
 
 //licenses
@@ -300,7 +317,7 @@ getLicenses()
               v-model="newTrack.bpm"
               id="bpm"
               class="base-input w-full bg-background"
-              type="text"
+              type="number"
               placeholder="BPM"
             />
             <BaseSelect

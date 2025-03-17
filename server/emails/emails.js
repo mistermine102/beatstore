@@ -62,7 +62,6 @@ export const sendTrackLikedEmail = async (email, track) => {
 
 export const sendTrackCommentedEmail = async (email, track) => {
   const viewUploadLink = `http://localhost:5173/track/${track._id}`
-
   const template = await ejs.renderFile(path.join(__dirname, '../templates/trackCommentedEmail.ejs'), { viewUploadLink, uploadTitle: track.title })
 
   await transporter.sendMail({
@@ -71,4 +70,16 @@ export const sendTrackCommentedEmail = async (email, track) => {
     subject: 'Someone commented your upload!',
     html: template,
   })
+}
+
+export const sendResetPasswordEmail = async (email, resetLink) => {
+  const template = await ejs.renderFile(path.join(__dirname, '../templates/resetPasswordEmail.ejs'), { resetLink })
+
+  const res = await transporter.sendMail({
+    from: NOREPLY_EMAIL,
+    to: email,
+    subject: 'Reset your password',
+    html: template,
+  })
+  console.log(res)
 }
