@@ -2,7 +2,7 @@
 import Toast from './components/Toast.vue'
 import TheNavbar from './components/TheNavbar.vue'
 import TheFooter from './components/TheFooter.vue'
-import TheAudioPlayer from './components/TheAudioPlayer.vue'
+ import TheAudioPlayer from './components/TheAudioPlayer.vue'
 import { useAudioPlayerStore } from './stores/audioPlayer'
 
 const audioPlayerStore = useAudioPlayerStore()

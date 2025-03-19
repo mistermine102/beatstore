@@ -44,6 +44,6 @@ function onSubmit(e: Event) {
         />
       </div>
     </slot>
-    <BaseButton v-if="showButton" :alt="true" :class="buttonClass" type="submit">Search</BaseButton>
+    <BaseButton v-if="showButton" :class="buttonClass" type="submit">Search</BaseButton>
   </form>
 </template>

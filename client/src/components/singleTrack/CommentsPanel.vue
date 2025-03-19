@@ -28,7 +28,7 @@ function addComment() {
 </script>
 
 <template>
-  <div class="panel">
+  <div class="panel mt-8">
     <h2 class="base-heading">Comments <span class="text-textLightGrey">{{ track.comments.length }}</span></h2>
     <div class="w-full">
       <div v-if="authStore.user" class="flex gap-x-4 mb-8">

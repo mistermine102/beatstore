@@ -8,7 +8,6 @@ import FrontpageTracktypes from '../components/FrontpageTracktypes.vue'
   <div class="h-full">
     <FrontpageHero />
     <FrontpageExplore class="relative" />
-    <FrontpageTracktypes />
     <div class="mt-48">
       <h2 class="text-[40px] mb-8 font-secondary">Popular right now</h2>
       <div class="flex gap-x-8">
@@ -49,5 +48,6 @@ import FrontpageTracktypes from '../components/FrontpageTracktypes.vue'
         </div>
       </div>
     </div>
+    <FrontpageTracktypes />
   </div>
 </template>

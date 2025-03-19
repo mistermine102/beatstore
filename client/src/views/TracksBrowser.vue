@@ -16,13 +16,14 @@ import LoginPromptModal from '../components/LoginPromptModal.vue'
 const route = useRoute()
 const router = useRouter()
 
-const query = route.query as { q?: string; type?: TrackType }
+const query = route.query as any
 
 //initialize search phrase and track type with whatever is in url query or default value
 const searchPhrase = ref(query.q || '')
 const trackType = ref<TrackType>(query.type && TRACK_TYPES.includes(query.type) ? query.type : 'all')
 
-const { currentFilters, activeFilters, removeFilter } = useTrackFilters(trackType)
+const { currentFilters, activeFilters, removeFilter } = useTrackFilters(trackType, query)
+
 const { tracks, getTracks, loadMoreTracks, isLoading, isLoadingMore, isMore } = useTracks()
 const { toggleLike, showLoginPrompt } = useToggleLike()
 
@@ -55,9 +56,45 @@ getTracksWithFilters()
 
 // Watch for filter changes
 watch([activeFilters], () => {
+  //get new tracks when filters change
   isLoading.value = true
   debouncedGetTracks()
 })
+
+//attach filters to url
+watch(
+  currentFilters,
+  () => {
+    const query: Record<string, any> = { ...route.query }
+
+    currentFilters.value.forEach(filter => {
+      switch (filter.type) {
+        case 'exact':
+          query[filter.id] = filter.value
+          break
+        case 'range':
+          query[`${filter.id}[min]`] = undefined
+          query[`${filter.id}[max]`] = undefined
+          if (filter.value.min || filter.value.max) {
+            if (filter.value.min) query[`${filter.id}[min]`] = filter.value.min
+            if (filter.value.max) query[`${filter.id}[max]`] = filter.value.max
+          }
+          break
+        case 'set':
+          query[filter.id] = undefined
+          if (filter.values.find(el => el[1])) {
+            query[filter.id] = filter.values
+              .filter(el => el[1])
+              .map(el => el[0])
+              .join(',')
+          }
+          break
+      }
+    })
+    router.replace({ query })
+  },
+  { deep: true }
+)
 
 const options = [
   {

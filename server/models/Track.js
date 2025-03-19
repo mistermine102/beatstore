@@ -14,7 +14,6 @@ const audioSchema = new Schema({
   },
 })
 
-
 const commentSchema = new Schema({
   content: {
     type: String,
@@ -89,8 +88,9 @@ const schema = new Schema({
   },
   license: {
     type: licenseSchema,
-    required: true
+    required: true,
   },
+  streamsHistory: Object
 })
 
 // Add a text index on the title to allow text search

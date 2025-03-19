@@ -32,7 +32,7 @@ getFeaturedProfiles()
               <router-link :to="`/track/${featured.track._id}`" class="text-2xl truncate">{{ featured.track.title }}</router-link>
               <p class="text-textLightGrey truncate">{{ featured.profile.username }}</p>
             </div>
-            <BaseButton @click="router.push(`/profile/${featured.profile._id}`)" class="">See more</BaseButton>
+            <BaseButton @click="router.push(`/profile/${featured.profile._id}`)">See more</BaseButton>
           </div>
         </div>
       </div>

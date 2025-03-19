@@ -12,6 +12,9 @@ import formatComments from '../utils/formatComments.js'
 import { getAudioDurationObject } from '../utils/audioDuration.js'
 import License from '../models/License.js'
 import { sendTrackLikedEmail, sendTrackPendingEmail } from '../emails/emails.js'
+import FeaturedProfile from '../models/FeaturedProfile.js'
+import moment from 'moment'
+import PopularTrack from '../models/PopularTrack.js'
 
 const UPLOAD_SCHEMAS = {
   beat: {
@@ -186,8 +189,10 @@ export const deleteTrack = async (req, res) => {
   const track = await Track.findById(trackId)
 
   if (!track) throw new AppError('TRACK_NOT_FOUND', 400)
-
   if (!track.author.equals(req.userId)) throw new AppError('NOT_AUTHORIZED', 403)
+
+  //remove profile with that track from featured profiles
+  await FeaturedProfile.findOneAndDelete({ trackId })
 
   //delete file from s3
   await deleteFileFromS3(track.audio.filename)
@@ -375,14 +380,85 @@ export const toggleTrackLike = async (req, res) => {
   res.json({ action: foundLike ? 'Disliked' : 'Liked', trackId })
 }
 
+// Function to get streams for the last 7 days
+function getLastSevenDaysStreams(track) {
+  const streamsHistory = track.streamsHistory || {}
+  let streams = 0
+
+  // Get streams for each of the last 7 days
+  for (let i = 6; i >= 0; i--) {
+    const date = moment().subtract(i, 'days')
+    const year = date.year()
+    const month = date.month() + 1 // moment months are 0-indexed
+    const day = date.date()
+
+    // Get the stream count for this day (default to 0 if not found)
+    streams += streamsHistory[year]?.[month]?.[day] || 0
+  }
+
+  return streams
+}
+
+async function tryAddingToPopular(track) {
+  const popularTracks = await PopularTrack.find()
+
+  //get the number of streams in the last 7 days
+  const streams = getLastSevenDaysStreams(track)
+
+  const isInPopularTracks = !!popularTracks.find(t => t._id.equals(track._id))
+  if (isInPopularTracks) {
+    await PopularTrack.findByIdAndUpdate(track._id, { streams })
+    return
+  }
+
+  if (popularTracks.length < 3) {
+    //not enough track in popular tracks add the one streamed
+    await PopularTrack.insertOne({ _id: track._id, streams })
+    return
+  }
+
+  //find the popular track with the least streams
+  const trackWithLeastStreams = popularTracks.reduce((minTrack, currentTrack) => {
+    return currentTrack.streams < minTrack.streams ? currentTrack : minTrack
+  }, popularTracks[0])
+
+  //check if the streamed track qualifies to the popular tracks
+  if (streams > trackWithLeastStreams.streams) {
+    await PopularTrack.insertOne({
+      _id: track._id,
+      streams,
+    })
+    await trackWithLeastStreams.deleteOne()
+  }
+}
+
 export const streamTrack = async (req, res) => {
   const track = await Track.findById(req.params.trackId)
-
   if (!track.playable) throw new AppError('TRACK_NOT_PLAYABLE', 400)
 
+  //increment streams
   track.totalStreams++
 
+  //update streams history
+  const date = new Date()
+  const year = date.getFullYear()
+  const month = date.getMonth() + 1
+  const day = date.getDate()
+
+  // Initialize the nested structure if it doesn't exist
+  track.streamsHistory = track.streamsHistory || {}
+  track.streamsHistory[year] = track.streamsHistory[year] || {}
+  track.streamsHistory[year][month] = track.streamsHistory[year][month] || {}
+
+  // Increment the counter (initializing to 0 if it doesn't exist)
+  track.streamsHistory[year][month][day] = (track.streamsHistory[year][month][day] || 0) + 1
+
+  //mark modified beacuse mongoose doesn't detect change in that nested strcuture so .save() doesn't update it
+  track.markModified('streamsHistory')
   await track.save()
+
+  //try adding this track to popular
+  await tryAddingToPopular(track)
 
   res.json({ trackId: track._id })
 }

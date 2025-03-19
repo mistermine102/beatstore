@@ -1,6 +1,6 @@
 <template>
-  <footer class="bg-darkGrey mt-32">
-    <div class="max-w-7xl mx-auto px-4 py-12">
+  <footer class="bg-darkGrey mt-32 px-64">
+    <div class="mx-auto px-4 py-12">
       <!-- Main Footer Content -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
         <!-- Brand Section -->
@@ -34,7 +34,6 @@
       <!-- Bottom Bar -->
       <div class="pt-8 border-t border-white/[0.1]">
         <div class="flex flex-col md:flex-row justify-between items-center">
-          <p class="text-textLightGrey text-sm">&copy; {{ new Date().getFullYear() }} BeatStore. All rights reserved.</p>
           <div class="flex space-x-6 mt-4 md:mt-0">
             <router-link to="/" class="text-sm text-textLightGrey hover:text-primary transition-colors">Privacy Policy</router-link>
             <router-link to="/" class="text-sm text-textLightGrey hover:text-primary transition-colors">Terms of Service</router-link>

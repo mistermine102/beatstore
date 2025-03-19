@@ -4,5 +4,14 @@ import { VineVitePlugin } from 'vue-vine/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue(), VineVitePlugin()],
+  plugins: [
+    vue({
+      template: {
+        compilerOptions: {
+          isCustomElement: tag => tag.includes('swiper'),
+        },
+      },
+    }),
+    VineVitePlugin(),
+  ],
 })

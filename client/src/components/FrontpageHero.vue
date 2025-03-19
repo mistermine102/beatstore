@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import BaseSearchbar from './base/BaseSearchbar.vue'
 import { useRouter } from 'vue-router'
+import { SearchIcon } from './icons/index.vine'
 
 const router = useRouter()
 
@@ -20,22 +21,35 @@ const searchPhrase = ref('')
         @search="phrase => router.push(`/tracks/browse?q=${phrase}`)"
         placeholder="What are you looking for?"
         class="mt-8"
-        container-class="py-2 bg-grey"
-        button-class="py-2"
+        container-class="py-2 bg-grey px-4"
+        button-class="h-full px-8"
+        :show-button="true"
       />
-      <div class="flex mt-2 gap-x-4">
-        <button class="bg-darkGrey px-4 flex items-center gap-x-2">
+      <div class="flex mt-4 gap-x-4">
+        <button
+          @click="router.push({ path: 'tracks/browse', query: { type: 'beat' } })"
+          class="bg-darkGrey px-4 flex items-center gap-x-2 rounded-regular clickable-icon"
+        >
           <span>Beats</span>
+          <SearchIcon :size="16" />
         </button>
-        <button class="bg-darkGrey px-4 flex items-center gap-x-2">
+        <button
+          @click="router.push({ path: 'tracks/browse', query: { type: 'sample' } })"
+          class="bg-darkGrey px-4 flex items-center gap-x-2 rounded-regular clickable-icon"
+        >
           <span>Samples</span>
+          <SearchIcon :size="16" />
         </button>
-        <button class="bg-darkGrey px-4 flex items-center gap-x-2">
+        <button
+          @click="router.push({ path: 'tracks/browse', query: { type: 'loop' } })"
+          class="bg-darkGrey px-4 flex items-center gap-x-2 rounded-regular clickable-icon"
+        >
           <span>Loops</span>
+          <SearchIcon :size="16" />
         </button>
       </div>
     </div>
-    <div class="flex items-end justify-center w-full h-[500px] relative">
+    <div class="flex items-end justify-center w-full h-[450px] relative">
       <img src="/pixel-art-hero.png" alt="" class="w-full h-full object-contain" />
       <div class="absolute inset-0 z-0 flex justify-center items-end mb-16">
         <div class="bg-primary w-[150px] h-[200px] absolute blur-[200px]"></div>

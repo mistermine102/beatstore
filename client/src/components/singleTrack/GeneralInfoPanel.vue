@@ -73,7 +73,7 @@ const waveformHeight = computed(() => {
 </script>
 
 <template>
-  <div class="panel relative mb-8">
+  <div class="panel relative">
     <div class="mb-16">
       <div v-if="track.author._id === authStore.user?._id" class="absolute top-4 right-4 z-20">
         <TrackOptionsPopover :track="track" />
