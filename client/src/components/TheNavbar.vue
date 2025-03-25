@@ -2,7 +2,7 @@
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '../stores/auth'
 import ProfilePopover from './ProfilePopover.vue'
-import { HeartIcon, ListIcon } from './icons/index.vine'
+import { HeartIcon, ListIcon, SearchIcon, UploadIcon } from './icons/index.vine'
 import BaseButton from './base/BaseButton.vue'
 import BasePopover from './base/BasePopover.vue'
 
@@ -17,9 +17,15 @@ const { user } = storeToRefs(authStore)
         <div class="flex justify-start">
           <router-link to="/" class="text-[18px] text-primary font-secondary">WavsMarket</router-link>
         </div>
-        <div class="items-start hidden sm:flex gap-x-8 lg:gap-x-16">
-          <router-link to="/tracks/browse">Browse</router-link>
-          <router-link to="/upload">Upload</router-link>
+        <div class="items-center hidden sm:flex gap-x-8 lg:gap-x-16">
+          <router-link to="/tracks/browse" class="flex items-center gap-x-2 text-iconLightGrey hover:text-white transition-colors">
+            <span>Browse</span>
+            <SearchIcon :size="18" />
+          </router-link>
+          <router-link to="/upload" class="flex items-center gap-x-2 text-iconLightGrey hover:text-white transition-colors">
+            <span>Upload</span>
+            <UploadIcon :size="18" />
+          </router-link>
         </div>
       </div>
       <div v-if="authStore.isLoading" class="scale-50">

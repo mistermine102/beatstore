@@ -42,7 +42,7 @@ const editProfileValidators = [
     .withMessage('Username must be a string'),
   body('specification')
     .trim()
-    .notEmpty()
+    .exists()
     .withMessage('Specification is required')
     .isLength({ max: 50 })
     .withMessage('Specification must be less than 50 characters long')

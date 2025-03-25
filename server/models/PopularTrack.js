@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 
 const popularTrackSchema = new mongoose.Schema({
-  _id: {
+  track: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Track',
     required: true,

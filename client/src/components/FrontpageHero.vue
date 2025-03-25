@@ -10,18 +10,18 @@ const searchPhrase = ref('')
 </script>
 
 <template>
-  <div class="relative grid grid-cols-2 gap-x-8">
+  <div class="relative grid lg:grid-cols-2 gap-x-8">
     <div class="flex flex-col justify-center relative">
       <h1 class="flex flex-col leading-tight">
-        <span class="font-secondary text-[48px]">Find high quality</span>
-        <span class="font-secondary text-[56px] text-primary">Beats, Samples and more</span>
+        <span class="font-secondary text-[40px] md:text-[48px]">Find high quality</span>
+        <span class="font-secondary text-[48px] md:text-[56px] text-primary">Beats, Samples and more</span>
       </h1>
       <BaseSearchbar
         v-model="searchPhrase"
         @search="phrase => router.push(`/tracks/browse?q=${phrase}`)"
         placeholder="What are you looking for?"
         class="mt-8"
-        container-class="py-2 bg-grey px-4"
+        container-class="md:py-2 bg-grey px-2 md:px-4"
         button-class="h-full px-8"
         :show-button="true"
       />
@@ -49,7 +49,7 @@ const searchPhrase = ref('')
         </button>
       </div>
     </div>
-    <div class="flex items-end justify-center w-full h-[450px] relative">
+    <div class="hidden lg:flex items-end justify-center w-full h-[450px] relative">
       <img src="/pixel-art-hero.png" alt="" class="w-full h-full object-contain" />
       <div class="absolute inset-0 z-0 flex justify-center items-end mb-16">
         <div class="bg-primary w-[150px] h-[200px] absolute blur-[200px]"></div>

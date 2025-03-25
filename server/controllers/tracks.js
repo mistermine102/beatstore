@@ -400,20 +400,22 @@ function getLastSevenDaysStreams(track) {
 }
 
 async function tryAddingToPopular(track) {
+  const POPULAR_TRACKS_LIMIT = 100
+
   const popularTracks = await PopularTrack.find()
 
   //get the number of streams in the last 7 days
   const streams = getLastSevenDaysStreams(track)
 
-  const isInPopularTracks = !!popularTracks.find(t => t._id.equals(track._id))
+  const isInPopularTracks = !!popularTracks.find(popularTrack => popularTrack.track.equals(track._id))
   if (isInPopularTracks) {
-    await PopularTrack.findByIdAndUpdate(track._id, { streams })
+    await PopularTrack.findOneAndUpdate({ track: track._id }, { streams })
     return
   }
 
-  if (popularTracks.length < 3) {
+  if (popularTracks.length < POPULAR_TRACKS_LIMIT) {
     //not enough track in popular tracks add the one streamed
-    await PopularTrack.insertOne({ _id: track._id, streams })
+    await PopularTrack.insertOne({ track: track._id, streams })
     return
   }
 
@@ -425,7 +427,7 @@ async function tryAddingToPopular(track) {
   //check if the streamed track qualifies to the popular tracks
   if (streams > trackWithLeastStreams.streams) {
     await PopularTrack.insertOne({
-      _id: track._id,
+      track: track._id,
       streams,
     })
     await trackWithLeastStreams.deleteOne()
@@ -461,4 +463,32 @@ export const streamTrack = async (req, res) => {
   await tryAddingToPopular(track)
 
   res.json({ trackId: track._id })
+}
+
+export const getPopularTracks = async (req, res) => {
+  const tracks = await PopularTrack.find()
+    .limit(5)
+    .sort({ streams: -1 })
+    .populate({
+      path: 'track',
+      populate: {
+        path: 'author',
+        select: 'username',
+      },
+    })
+
+  const formattedTracks = await Promise.all(
+    tracks.map(async popularTrack => {
+      //when popualting _id field, _id becomes track
+      const formattedTrack = await formatTrackData(popularTrack.track)
+
+      return {
+        ...formattedTrack,
+        streamsInLast7days: popularTrack.streams,
+      }
+    })
+  )
+
+  // res.json({ tracks: formattedTracks })
+  res.json({ tracks: formattedTracks })
 }

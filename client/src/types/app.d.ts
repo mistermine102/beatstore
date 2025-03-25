@@ -69,7 +69,7 @@ interface BaseTrack {
   }
   totalStreams?: number
   type: TrackType
-  playable: boolean
+  playable?: boolean
   key?: string
   genre?: string
   bpm?: string
@@ -78,6 +78,7 @@ interface BaseTrack {
 }
 
 interface BasePlayableTrack extends BaseTrack {
+  playable: true
   audio: {
     url: string
     duration: {
@@ -91,9 +92,12 @@ interface BasePlayableTrack extends BaseTrack {
   totalStreams: number
 }
 
+interface PopularTrack extends BasePlayableTrack {
+  streamsInLast7Days: number
+}
+
 interface Beat extends BasePlayableTrack {
   type: TrackType = 'beat'
-  playable: true
   key?: string
   genre?: string
   bpm?: string
@@ -101,14 +105,12 @@ interface Beat extends BasePlayableTrack {
 
 interface Sample extends BasePlayableTrack {
   type: TrackType = 'sample'
-  playable: true
   key?: string
   bpm?: string
 }
 
 interface Loop extends BasePlayableTrack {
   type: TrackType = 'loop'
-  playable: true
   key?: string
   bpm?: string
 }
