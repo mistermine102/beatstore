@@ -11,6 +11,31 @@ import FeaturedProfile from '../models/FeaturedProfile.js'
 import formatTrackData from '../utils/formatTrackData.js'
 import hasDuplicate from '../utils/hasDuplicate.js'
 
+const createUpdatedNotificationRules = (existingRules, newRules) => {
+  // Initialize empty object to store updated rules
+  const updatedNotificationRules = {}
+
+  // Loop through each rule and its media settings in the existing rules
+  for (const [rule, media] of Object.entries(existingRules)) {
+    // Create an empty object for this rule in the updated rules
+    updatedNotificationRules[rule] = {}
+
+    // Loop through each medium and its value for the current rule
+    for (const [medium, value] of Object.entries(media)) {
+      // Determine the new value:
+      // - If newRules exists AND
+      // - If this specific rule exists in newRules AND
+      // - If this specific medium exists as a boolean in newRules
+      // Then use the new value, otherwise keep the existing value
+      updatedNotificationRules[rule][medium] =
+        newRules && newRules[rule] && typeof newRules[rule][medium] === 'boolean' ? newRules[rule][medium] : value
+    }
+  }
+
+  // Return the completely updated notification rules object
+  return updatedNotificationRules
+}
+
 const sanitizeProfile = profile => {
   const { image, isFollowed, specification, totalUploads, totalFollows, username, _id, socialLinks } = profile
   return { image, isFollowed, specification, totalUploads, totalFollows, username, _id, socialLinks }
@@ -117,7 +142,7 @@ export const editProfile = async (req, res) => {
   //authorize
   if (!user._id.equals(req.userId)) throw new AppError('Not authorized', 403)
 
-  const { username, specification, socialLinks } = req.body
+  const { username, specification, socialLinks, notificationRules } = req.body
 
   const existingUser = await User.findOne({ username })
   if (existingUser && !existingUser._id.equals(req.userId)) throw new AppError('USERNAME_NOT_AVAILABLE', 400)
@@ -125,9 +150,12 @@ export const editProfile = async (req, res) => {
   //check for duplicate social links urls
   if (hasDuplicate(socialLinks.map(l => l.url))) throw new AppError('Duplicate url in social links', 400)
 
+  const newNotificationsRules = createUpdatedNotificationRules(user.notificationRules.toObject(), notificationRules)
+
   user.username = username
   user.specification = specification
   user.socialLinks = socialLinks
+  user.notificationRules = newNotificationsRules
 
   //save user
   await user.save()

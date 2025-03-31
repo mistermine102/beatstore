@@ -63,6 +63,31 @@ const schema = new Schema({
     type: [String],
     default: [],
   },
+  notificationRules: {
+    type: {
+      _id: false,
+      trackVerified: {
+        email: Boolean,
+      },
+      trackLiked: {
+        email: Boolean,
+      },
+      trackCommented: {
+        email: Boolean,
+      },
+    },
+    default: {
+      trackVerified: {
+        email: true,
+      },
+      trackLiked: {
+        email: true,
+      },
+      trackCommented: {
+        email: true,
+      },
+    },
+  },
   createdAt: {
     type: Date,
     default: Date.now,

@@ -4,8 +4,10 @@ import './style.css'
 import App from './App.vue'
 import router from './router'
 import VueTippy from 'vue-tippy'
-import 'tippy.js/dist/tippy.css'
 import { register } from 'swiper/element/bundle'
+import 'tippy.js/dist/tippy.css'
+import 'swiper/swiper-bundle.css'
+
 
 const pinia = createPinia()
 const app = createApp(App)

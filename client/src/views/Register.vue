@@ -90,6 +90,11 @@ function register() {
       </div>
       <BaseButton class="w-full" :isLoading="wrapRegister.isLoading">Sign Up</BaseButton>
     </form>
+    <p class="text-textLightGrey text-sm mt-2">
+      By registering, you confirm that you have read and agree to our
+      <router-link to="/terms" class="font-semibold text-textLightGrey hover:text-white transition-colors underline">Terms of Service</router-link>
+      and <router-link to="/privacy-policy" class="font-semibold text-textLightGrey hover:text-white transition-colors underline">Privacy Policy</router-link>.
+    </p>
     <div class="mt-6 text-center">
       <p class="text-textLightGrey">
         Already have an account?

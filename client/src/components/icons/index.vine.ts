@@ -3,8 +3,11 @@ import {
   PhList,
   PhUser,
   PhUploadSimple,
+  PhDownloadSimple,
   PhHouse,
   PhCaretDown,
+  PhCaretRight,
+  PhCaretLeft,
   PhImage,
   PhPlay,
   PhPause,
@@ -21,7 +24,7 @@ import {
   PhCheck,
   PhPencilSimple,
   PhX,
-  PhFunnel
+  PhFunnel,
 } from '@phosphor-icons/vue'
 
 interface IconProps {
@@ -45,12 +48,24 @@ export function UploadIcon(props: IconProps = {}) {
   return h(PhUploadSimple, { weight: props.fill ? 'fill' : 'bold', size: props.size || 24 })
 }
 
+export function DownloadIcon(props: IconProps = {}) {
+  return h(PhDownloadSimple, { weight: props.fill ? 'fill' : 'bold', size: props.size || 24 })
+}
+
 export function HomeIcon(props: IconProps = {}) {
   return h(PhHouse, { weight: props.fill ? 'fill' : 'bold', size: props.size || 24 })
 }
 
 export function ChevronDownIcon(props: IconProps = {}) {
   return h(PhCaretDown, { weight: props.fill ? 'fill' : 'bold', size: props.size || 24 })
+}
+
+export function ChevronRightIcon(props: IconProps = {}) {
+  return h(PhCaretRight, { weight: props.fill ? 'fill' : 'bold', size: props.size || 24 })
+}
+
+export function ChevronLeftIcon(props: IconProps = {}) {
+  return h(PhCaretLeft, { weight: props.fill ? 'fill' : 'bold', size: props.size || 24 })
 }
 
 export function ImageIcon(props: IconProps = {}) {

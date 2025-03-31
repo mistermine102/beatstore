@@ -18,18 +18,15 @@ getFeaturedProfiles()
       <div v-if="isLoadingFeaturedProfiles" class="flex justify-center items-center h-full w-full">
         <div class="loader"></div>
       </div>
-      <div v-else class="grid grid-cols-1 xl:grid-cols-3 gap-x-16 h-full">
+      <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-y-16 gap-x-8 md:gap-x-16 h-full">
         <div v-for="featured in featuredProfiles" class="flex flex-col h-full">
-          <!-- Image container with percentage-based height -->
-          <ClickableTrackImage :track="featured.track" class="xl:w-full h-full xl:h-[75%]" />
-
-          <!-- Content below image with fixed height -->
-          <div class="flex justify-between gap-x-2 items-center mt-2 xl:h-[25%]">
+          <ClickableTrackImage :track="featured.track" class="w-full h-[200px] xl:h-[75%]" />
+          <div class="flex flex-col xl:flex-row justify-between gap-x-2 xl:items-center mt-2 xl:h-[25%]">
             <div class="overflow-hidden">
               <router-link :to="`/track/${featured.track._id}`" class="text-2xl truncate">{{ featured.track.title }}</router-link>
               <p class="text-textLightGrey truncate">{{ featured.profile.username }}</p>
             </div>
-            <BaseButton @click="router.push(`/profile/${featured.profile._id}`)">See more</BaseButton>
+            <BaseButton @click="router.push(`/profile/${featured.profile._id}`)" class="mt-4 xl:mt-0 w-full xl:w-auto">See more</BaseButton>
           </div>
         </div>
       </div>

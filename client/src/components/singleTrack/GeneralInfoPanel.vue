@@ -5,11 +5,15 @@ import { useAuthStore } from '../../stores/auth'
 import getWaveformColors from '../../utils/getWaveformColors'
 import useInteractiveWafeform from '../../composables/useInteractiveWafeform'
 import { useCssVar } from '@vueuse/core'
-import { HeartIcon, PlayIcon } from '../icons/index.vine'
+import { DownloadIcon, HeartIcon, PlayIcon } from '../icons/index.vine'
 import PlayPauseBtn from '../PlayPauseBtn.vue'
 import useToggleLike from '../../composables/useToggleLike'
 import { computed, ref } from 'vue'
 import LoginPromptModal from '../../components/LoginPromptModal.vue'
+import BaseButton from '../base/BaseButton.vue'
+import router from '../../router'
+import useAsyncWrap from '../../composables/useAsyncWrap'
+import axios from 'axios'
 
 const props = defineProps<{ track: Track }>()
 const emit = defineEmits(['likeToggled'])
@@ -70,6 +74,39 @@ const waveformHeight = computed(() => {
       return 60
   }
 })
+
+const wrapDownloadAudio = useAsyncWrap()
+
+function downloadAudio(track: PlayableTrack) {
+  wrapDownloadAudio.run(async () => {
+    const filename = track.title
+
+    const response = await axios.get(track.audio.url, {
+      responseType: 'blob',
+    })
+
+    // Sanitize filename
+    const sanitizedFilename = filename.replace(/[^a-z0-9.]/gi, '_').replace(/_+/g, '_')
+
+    // Ensure correct file extension and add prefix
+    const prefixedFilename = `wm-${track.type}-${sanitizedFilename}`
+    const finalFilename = prefixedFilename.includes('.') ? prefixedFilename : `${prefixedFilename}.wav`
+
+    // Create a link element to trigger the download
+    const downloadUrl = window.URL.createObjectURL(new Blob([response.data], { type: 'audio/wav' }))
+    const link = document.createElement('a')
+    link.href = downloadUrl
+    link.download = finalFilename
+
+    // Append to body, click, and remove
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+
+    // Clean up the created URL
+    window.URL.revokeObjectURL(downloadUrl)
+  })
+}
 </script>
 
 <template>
@@ -157,10 +194,19 @@ const waveformHeight = computed(() => {
         </div>
       </div>
     </div>
-    <div class="mb-16">
-      <h2 class="base-heading mb-2">{{ track.license.shortDescription }}</h2>
-      <p class="text-textLightGrey">{{ track.license.longDescription }}</p>
+    <div class="mb-16 flex gap-x-16">
+      <div>
+        <h2 class="base-heading mb-2">{{ track.license.shortDescription }}</h2>
+        <p class="text-textLightGrey">{{ track.license.longDescription }}</p>
+      </div>
+      <BaseButton v-if="track.playable" class="w-full mt-2" alt @click="downloadAudio(track)">
+        <div class="flex gap-x-2 items-center">
+          <span>Download</span>
+          <DownloadIcon class="text-iconLightGrey" :size="20" />
+        </div>
+      </BaseButton>
     </div>
+
     <div class="mb-8">
       <h2 class="base-heading mb-4">Description</h2>
       <p v-if="track.description" class="overflow-hidden text-textLightGrey">{{ track.description }}</p>

@@ -28,21 +28,21 @@ const searchPhrase = ref('')
       <div class="flex mt-4 gap-x-4">
         <button
           @click="router.push({ path: 'tracks/browse', query: { type: 'beat' } })"
-          class="bg-darkGrey px-4 flex items-center gap-x-2 rounded-regular clickable-icon"
+          class="bg-darkGrey px-4 py-1 flex items-center gap-x-2 rounded-regular clickable-icon"
         >
           <span>Beats</span>
           <SearchIcon :size="16" />
         </button>
         <button
           @click="router.push({ path: 'tracks/browse', query: { type: 'sample' } })"
-          class="bg-darkGrey px-4 flex items-center gap-x-2 rounded-regular clickable-icon"
+          class="bg-darkGrey px-4 py-1 flex items-center gap-x-2 rounded-regular clickable-icon"
         >
           <span>Samples</span>
           <SearchIcon :size="16" />
         </button>
         <button
           @click="router.push({ path: 'tracks/browse', query: { type: 'loop' } })"
-          class="bg-darkGrey px-4 flex items-center gap-x-2 rounded-regular clickable-icon"
+          class="bg-darkGrey px-4 py-1 flex items-center gap-x-2 rounded-regular clickable-icon"
         >
           <span>Loops</span>
           <SearchIcon :size="16" />

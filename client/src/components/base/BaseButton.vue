@@ -32,8 +32,10 @@ const scaleValues = {
     class="relative transition-all duration-150 ease-in-out rounded-regular flex items-center justify-center origin-center hover:-translate-y-[1px] will-change-transform"
     :class="[
       isDisabled ? 'opacity-50 cursor-not-allowed hover:-translate-y-0' : undefined,
+      alt
+        ? 'bg-darkGrey border border-white/[0.1] hover:border-white/[0.3]'
+        : 'bg-primary hover:bg-darkPrimary border border-primary hover:border-darkPrimary',
       sizeClasses[buttonSize],
-      alt ? 'bg-darkGrey border border-white/[0.1] hover:border-white/[0.3]' : 'bg-primary hover:bg-darkPrimary border border-primary hover:border-darkPrimary',
     ]"
     :disabled="isDisabled"
   >

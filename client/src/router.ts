@@ -79,6 +79,14 @@ const routes: RouteRecordRaw[] = [
     path: '/reset-password/:token',
     component: () => import('./views/ResetPassword.vue'),
   },
+  {
+    path: '/terms',
+    component: () => import('./views/Terms.vue'),
+  },
+  {
+    path: '/privacy-policy',
+    component: () => import('./views/PrivacyPolicy.vue'),
+  },
   // Add a catch-all 404 route
   {
     path: '/:pathMatch(.*)*',
