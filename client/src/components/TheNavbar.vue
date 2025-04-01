@@ -19,12 +19,12 @@ const { user } = storeToRefs(authStore)
         </div>
         <div class="items-center hidden sm:flex gap-x-8 lg:gap-x-16">
           <router-link to="/tracks/browse" class="flex items-center gap-x-2 text-iconLightGrey hover:text-white transition-colors">
+            <SearchIcon />
             <span>Browse</span>
-            <SearchIcon :size="18" />
           </router-link>
           <router-link to="/upload" class="flex items-center gap-x-2 text-iconLightGrey hover:text-white transition-colors">
+            <UploadIcon />
             <span>Upload</span>
-            <UploadIcon :size="18" />
           </router-link>
         </div>
       </div>

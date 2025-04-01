@@ -11,7 +11,7 @@ import getWaveformSamples from '../utils/getWaveformSamples.js'
 import formatComments from '../utils/formatComments.js'
 import { getAudioDurationObject } from '../utils/audioDuration.js'
 import License from '../models/License.js'
-import { sendTrackLikedEmail, sendTrackPendingEmail } from '../emails/emails.js'
+import { sendNotificationEmail, sendTrackPendingEmail } from '../emails/emails.js'
 import FeaturedProfile from '../models/FeaturedProfile.js'
 import moment from 'moment'
 import PopularTrack from '../models/PopularTrack.js'
@@ -355,7 +355,7 @@ export const toggleTrackLike = async (req, res) => {
   const likeId = `User-${req.userId}Track-${trackId}`
 
   const foundLike = await Like.findById(likeId)
-  const foundTrack = await Track.findById(trackId).populate('author', 'email')
+  const foundTrack = await Track.findById(trackId).populate('author')
 
   if (!foundLike) {
     foundTrack.totalLikes++
@@ -369,7 +369,7 @@ export const toggleTrackLike = async (req, res) => {
     await newLike.save()
 
     //send email
-    sendTrackLikedEmail(foundTrack.author.email, foundTrack)
+    await sendNotificationEmail(foundTrack.author, 'trackLiked', { track: foundTrack })
   } else {
     foundTrack.totalLikes--
     await foundLike.deleteOne()

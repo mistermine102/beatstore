@@ -2,7 +2,7 @@ import Track, { UnverifiedTrack } from '../models/Track.js'
 import AppError from '../classes/AppError.js'
 import formatTrackData from '../utils/formatTrackData.js'
 import User from '../models/User.js'
-import { sendTrackVerifiedEmail } from '../emails/emails.js'
+import { sendNotificationEmail } from '../emails/emails.js'
 
 /**
  * Approve a track by moving it from "unverifiedTracks" to "tracks".
@@ -29,7 +29,9 @@ export const verifyTrack = async (req, res) => {
     await UnverifiedTrack.findByIdAndDelete(trackId)
 
     //send email
-    await sendTrackVerifiedEmail(author.email, track)
+    if (author.notificationRules.trackVerified.email) {
+      await sendNotificationEmail(author, 'trackVerified', { track })
+    }
   } else {
     //remove track
     await UnverifiedTrack.findByIdAndDelete(trackId)

@@ -40,7 +40,7 @@ function deleteComment() {
 <template>
   <div class="flex justify-between group">
     <div class="flex gap-x-4">
-      <img :src="comment.author.image.url" alt="" class="image-small" />
+      <img :src="comment.author.image.url" alt="" class="image-small rounded-regular" />
       <div>
         <router-link :to="`/profile/${comment.author._id}`" class="text-textLightGrey">{{ comment.author.username }}</router-link>
         <p class="mb-2">{{ comment.content }}</p>

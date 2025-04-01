@@ -13,9 +13,19 @@ import SocialLink from '../components/SocialLink.vue'
 import BaseSelect from '../components/base/BaseSelect.vue'
 import { GENERIC_ERROR_TOAST, PLATFORM_LABELS, PLATFORMS } from '../constants'
 import EmptyState from '../components/EmptyState.vue'
+import { useAuthStore } from '../stores/auth'
+import BaseSwitch from '../components/base/BaseSwitch.vue'
 
 const route = useRoute()
 const router = useRouter()
+
+const { user } = useAuthStore()
+
+const NOTIFICATION_RULE_LABELS: Record<string, string> = {
+  trackVerified: 'Upload verified',
+  trackLiked: 'Upload liked',
+  trackCommented: 'Upload commented',
+}
 
 const { id: profileId } = route.params as {
   id: string
@@ -30,6 +40,7 @@ const editedProfile = ref({
   specification: profile.value?.specification || '',
   image: null as File | null,
   socialLinks: profile.value?.socialLinks || ([] as SocialLink[]),
+  notificationRules: {} as Record<string, Record<string, boolean>>,
 })
 
 function validate() {
@@ -114,6 +125,7 @@ onMounted(async () => {
   editedProfile.value.username = profile.value?.username || ''
   editedProfile.value.specification = profile.value?.specification || ''
   editedProfile.value.socialLinks = profile.value?.socialLinks || []
+  editedProfile.value.notificationRules = user?.notificationRules || {}
 })
 </script>
 <template>
@@ -183,6 +195,18 @@ onMounted(async () => {
               <button type="button" @click="editedProfile.socialLinks = editedProfile.socialLinks.filter(l => l.url !== link.url)">
                 <TrashIcon class="text-red-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:transition-opacity" />
               </button>
+            </div>
+          </div>
+        </div>
+        <div v-if="user" class="panel mt-8">
+          <h2 class="base-heading">Notifications</h2>
+          <div>
+            <div v-for="[rule, media] in Object.entries(user.notificationRules)" class="mt-2">
+              <h3 class="text-lg font-semibold">{{ NOTIFICATION_RULE_LABELS[rule] }}</h3>
+              <div v-for="[medium, value] in Object.entries(media)" class="flex gap-x-2 items-center">
+                <p class="text-textLightGrey">{{ medium[0].toUpperCase() + medium.slice(1) }}</p>
+                <BaseSwitch v-model="editedProfile.notificationRules[rule][medium]" />
+              </div>
             </div>
           </div>
         </div>

@@ -4,6 +4,7 @@ interface User {
   username: string
   createdAt: Date
   roles: string[]
+  notificationRules: Record<string, Record<string, boolean>>
 }
 
 interface License {

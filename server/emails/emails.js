@@ -7,6 +7,22 @@ import ejs from 'ejs'
 const NOREPLY_EMAIL = 'noreply@wavsmarket.com'
 const ADMIN_ADDRESSES = ['szymonjarosz102@gmail.com']
 
+export const sendNotificationEmail = async (user, notificationType, data) => {
+  if (!user.notificationRules[notificationType].email) return
+
+  switch (notificationType) {
+    case 'trackVerified':
+      await sendTrackVerifiedEmail(user.email, data.track)
+      break
+    case 'trackLiked':
+      await sendTrackLikedEmail(user.email, data.track)
+      break
+    case 'trackCommented':
+      await sendTrackCommentedEmail(user.email, data.track)
+      break
+  }
+}
+
 export const sendVerifyEmail = async email => {
   //generate url with token
   const baseUrl = 'http://localhost:3000'
@@ -22,6 +38,17 @@ export const sendVerifyEmail = async email => {
     to: email,
     subject: 'Verify your email address', // Subject line
     html: template, // html body
+  })
+}
+
+export const sendResetPasswordEmail = async (email, resetLink) => {
+  const template = await ejs.renderFile(path.join(__dirname, '../templates/resetPasswordEmail.ejs'), { resetLink })
+
+  const res = await transporter.sendMail({
+    from: NOREPLY_EMAIL,
+    to: email,
+    subject: 'Reset your password',
+    html: template,
   })
 }
 
@@ -72,14 +99,4 @@ export const sendTrackCommentedEmail = async (email, track) => {
   })
 }
 
-export const sendResetPasswordEmail = async (email, resetLink) => {
-  const template = await ejs.renderFile(path.join(__dirname, '../templates/resetPasswordEmail.ejs'), { resetLink })
 
-  const res = await transporter.sendMail({
-    from: NOREPLY_EMAIL,
-    to: email,
-    subject: 'Reset your password',
-    html: template,
-  })
-  console.log(res)
-}

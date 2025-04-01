@@ -1,6 +1,6 @@
 import Track from '../models/Track.js'
 import AppError from '../classes/AppError.js'
-import { sendTrackCommentedEmail } from '../emails/emails.js'
+import { sendNotificationEmail } from '../emails/emails.js'
 
 // Helper function to find a track and a comment
 const findTrackAndComment = async (trackId, commentId) => {
@@ -18,7 +18,7 @@ export const addComment = async (req, res) => {
   const { trackId } = req.params
 
   // Find track
-  const track = await Track.findById(trackId).populate('author', 'email')
+  const track = await Track.findById(trackId).populate('author')
   if (!track) throw new AppError('TRACK_NOT_FOUND', 404)
 
   // Add comment to track
@@ -32,7 +32,7 @@ export const addComment = async (req, res) => {
   await track.save()
 
   //send email
-  await sendTrackCommentedEmail(track.author.email, track)
+  await sendNotificationEmail(track.author, 'trackCommented', { track })
 
   res.json({ trackId })
 }
