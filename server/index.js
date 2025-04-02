@@ -38,7 +38,7 @@ app.use('/api/admin', adminRoutes)
 app.use('/api/reports', reportRoutes)
 app.use('/api/licenses', licenseRoutes)
 
-app.get('/test', (req, res) => {
+app.get('/api/test', (req, res) => {
   res.json('test')
 })
 
