@@ -39,9 +39,8 @@ app.use('/api/admin', adminRoutes)
 app.use('/api/reports', reportRoutes)
 app.use('/api/licenses', licenseRoutes)
 
-app.get('/api/test', async (req, res) => {
-    const tracks = await Track.find()
-    return res.json({tracks})
+app.get('/api/test', (req, res) => {
+  return res.json({ dbState: mongoose.connection.readyState })
 })
 
 //404 invalid route
