@@ -2,7 +2,6 @@
 import BaseButton from './base/BaseButton.vue'
 import useFeaturedProfiles from '../composables/useFeaturedProfiles'
 import { useRouter } from 'vue-router'
-import PlayPauseBtn from './PlayPauseBtn.vue'
 import ClickableTrackImage from './ClickableTrackImage.vue'
 
 const router = useRouter()

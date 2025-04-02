@@ -11,7 +11,6 @@ import useToggleLike from '../../composables/useToggleLike'
 import { computed, ref } from 'vue'
 import LoginPromptModal from '../../components/LoginPromptModal.vue'
 import BaseButton from '../base/BaseButton.vue'
-import router from '../../router'
 import useAsyncWrap from '../../composables/useAsyncWrap'
 import axios from 'axios'
 

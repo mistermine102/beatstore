@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, useTemplateRef } from 'vue'
+import { onMounted, ref, useTemplateRef } from 'vue'
 import { PlayIcon, ChevronLeftIcon, ChevronRightIcon } from '../components/icons/index.vine'
 import ClickableTrackImage from './ClickableTrackImage.vue'
 import appApi from '../api/appApi'

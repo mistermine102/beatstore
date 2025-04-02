@@ -7,7 +7,7 @@ interface Props {
   isLiked?: boolean
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   isLiked: false
 })
 

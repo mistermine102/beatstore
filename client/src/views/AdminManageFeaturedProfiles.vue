@@ -15,7 +15,6 @@ const {
   featuredProfiles,
   isLoadingFeaturedProfiles,
   isAddingFeaturedProfile,
-  isDeletingFeaturedProfile,
   getFeaturedProfiles,
   addFeaturedProfile,
   deleteFeaturedProfile,

@@ -203,7 +203,7 @@ onMounted(async () => {
           <div>
             <div v-for="[rule, media] in Object.entries(user.notificationRules)" class="mt-2">
               <h3 class="text-lg font-semibold">{{ NOTIFICATION_RULE_LABELS[rule] }}</h3>
-              <div v-for="[medium, value] in Object.entries(media)" class="flex gap-x-2 items-center">
+              <div v-for="[medium] in Object.entries(media)" class="flex gap-x-2 items-center">
                 <p class="text-textLightGrey">{{ medium[0].toUpperCase() + medium.slice(1) }}</p>
                 <BaseSwitch v-model="editedProfile.notificationRules[rule][medium]" />
               </div>

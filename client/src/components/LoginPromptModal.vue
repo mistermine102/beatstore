@@ -3,7 +3,7 @@ import BaseModal from './base/BaseModal.vue'
 import BaseButton from './base/BaseButton.vue'
 import { useRouter } from 'vue-router'
 
-const props = defineProps<{
+defineProps<{
   isOpen: boolean
   message: string
 }>()
