@@ -3,7 +3,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 import express from 'express'
-import cors from 'cors'
+// import cors from 'cors'
 import mongoose from 'mongoose'
 import errorHandling from './middleware/errorHandling.js'
 import invalidRoute from './invalidRoute.js'
@@ -14,7 +14,7 @@ import adminRoutes from './routes/admin.js'
 import reportRoutes from './routes/reports.js'
 import licenseRoutes from './routes/licenses.js'
 import cookieParser from 'cookie-parser'
-import helmet from 'helmet'
+// import helmet from 'helmet'
 import { globalLimiter } from './limiters.js'
 
 import { verifyToken } from './middleware/auth.js'
@@ -23,8 +23,8 @@ const app = express()
 
 app.use(express.json())
 app.use(cookieParser())
-app.use(cors({ credentials: true, origin: process.env.FRONTEND_URL }))
-app.use(helmet())
+// app.use(cors({ credentials: true, origin: process.env.FRONTEND_URL }))
+// app.use(helmet())
 app.set('trust proxy', 1)
 app.use(globalLimiter)
 
