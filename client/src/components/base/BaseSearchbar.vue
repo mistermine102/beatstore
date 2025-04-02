@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, defineEmits, computed } from 'vue'
+import { computed } from 'vue'
 import { SearchIcon } from '../icons/index.vine'
 import BaseButton from './BaseButton.vue'
 

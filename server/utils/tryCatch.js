@@ -1,4 +1,4 @@
-export default fn => {
+const tryCatch = fn => {
   return async (req, res, next) => {
     try {
       await fn(req, res, next)
@@ -7,3 +7,5 @@ export default fn => {
     }
   }
 }
+
+export default tryCatch

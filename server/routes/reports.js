@@ -12,6 +12,7 @@ const reportValidators = [
   body('message')
     .notEmpty().withMessage('Message is required')
     .isLength({ max: 500 }).withMessage('Message must be less than 500 characters')
+    .escape()
 ]
 
 // Regular user routes

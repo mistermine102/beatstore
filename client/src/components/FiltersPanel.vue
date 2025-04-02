@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue'
 import BasePopover from './base/BasePopover.vue'
-import { ChevronDownIcon, FilterIcon } from './icons/index.vine'
+import { ChevronDownIcon } from './icons/index.vine'
 
 // Props for the filters
 const props = defineProps<{ filters: Filter[] }>()

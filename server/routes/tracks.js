@@ -17,6 +17,7 @@ import {
 import isValidId from '../middleware/isValidId.js'
 import { addComment, deleteComment, toggleCommentLike } from '../controllers/trackComments.js'
 import { KEYS, MOODS, GENRES, INSTRUMENTS } from '../constants.js'
+import { uploadFilelimiter } from '../limiters.js'
 
 const router = express.Router()
 
@@ -25,20 +26,24 @@ const getTracksValidators = [
     .exists()
     .withMessage('type is required')
     .isIn(['beat', 'sample', 'drumkit', 'all', 'loop'])
-    .withMessage('type must be one of: beat, sample, drumkit, all'),
+    .withMessage('type must be one of: beat, sample, drumkit, all')
+    .escape(),
   query('start')
     .optional() // Allow 'start' to be omitted
     .isInt({ min: 0 })
-    .withMessage('start must be an integer greater than or equal to 0'),
+    .withMessage('start must be an integer greater than or equal to 0')
+    .escape(),
   // Validate 'amount'
   query('amount')
     .optional() // Allow 'amount' to be omitted
     .isInt({ min: 0, max: 100 })
-    .withMessage('amount must be an integer between 0 and 100'),
+    .withMessage('amount must be an integer between 0 and 100')
+    .escape(),
   query('authorId')
     .optional() // Allow 'AuthorId' to be omitted
     .isMongoId()
-    .withMessage('AuthorId must be a valid MongoDB ObjectId'),
+    .withMessage('AuthorId must be a valid MongoDB ObjectId')
+    .escape(),
 ]
 
 const uploadTrackValidators = [
@@ -56,8 +61,9 @@ const uploadTrackValidators = [
     .isString()
     .withMessage('Title must be a string')
     .isLength({ min: 4, max: 100 })
-    .withMessage('Title must be between 4 and 100 characters'),
-  body('licenseId').exists().withMessage('License cannot be empty').trim().isString().withMessage('License ID must be a string'),
+    .withMessage('Title must be between 4 and 100 characters')
+    .escape(),
+  body('licenseId').exists().withMessage('License cannot be empty').trim().isString().withMessage('License ID must be a string').escape(),
   body('bpm')
     .optional()
     .custom(value => {
@@ -85,7 +91,8 @@ const uploadTrackValidators = [
       }
 
       return true
-    }),
+    })
+    .escape(),
   body('key')
     .optional()
     .isIn([...KEYS, ''])
@@ -119,7 +126,7 @@ const uploadTrackValidators = [
     }),
 ]
 
-export const addCommentValidators = [
+const addCommentValidators = [
   body('content')
     .exists()
     .withMessage('Content is required')
@@ -130,7 +137,8 @@ export const addCommentValidators = [
     .notEmpty()
     .withMessage('Content cannot be empty')
     .isLength({ min: 1, max: 500 })
-    .withMessage('Content must be between 1 and 500 characters'),
+    .withMessage('Content must be between 1 and 500 characters')
+    .escape(),
 ]
 
 router.get('/popular', tryCatch(getPopularTracks))
@@ -141,9 +149,9 @@ router.get('/single/:trackId', isValidId('trackId'), tryCatch(getSingleTrack))
 
 router.delete('/:trackId', isAuthenticated, isValidId('trackId'), tryCatch(deleteTrack))
 
-router.post('/', isAuthenticated, trackUpload.single('audio'), uploadTrackValidators, validate, tryCatch(uploadTrack))
+router.post('/', isAuthenticated, uploadFilelimiter, trackUpload.single('audio'), uploadTrackValidators, validate, tryCatch(uploadTrack))
 
-router.post('/:trackId/image', isAuthenticated, isValidId('trackId'), trackImageUpload.single('image'), tryCatch(uploadTrackImage))
+router.post('/:trackId/image', uploadFilelimiter, isAuthenticated, isValidId('trackId'), trackImageUpload.single('image'), tryCatch(uploadTrackImage))
 
 router.post('/:trackId/like', isAuthenticated, isValidId('trackId'), tryCatch(toggleTrackLike))
 

@@ -17,7 +17,7 @@ import validate from '../middleware/validate.js'
 const router = express.Router()
 
 const registerValidators = [
-  body('username').isLength({ min: 4, max: 25 }).withMessage('Username must be between 4 and 25 characters long'),
+  body('username').isLength({ min: 4, max: 25 }).withMessage('Username must be between 4 and 25 characters long').escape(),
   body('email').isEmail().withMessage('Invalid email'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
 ]

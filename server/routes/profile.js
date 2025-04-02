@@ -12,10 +12,12 @@ import {
   getFeaturedProfiles,
 } from '../controllers/profile.js'
 import { hasRole, isAuthenticated } from '../middleware/auth.js'
-import { profileImageUpload } from '../multer.js'
+import { allowedImageMimetypes, profileImageUpload } from '../multer.js'
 import validate from '../middleware/validate.js'
 import isValidId from '../middleware/isValidId.js'
 import { query, body } from 'express-validator'
+import { validateFileType } from '../middleware/validateFileType.js'
+import { uploadFilelimiter } from '../limiters.js'
 
 const router = express.Router()
 
@@ -39,7 +41,8 @@ const editProfileValidators = [
     .isLength({ min: 4, max: 25 })
     .withMessage('Username must be between 4 and 25 characters long')
     .isString()
-    .withMessage('Username must be a string'),
+    .withMessage('Username must be a string')
+    .escape(),
   body('specification')
     .trim()
     .exists()
@@ -47,7 +50,8 @@ const editProfileValidators = [
     .isLength({ max: 50 })
     .withMessage('Specification must be less than 50 characters long')
     .isString()
-    .withMessage('Specification must be a string'),
+    .withMessage('Specification must be a string')
+    .escape(),
   body('socialLinks')
     .exists()
     .withMessage('Social links are required')
@@ -81,7 +85,14 @@ router.get('/', getProfilesValidators, validate, tryCatch(getProfiles))
 
 router.patch('/', isAuthenticated, editProfileValidators, validate, tryCatch(editProfile))
 
-router.post('/image', isAuthenticated, profileImageUpload.single('image'), tryCatch(uploadProfileImage))
+router.post(
+  '/image',
+  uploadFilelimiter,
+  isAuthenticated,
+  profileImageUpload.single('image'),
+  validateFileType(allowedImageMimetypes),
+  tryCatch(uploadProfileImage)
+)
 
 router.post('/:profileId/follow', isValidId('profileId'), isAuthenticated, tryCatch(toggleFollow))
 

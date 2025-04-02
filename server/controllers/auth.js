@@ -94,7 +94,6 @@ export const login = async (req, res) => {
     httpOnly: true,
     secure: true,
     sameSite: 'Strict',
-    path: '/',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   })
 
@@ -102,7 +101,6 @@ export const login = async (req, res) => {
 }
 
 export const refreshToken = async (req, res) => {
-  console.log('Attempting to refresh token...')
   const { refreshToken } = req.cookies
   if (!refreshToken) throw new AppError('Refresh token not provided', 403)
 

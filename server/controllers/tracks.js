@@ -94,6 +94,26 @@ const FILTER_SCHEMAS = {
   },
 }
 
+function sanitizeSearchText(text) {
+  if (!text || typeof text !== 'string') {
+    return ''
+  }
+
+  // Trim whitespace
+  let sanitized = text.trim()
+
+  // Limit length to reasonable size (e.g., 100 characters)
+  sanitized = sanitized.substring(0, 100)
+
+  // Escape special characters that could be used in MongoDB operators
+  sanitized = sanitized.replace(/[&\/\\#,+()$~%.^'":*?<>{}[\]]/g, ' ')
+
+  // Remove extra spaces
+  sanitized = sanitized.replace(/\s+/g, ' ')
+
+  return sanitized
+}
+
 export const uploadTrack = async (req, res) => {
   const { type } = req.body
 
@@ -249,9 +269,12 @@ export const getTracks = async (req, res) => {
 
   // Apply phrase-based search if 'phrase' is provided
   if (phrase) {
-    const formattedPhrase = phrase.trim().toLowerCase()
-    // Use $text search if available
-    filter.$text = { $search: formattedPhrase }
+    const sanitizedPhrase = sanitizeSearchText(phrase)
+
+    // Only proceed with search if sanitized text is not empty
+    if (sanitizedPhrase.length > 0) {
+      filter.$text = { $search: sanitizedPhrase }
+    }
   }
 
   //don't add type filter if querying for all tracks
@@ -415,7 +438,7 @@ async function tryAddingToPopular(track) {
 
   if (popularTracks.length < POPULAR_TRACKS_LIMIT) {
     //not enough track in popular tracks add the one streamed
-    await PopularTrack.insertOne({ track: track._id, streams })
+    await PopularTrack.create({ track: track._id, streams })
     return
   }
 
@@ -426,7 +449,7 @@ async function tryAddingToPopular(track) {
 
   //check if the streamed track qualifies to the popular tracks
   if (streams > trackWithLeastStreams.streams) {
-    await PopularTrack.insertOne({
+    await PopularTrack.create({
       track: track._id,
       streams,
     })

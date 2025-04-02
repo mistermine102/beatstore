@@ -14,6 +14,8 @@ import adminRoutes from './routes/admin.js'
 import reportRoutes from './routes/reports.js'
 import licenseRoutes from './routes/licenses.js'
 import cookieParser from 'cookie-parser'
+import helmet from 'helmet'
+import { globalLimiter } from './limiters.js'
 
 import { verifyToken } from './middleware/auth.js'
 
@@ -22,6 +24,8 @@ const app = express()
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors({ credentials: true, origin: 'http://localhost:5173' }))
+app.use(helmet())
+app.use(globalLimiter)
 
 app.use(verifyToken)
 
