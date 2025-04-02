@@ -18,14 +18,13 @@ import cookieParser from 'cookie-parser'
 import { globalLimiter } from './limiters.js'
 
 import { verifyToken } from './middleware/auth.js'
-import Track from './models/Track.js'
 
 const app = express()
 
 app.use(express.json())
 app.use(cookieParser())
-// app.use(cors({ credentials: true, origin: process.env.FRONTEND_URL }))
-// app.use(helmet())
+app.use(cors({ credentials: true, origin: process.env.FRONTEND_URL }))
+app.use(helmet())
 app.set('trust proxy', 1)
 app.use(globalLimiter)
 
