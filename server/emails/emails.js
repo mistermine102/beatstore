@@ -44,7 +44,7 @@ export const sendVerifyEmail = async email => {
 export const sendResetPasswordEmail = async (email, resetLink) => {
   const template = await ejs.renderFile(path.join(__dirname, '../templates/resetPasswordEmail.ejs'), { resetLink })
 
-  const res = await transporter.sendMail({
+  await transporter.sendMail({
     from: NOREPLY_EMAIL,
     to: email,
     subject: 'Reset your password',
@@ -98,5 +98,3 @@ export const sendTrackCommentedEmail = async (email, track) => {
     html: template,
   })
 }
-
-

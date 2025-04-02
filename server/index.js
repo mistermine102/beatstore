@@ -38,6 +38,10 @@ app.use('/api/admin', adminRoutes)
 app.use('/api/reports', reportRoutes)
 app.use('/api/licenses', licenseRoutes)
 
+app.get('/test', (req, res) => {
+  res.json('test')
+})
+
 //404 invalid route
 app.all('*', invalidRoute)
 
