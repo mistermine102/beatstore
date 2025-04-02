@@ -29,26 +29,6 @@ app.use(cookieParser())
 app.set('trust proxy', 1)
 app.use(globalLimiter)
 
-app.use(verifyToken)
-
-//routes
-app.use('/api/auth', authRoutes)
-app.use('/api/tracks', trackRoutes)
-app.use('/api/profile', profileRoutes)
-app.use('/api/admin', adminRoutes)
-app.use('/api/reports', reportRoutes)
-app.use('/api/licenses', licenseRoutes)
-
-app.get('/api/test', (req, res) => {
-  return res.json({ dbState: mongoose.connection.readyState })
-})
-
-//404 invalid route
-app.all('*', invalidRoute)
-
-//generic error handling middleware
-app.use(errorHandling)
-
 // For local development only
 if (process.env.NODE_ENV !== 'production') {
   const startServer = async () => {
@@ -83,5 +63,25 @@ app.use(async (req, res, next) => {
   await connectDB()
   next()
 })
+
+app.use(verifyToken)
+
+//routes
+app.use('/api/auth', authRoutes)
+app.use('/api/tracks', trackRoutes)
+app.use('/api/profile', profileRoutes)
+app.use('/api/admin', adminRoutes)
+app.use('/api/reports', reportRoutes)
+app.use('/api/licenses', licenseRoutes)
+
+app.get('/api/test', (req, res) => {
+  return res.json({ dbState: mongoose.connection.readyState })
+})
+
+//404 invalid route
+app.all('*', invalidRoute)
+
+//generic error handling middleware
+app.use(errorHandling)
 
 export default app
