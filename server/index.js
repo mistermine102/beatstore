@@ -18,6 +18,7 @@ import cookieParser from 'cookie-parser'
 import { globalLimiter } from './limiters.js'
 
 import { verifyToken } from './middleware/auth.js'
+import Track from './models/Track.js'
 
 const app = express()
 
@@ -38,8 +39,13 @@ app.use('/api/admin', adminRoutes)
 app.use('/api/reports', reportRoutes)
 app.use('/api/licenses', licenseRoutes)
 
-app.get('/api/test', (req, res) => {
-  res.json('test')
+app.get('/api/test', async (req, res) => {
+  try {
+    const tracks = await Track.find()
+    return res.json({tracks})
+  } catch (error) {
+    return res.json({ error })
+  }
 })
 
 //404 invalid route
