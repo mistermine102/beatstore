@@ -50,7 +50,7 @@ const searchPhrase = ref('')
       </div>
     </div>
     <div class="hidden lg:flex items-end justify-center w-full h-[450px] relative">
-      <img src="assets/pixel-art-hero.png" alt="" class="w-full h-full object-contain" />
+      <img src="/assets/pixel-art-hero.png" alt="" class="w-full h-full object-contain" />
       <div class="absolute inset-0 z-0 flex justify-center items-end mb-16">
         <div class="bg-primary w-[150px] h-[200px] absolute blur-[200px]"></div>
       </div>
