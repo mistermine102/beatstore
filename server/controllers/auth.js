@@ -164,7 +164,7 @@ export const verifyUser = async (req, res) => {
 
   jwt.verify(token, process.env.JWT_EMAIL_SECRET, async (err, payload) => {
     //if token expired return a response
-    if (err && err.name === 'TokenExpiredError') return res.redirect('http://localhost:5173/verify-user/link-expired')
+    if (err && err.name === 'TokenExpiredError') return res.redirect(`${process.env.FRONTEND_URL}/verify-user/link-expired`)
 
     const { email } = payload
 
@@ -179,7 +179,7 @@ export const verifyUser = async (req, res) => {
     await newUser.save()
     await unverifiedUser.deleteOne()
 
-    res.redirect('http://localhost:5173/verify-user/success')
+    res.redirect(`${process.env.FRONTEND_URL}/verify-user/success`)
   })
 }
 
@@ -214,7 +214,7 @@ export const sendResetPasswordLink = async (req, res) => {
   )
 
   // Create reset link with token
-  const resetLink = `http://localhost:5173/reset-password/${token}`
+  const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`
 
   // Send email with reset link
   await sendResetPasswordEmail(email, resetLink)

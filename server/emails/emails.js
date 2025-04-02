@@ -25,7 +25,7 @@ export const sendNotificationEmail = async (user, notificationType, data) => {
 
 export const sendVerifyEmail = async email => {
   //generate url with token
-  const baseUrl = 'http://localhost:3000'
+  const baseUrl = process.env.FRONTEND_URL
   const token = jwt.sign({ email }, process.env.JWT_EMAIL_SECRET, { expiresIn: 3600 })
   const link = `${baseUrl}/auth/verify/${token}`
 
@@ -62,7 +62,7 @@ export const sendTrackPendingEmail = async () => {
 }
 
 export const sendTrackVerifiedEmail = async (email, track) => {
-  const viewUploadLink = `http://localhost:5173/track/${track._id}`
+  const viewUploadLink = `${process.env.FRONTEND_URL}/track/${track._id}`
 
   const template = await ejs.renderFile(path.join(__dirname, '../templates/trackVerifiedEmail.ejs'), { viewUploadLink, uploadTitle: track.title })
 
@@ -75,7 +75,7 @@ export const sendTrackVerifiedEmail = async (email, track) => {
 }
 
 export const sendTrackLikedEmail = async (email, track) => {
-  const viewUploadLink = `http://localhost:5173/track/${track._id}`
+  const viewUploadLink = `${process.env.FRONTEND_URL}/track/${track._id}`
 
   const template = await ejs.renderFile(path.join(__dirname, '../templates/trackLikedEmail.ejs'), { viewUploadLink, uploadTitle: track.title })
 
@@ -88,7 +88,7 @@ export const sendTrackLikedEmail = async (email, track) => {
 }
 
 export const sendTrackCommentedEmail = async (email, track) => {
-  const viewUploadLink = `http://localhost:5173/track/${track._id}`
+  const viewUploadLink = `${process.env.FRONTEND_URL}/track/${track._id}`
   const template = await ejs.renderFile(path.join(__dirname, '../templates/trackCommentedEmail.ejs'), { viewUploadLink, uploadTitle: track.title })
 
   await transporter.sendMail({

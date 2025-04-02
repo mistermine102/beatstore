@@ -2,7 +2,7 @@ import axios from 'axios'
 import { useAuthStore } from '../stores/auth'
 
 const appApi = axios.create({
-  baseURL: 'http://localhost:3000',
+  baseURL: 'https://wavsmarket.com/api',
 })
 
 appApi.interceptors.request.use(
