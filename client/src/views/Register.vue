@@ -13,9 +13,9 @@ const wrapRegister = reactive(useAsyncWrap())
 const toastStore = useToastStore()
 const router = useRouter()
 
-const email = ref('szymonjarosz102@gmail.com')
-const username = ref('mistermine102')
-const password = ref('123456')
+const email = ref('')
+const username = ref('')
+const password = ref('')
 
 function validate() {
   //all of toasts in this function will be error toasts with this title

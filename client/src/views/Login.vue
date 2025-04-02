@@ -17,8 +17,8 @@ const toastStore = useToastStore()
 const wrapLogin = reactive(useAsyncWrap())
 const router = useRouter()
 
-const email = ref('szymonjarosz102@gmail.com')
-const password = ref('123456')
+const email = ref('')
+const password = ref('')
 const showVerificationModal = ref(false)
 const showForgotPasswordModal = ref(false)
 
