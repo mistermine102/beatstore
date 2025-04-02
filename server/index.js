@@ -39,9 +39,9 @@ app.use('/api/admin', adminRoutes)
 app.use('/api/reports', reportRoutes)
 app.use('/api/licenses', licenseRoutes)
 
-app.get('/api/test', (req, res) => {
-    const mongodb_uri = process.env.DB_URI
-    return res.json({uri: mongodb_uri === undefined ? 'Uri is undefined :(' : mongodb_uri.slice(0, 5)})
+app.get('/api/test', async (req, res) => {
+    const tracks = await Track.find()
+    return res.json({tracks})
 })
 
 //404 invalid route
