@@ -30,12 +30,12 @@ app.use(globalLimiter)
 app.use(verifyToken)
 
 //routes
-app.use('api/auth', authRoutes)
-app.use('api/tracks', trackRoutes)
-app.use('api/profile', profileRoutes)
-app.use('api/admin', adminRoutes)
-app.use('api/reports', reportRoutes)
-app.use('api/licenses', licenseRoutes)
+app.use('/api/auth', authRoutes)
+app.use('/api/tracks', trackRoutes)
+app.use('/api/profile', profileRoutes)
+app.use('/api/admin', adminRoutes)
+app.use('/api/reports', reportRoutes)
+app.use('/api/licenses', licenseRoutes)
 
 //404 invalid route
 app.all('*', invalidRoute)
