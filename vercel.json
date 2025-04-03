@@ -6,9 +6,9 @@
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "server/index.js" },
-    { "src": "/assets/(.*)", "dest": "/client/dist/assets/$1" },
-    { "src": "/public/(.*)", "dest": "/client/dist/public/$1" },
-    { "src": "/(.*\\.[a-z0-9]+)$", "dest": "/client/dist/$1" },
-    { "src": "/(.*)", "dest": "/client/dist/index.html" }
+    { "src": "/assets/(.*)", "dest": "/client/assets/$1" },
+    { "src": "/public/(.*)", "dest": "/client/public/$1" },
+    { "src": "/(.*\\.[a-z0-9]+)$", "dest": "/client/$1" },
+    { "src": "/(.*)", "dest": "/client/index.html" }
   ]
 }

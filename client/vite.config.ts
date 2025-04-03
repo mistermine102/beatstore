@@ -14,4 +14,10 @@ export default defineConfig({
     }),
     VineVitePlugin(),
   ],
+  publicDir: 'public', // This is the default value
+  build: {
+    // If you want to keep the public directory structure:
+    assetsDir: 'assets',
+    copyPublicDir: true,
+  },
 })
