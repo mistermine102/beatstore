@@ -20,7 +20,7 @@ const token = ref('')
 
 onMounted(() => {
   // Get token from URL
-  token.value = (route.params.token as string) || ''
+  token.value = (route.query.token as string) || ''
 
   if (!token.value) {
     toastStore.show({

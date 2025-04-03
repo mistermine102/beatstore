@@ -214,7 +214,7 @@ export const sendResetPasswordLink = async (req, res) => {
   )
 
   // Create reset link with token
-  const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`
+  const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`
 
   // Send email with reset link
   await sendResetPasswordEmail(email, resetLink)
