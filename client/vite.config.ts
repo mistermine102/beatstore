@@ -14,4 +14,7 @@ export default defineConfig({
     }),
     VineVitePlugin(),
   ],
+  build: {
+    outDir: 'dist',
+  },
 })
