@@ -27,7 +27,7 @@ export const sendVerifyEmail = async email => {
   //generate url with token
   const baseUrl = process.env.FRONTEND_URL
   const token = jwt.sign({ email }, process.env.JWT_EMAIL_SECRET, { expiresIn: 3600 })
-  const link = `${baseUrl}/auth/verify/${token}`
+  const link = `${baseUrl}/api/auth/verify/${token}`
 
   //get the template
   const template = await ejs.renderFile(path.join(__dirname, '../templates/userVerifyEmail.ejs'), { verificationLink: link })
