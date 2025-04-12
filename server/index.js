@@ -73,10 +73,6 @@ app.use('/api/admin', adminRoutes)
 app.use('/api/reports', reportRoutes)
 app.use('/api/licenses', licenseRoutes)
 
-app.get('/api/test', (req, res) => {
-  return res.json({ db_uri: process.env.DB_URI })
-})
-
 //404 invalid route
 app.all('*', invalidRoute)
 
