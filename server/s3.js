@@ -13,6 +13,7 @@ export const s3 = new S3Client({
   },
 })
 
+ 
 export const uploadFileToS3 = async file => {
   const filename = generateRandomFilename()
 
