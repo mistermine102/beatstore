@@ -74,7 +74,7 @@ app.use('/api/reports', reportRoutes)
 app.use('/api/licenses', licenseRoutes)
 
 app.get('/api/test', (req, res) => {
-  return res.json({ dbState: mongoose.connection.readyState })
+  return res.json({ db_uri: process.env.DB_URI })
 })
 
 //404 invalid route
