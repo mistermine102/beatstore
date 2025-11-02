@@ -9,7 +9,7 @@ const defaultSettings = {
 
 export const globalLimiter = rateLimit({
   ...defaultSettings,
-  limit: 300,
+  limit: 1000,
 })
 
 export const uploadFilelimiter = rateLimit({

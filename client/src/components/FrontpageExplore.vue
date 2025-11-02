@@ -21,9 +21,9 @@ getFeaturedProfiles()
         <div v-for="featured in featuredProfiles" class="flex flex-col h-full">
           <ClickableTrackImage :track="featured.track" class="w-full h-[200px] xl:h-[75%]" />
           <div class="flex flex-col xl:flex-row justify-between gap-x-2 xl:items-center mt-2 xl:h-[25%]">
-            <div class="overflow-hidden">
+            <div class="overflow-hidden flex flex-col">
               <router-link :to="`/track/${featured.track._id}`" class="text-2xl truncate">{{ featured.track.title }}</router-link>
-              <p class="text-textLightGrey truncate">{{ featured.profile.username }}</p>
+              <router-link :to="`/profile/${featured.profile._id}`" class="text-textLightGrey truncate">{{ featured.profile.username }}</router-link>
             </div>
             <BaseButton @click="router.push(`/profile/${featured.profile._id}`)" class="mt-4 xl:mt-0 w-full xl:w-auto">See more</BaseButton>
           </div>

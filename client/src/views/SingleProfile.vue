@@ -17,9 +17,7 @@ const route = useRoute()
 const authStore = useAuthStore()
 const showUnverified = ref(false)
 
-const { id: profileId } = route.params as {
-  id: string
-}
+const profileId = ref(route.params.id as string)
 
 const { profile, getProfile, toggleFollow, isLoading: isLoadingProfile, showLoginPrompt: followLoginPrompt, isFollowLoading } = useProfile()
 const { tracks, isLoading: isLoadingTracks, getTracks, isMore, isLoadingMore, loadMoreTracks } = useTracks()
@@ -29,20 +27,22 @@ function handleLike(track: Track) {
   toggleLike(track)
 }
 
-getProfile(profileId)
-getTracks('all', { filters: { authorId: profileId } })
+getProfile(profileId.value)
+getTracks('all', { filters: { authorId: profileId.value } })
 
 watch(
   () => route.params.id,
   () => {
-    getProfile(profileId)
-    getTracks('all', { filters: { authorId: profileId } })
+    profileId.value = route.params.id as string
+    getProfile(profileId.value)
+    getTracks('all', { filters: { authorId: profileId.value } })
   }
 )
 
 watch(showUnverified, () => {
   const filters: GetTracksFilters = {
     unverified: showUnverified.value ? true : undefined,
+    authorId: profileId.value
   }
 
   getTracks('all', { filters })
