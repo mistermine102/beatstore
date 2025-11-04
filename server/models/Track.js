@@ -70,6 +70,16 @@ const schema = new Schema({
   genre: String,
   instruments: [String],
   mood: String,
+  pricingType: {
+    type: String,
+    enum: ['free', 'paid'],
+    default: 'free',
+  },
+  sellThrough: {
+    type: String,
+    enum: ['platform', 'external', null],
+    default: null,
+  },
   price: Object,
   playable: Boolean,
   totalLikes: Number,

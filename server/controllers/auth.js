@@ -14,8 +14,8 @@ const JWT_SECRET = process.env.JWT_SECRET
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET
 
 const sanitizeUser = user => {
-  const { _id, email, username, createdAt, roles, notificationRules } = user
-  return { _id, email, username, createdAt, roles, notificationRules }
+  const { _id, email, username, createdAt, roles, notificationRules, stripe } = user
+  return { _id, email, username, createdAt, roles, notificationRules, stripe }
 }
 
 const generateAccessToken = user => {

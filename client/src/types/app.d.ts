@@ -5,6 +5,10 @@ interface User {
   createdAt: Date
   roles: string[]
   notificationRules: Record<string, Record<string, boolean>>
+  stripe?: {
+    connectedAccountId: string | null
+    isConnectedAccountLinked: boolean
+  }
 }
 
 interface License {
@@ -55,10 +59,9 @@ interface BaseTrack {
   createdAt: Date
   comments: TrackComment[]
   verified: boolean
-  price?: {
-    currency: string
-    value: number
-  }
+  price: { unitAmount: 50; currency: 'USD' }
+  pricingType?: 'free' | 'paid'
+  sellThrough?: 'platform' | 'external' | null
   totalLikes: number
   isLiked: boolean
   audio?: {

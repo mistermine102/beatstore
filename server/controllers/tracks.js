@@ -30,6 +30,8 @@ const UPLOAD_SCHEMAS = {
     totalLikes: 0,
     totalStreams: 0,
     playable: true,
+    pricingType: 'free',
+    sellThrough: null,
   },
   sample: {
     title: '',
@@ -43,11 +45,15 @@ const UPLOAD_SCHEMAS = {
     totalLikes: 0,
     totalStreams: 0,
     playable: true,
+    pricingType: 'free',
+    sellThrough: null,
   },
   drumkit: {
     title: '',
     type: 'drumkit',
     description: '',
+    pricingType: 'free',
+    sellThrough: null,
   },
   loop: {
     title: '',
@@ -61,6 +67,8 @@ const UPLOAD_SCHEMAS = {
     totalLikes: 0,
     totalStreams: 0,
     playable: true,
+    pricingType: 'free',
+    sellThrough: null,
   },
 }
 
@@ -133,6 +141,14 @@ export const uploadTrack = async (req, res) => {
   //we can later check if a field exists on a track and execute needed code
   for (const schemaKey of Object.keys(uploadSchema)) {
     newTrack[schemaKey] = req.body[schemaKey] ? req.body[schemaKey] : uploadSchema[schemaKey]
+  }
+
+  //attach price
+  if (req.body.price) {
+    newTrack.price = {
+      unitAmount: parseInt(req.body.price),
+      currency: "USD"
+    }
   }
 
   //attach author
@@ -503,6 +519,8 @@ export const getPopularTracks = async (req, res) => {
   const formattedTracks = await Promise.all(
     tracks.map(async popularTrack => {
       //when popualting _id field, _id becomes track
+      console.log("POPULAR TRACK: ", popularTrack)
+
       const formattedTrack = await formatTrackData(popularTrack.track)
 
       return {

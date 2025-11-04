@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, type ButtonHTMLAttributes } from 'vue'
 
 type ButtonSize = 'small' | 'medium' | 'large'
 
@@ -8,6 +8,7 @@ const props = defineProps<{
   alt?: boolean
   disabled?: boolean
   size?: ButtonSize
+  type?: ButtonHTMLAttributes['type']
 }>()
 
 // Use computed for reactive values with defaults
@@ -29,6 +30,7 @@ const scaleValues = {
 
 <template>
   <button
+    :type="props.type"
     class="relative transition-all duration-150 ease-in-out rounded-regular flex items-center justify-center origin-center hover:-translate-y-[1px] will-change-transform"
     :class="[
       isDisabled ? 'opacity-50 cursor-not-allowed hover:-translate-y-0' : undefined,

@@ -23,6 +23,9 @@ interface NewTrack {
   instruments?: string[]
   audio?: File | null
   licenseId: string | null
+  pricingType?: 'free' | 'paid'
+  sellThrough?: 'platform' | 'external'
+  price?: string
 }
 
 interface NewBeat extends NewTrack {
@@ -182,6 +185,36 @@ function validate() {
     return false
   }
 
+  if (!newTrack.value.pricingType) {
+    toastStore.show({ type, title, message: 'Pricing type (Free/Paid) is required' })
+    return false
+  }
+
+  if (newTrack.value.pricingType === 'paid') {
+    if (!newTrack.value.sellThrough) {
+      toastStore.show({ type, title, message: 'Please select how you want to sell' })
+      return false
+    }
+
+    if (newTrack.value.sellThrough === 'platform') {
+      if (!newTrack.value.price) {
+        toastStore.show({ type, title, message: 'Price is required' })
+        return false
+      }
+
+      const price = parseFloat(newTrack.value.price)
+      if (isNaN(price) || price < 0) {
+        toastStore.show({ type, title, message: 'Price must be a valid positive number' })
+        return false
+      }
+
+      if (price === 0) {
+        toastStore.show({ type, title, message: 'Price must be greater than 0' })
+        return false
+      }
+    }
+  }
+
   return true
 }
 
@@ -191,11 +224,18 @@ function uploadTrack(e: Event) {
 
   wrapUploadTrack.run(
     async () => {
-      //set image field to null so backend doesn't complain it got an unexpected field (issue only with file fields)
-      const response = await appApi.postForm<{ trackId: string }>('/tracks', {
+      const trackData = {
         ...newTrack.value,
         image: null,
-      })
+      }
+
+      // Convert price from dollars to cents (multiply by 100) for platform purchases
+      if (trackData.pricingType === 'paid' && trackData.sellThrough === 'platform' && trackData.price) {
+        trackData.price = String(Math.round(parseFloat(trackData.price) * 100))
+      }
+
+      //set image field to null so backend doesn't complain it got an unexpected field (issue only with file fields)
+      const response = await appApi.postForm<{ trackId: string }>('/tracks', trackData)
 
       if (newTrack.value.image) {
         await appApi.postForm(`tracks/${response.data.trackId}/image`, {
@@ -358,6 +398,69 @@ getLicenses()
             placeholder="Describe your upload (max 500 characters)"
             maxlength="500"
           ></textarea>
+        </div>
+
+        <!-- Pricing Panel -->
+        <div class="panel col-span-3">
+          <h2 class="text-2xl mb-6">Pricing</h2>
+
+          <!-- Free/Paid Selection -->
+          <div class="mb-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <BaseButton
+                type="button"
+                @click="newTrack.pricingType = 'free'"
+                :alt="newTrack.pricingType !== 'free'"
+                :class="['h-24 w-full', newTrack.pricingType === 'free' ? 'hover:bg-primary' : '']"
+              >
+                <span class="text-lg">Free</span>
+              </BaseButton>
+              <BaseButton
+                type="button"
+                @click="newTrack.pricingType = 'paid'"
+                :alt="newTrack.pricingType !== 'paid'"
+                :class="['h-24 w-full', newTrack.pricingType === 'paid' ? 'hover:bg-primary' : '']"
+              >
+                <span class="text-lg">Paid</span>
+              </BaseButton>
+            </div>
+          </div>
+
+          <!-- How to Sell Selection (Only show if Paid) -->
+          <div v-if="newTrack.pricingType === 'paid'" class="mb-8">
+            <p class="text-lg mb-4">How do you want to sell?</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <BaseButton
+                type="button"
+                @click="newTrack.sellThrough = 'platform'"
+                :alt="newTrack.sellThrough !== 'platform'"
+                :class="['h-24 w-full', newTrack.sellThrough === 'platform' ? 'hover:bg-primary' : '']"
+              >
+                <span class="text-lg">Through WavsMarket</span>
+              </BaseButton>
+              <BaseButton
+                type="button"
+                @click="newTrack.sellThrough = 'external'"
+                :alt="newTrack.sellThrough !== 'external'"
+                :class="['h-24 w-full', newTrack.sellThrough === 'external' ? 'hover:bg-primary' : '']"
+              >
+                <span class="text-lg">Outside the platform</span>
+              </BaseButton>
+            </div>
+          </div>
+
+          <!-- Price Input (Only show if Through Platform) -->
+          <div v-if="newTrack.pricingType === 'paid' && newTrack.sellThrough === 'platform'">
+            <label class="block text-textLightGrey mb-2">Price in USD</label>
+            <input
+              v-model="newTrack.price"
+              type="number"
+              step="0.01"
+              min="0.01"
+              placeholder="Enter price in dollars (e.g., 9.99)"
+              class="base-input bg-background w-full"
+            />
+          </div>
         </div>
       </div>
       <BaseButton type="submit" :is-loading="wrapUploadTrack.isLoading" class="mt-8 w-full sm:w-1/2 mx-auto">

@@ -124,6 +124,11 @@ const uploadTrackValidators = [
 
       return true
     }),
+  body('price')
+    .optional()
+    .isInt({ min: 1, max: 99999 })
+    .withMessage('Price must be a positive integer between 1 and 99999')
+    .escape()
 ]
 
 const addCommentValidators = [

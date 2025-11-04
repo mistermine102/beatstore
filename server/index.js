@@ -13,6 +13,7 @@ import profileRoutes from './routes/profile.js'
 import adminRoutes from './routes/admin.js'
 import reportRoutes from './routes/reports.js'
 import licenseRoutes from './routes/licenses.js'
+import paymentRoutes from './routes/payments.js'
 import cookieParser from 'cookie-parser'
 import helmet from 'helmet'
 import { globalLimiter } from './limiters.js'
@@ -20,6 +21,9 @@ import { globalLimiter } from './limiters.js'
 import { verifyToken } from './middleware/auth.js'
 
 const app = express()
+
+// Webhook route with raw body BEFORE json middleware
+app.use('/api/payments/stripe-events', express.raw({ type: 'application/json' }))
 
 app.use(express.json())
 app.use(cookieParser())
@@ -72,6 +76,7 @@ app.use('/api/profile', profileRoutes)
 app.use('/api/admin', adminRoutes)
 app.use('/api/reports', reportRoutes)
 app.use('/api/licenses', licenseRoutes)
+app.use('/api/payments', paymentRoutes)
 
 //404 invalid route
 app.all('*', invalidRoute)
