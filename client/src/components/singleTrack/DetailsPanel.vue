@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import BaseButton from '../base/BaseButton.vue'
+
 defineProps<{ track: Track }>()
-</script>
+
 
 <template>
   <div class="panel mb-8">
@@ -28,6 +30,12 @@ defineProps<{ track: Track }>()
           <span>{{ track.mood || 'Unknown' }}</span>
         </p>
       </div>
+    </div>
+
+    <div class="px-8 pb-6 pt-2">
+      <BaseButton class="w-full" size="large">
+        Buy Now
+      </BaseButton>
     </div>
   </div>
 </template>
