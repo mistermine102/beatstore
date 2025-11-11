@@ -87,6 +87,15 @@ const routes: RouteRecordRaw[] = [
     path: '/privacy-policy',
     component: () => import('./views/PrivacyPolicy.vue'),
   },
+  {
+    path: '/payment/success',
+    component: () => import('./views/PaymentSuccess.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/payment/cancel',
+    component: () => import('./views/PaymentCancel.vue'),
+  },
   // Add a catch-all 404 route
   {
     path: '/:pathMatch(.*)*',

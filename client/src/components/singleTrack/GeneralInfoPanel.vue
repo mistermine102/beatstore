@@ -13,6 +13,9 @@ import LoginPromptModal from '../../components/LoginPromptModal.vue'
 import BaseButton from '../base/BaseButton.vue'
 import useAsyncWrap from '../../composables/useAsyncWrap'
 import axios from 'axios'
+import { apiClient } from '../../api/appApi'
+import { useToastStore } from '../../stores/toast'
+import { ShoppingCartIcon } from '../icons/index.vine'
 
 const props = defineProps<{ track: Track }>()
 const emit = defineEmits(['likeToggled'])
@@ -20,6 +23,7 @@ const emit = defineEmits(['likeToggled'])
 const { track } = props
 const authStore = useAuthStore()
 const { toggleLike, showLoginPrompt } = useToggleLike()
+const toastStore = useToastStore()
 
 const isAnimating = ref(false)
 
@@ -104,6 +108,60 @@ function downloadAudio(track: PlayableTrack) {
 
     // Clean up the created URL
     window.URL.revokeObjectURL(downloadUrl)
+  })
+}
+
+const wrapBuyNow = useAsyncWrap()
+
+// Determine if track can be purchased
+const canPurchase = computed(() => {
+  // Can't purchase if not logged in
+  if (!authStore.user) return false
+
+  // Can't purchase your own track
+  if (track.author._id === authStore.user._id) return false
+
+  // Must be a paid track with a price
+  if (track.pricingType !== 'paid' || !track.price?.unitAmount || track.price.unitAmount <= 0) return false
+
+  // Must be sold through the platform
+  if (track.sellThrough !== 'platform') return false
+
+  return true
+})
+
+// Format price for display
+const formattedPrice = computed(() => {
+  if (!track.price?.unitAmount) return '$0.00'
+  const dollars = track.price.unitAmount / 100
+  return `$${dollars.toFixed(2)}`
+})
+
+function buyNow() {
+  if (!authStore.user) {
+    showLoginPrompt.value = true
+    return
+  }
+
+  wrapBuyNow.run(async () => {
+    try {
+      const response = await apiClient.post('/payments/create-checkout-session', {
+        trackId: track._id
+      })
+
+      // Redirect to Stripe checkout
+      if (response.data.url) {
+        window.location.href = response.data.url
+      } else {
+        toastStore.addToast('Failed to create checkout session', 'error')
+      }
+    } catch (error: any) {
+      console.error('Error creating checkout session:', error)
+      toastStore.addToast(
+        error.response?.data?.message || 'Failed to initiate purchase. Please try again.',
+        'error'
+      )
+    }
   })
 }
 </script>
@@ -198,12 +256,25 @@ function downloadAudio(track: PlayableTrack) {
         <h2 class="base-heading mb-2">{{ track.license.shortDescription }}</h2>
         <p class="text-textLightGrey text-sm">{{ track.license.longDescription }}</p>
       </div>
-      <BaseButton v-if="track.playable" class="w-full mt-2" alt @click="downloadAudio(track)">
-        <div class="flex gap-x-2 items-center">
-          <span>Download</span>
-          <DownloadIcon class="text-iconLightGrey" :size="20" />
-        </div>
-      </BaseButton>
+      <div class="flex flex-col gap-y-2 w-full">
+        <BaseButton
+          v-if="canPurchase"
+          class="w-full mt-2"
+          @click="buyNow"
+          :disabled="wrapBuyNow.isLoading.value"
+        >
+          <div class="flex gap-x-2 items-center justify-center">
+            <span>{{ wrapBuyNow.isLoading.value ? 'Processing...' : `Buy Now - ${formattedPrice}` }}</span>
+            <ShoppingCartIcon v-if="!wrapBuyNow.isLoading.value" :size="20" />
+          </div>
+        </BaseButton>
+        <BaseButton v-if="track.playable" class="w-full" :class="{ 'mt-2': !canPurchase }" alt @click="downloadAudio(track)">
+          <div class="flex gap-x-2 items-center">
+            <span>Download</span>
+            <DownloadIcon class="text-iconLightGrey" :size="20" />
+          </div>
+        </BaseButton>
+      </div>
     </div>
 
     <div class="mb-8">

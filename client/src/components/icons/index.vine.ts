@@ -25,6 +25,7 @@ import {
   PhPencilSimple,
   PhX,
   PhFunnel,
+  PhShoppingCart,
 } from '@phosphor-icons/vue'
 
 interface IconProps {
@@ -130,4 +131,8 @@ export function CheckIcon(props: IconProps = {}) {
 
 export function PencilIcon(props: IconProps = {}) {
   return h(PhPencilSimple, { weight: props.fill ? 'fill' : 'bold', size: props.size || 24 })
+}
+
+export function ShoppingCartIcon(props: IconProps = {}) {
+  return h(PhShoppingCart, { weight: props.fill ? 'fill' : 'bold', size: props.size || 24 })
 }
