@@ -93,7 +93,7 @@ const schema = new Schema({
   streamsHistory: Object
 })
 
-// Add a text index on the title to allow text search
+// Add a text index on the title to allow text searchh
 schema.index({ title: 'text' })
 
 const Track = mongoose.model('Track', schema)
