@@ -30,8 +30,6 @@ const UPLOAD_SCHEMAS = {
     totalLikes: 0,
     totalStreams: 0,
     playable: true,
-    pricingType: 'free',
-    sellThrough: null,
   },
   sample: {
     title: '',
@@ -45,15 +43,11 @@ const UPLOAD_SCHEMAS = {
     totalLikes: 0,
     totalStreams: 0,
     playable: true,
-    pricingType: 'free',
-    sellThrough: null,
   },
   drumkit: {
     title: '',
     type: 'drumkit',
     description: '',
-    pricingType: 'free',
-    sellThrough: null,
   },
   loop: {
     title: '',
@@ -67,8 +61,6 @@ const UPLOAD_SCHEMAS = {
     totalLikes: 0,
     totalStreams: 0,
     playable: true,
-    pricingType: 'free',
-    sellThrough: null,
   },
 }
 
@@ -123,7 +115,7 @@ function sanitizeSearchText(text) {
 }
 
 export const uploadTrack = async (req, res) => {
-  const { type } = req.body
+  const { type, pricingType, sellThrough, tiers } = req.body
 
   if (type === 'drumkit') throw new AppError('Drumkits not available yet', 400)
 
@@ -141,14 +133,6 @@ export const uploadTrack = async (req, res) => {
   //we can later check if a field exists on a track and execute needed code
   for (const schemaKey of Object.keys(uploadSchema)) {
     newTrack[schemaKey] = req.body[schemaKey] ? req.body[schemaKey] : uploadSchema[schemaKey]
-  }
-
-  //attach price
-  if (req.body.price) {
-    newTrack.price = {
-      unitAmount: parseInt(req.body.price),
-      currency: "USD"
-    }
   }
 
   //attach author
@@ -170,10 +154,43 @@ export const uploadTrack = async (req, res) => {
     }
   }
 
-  //attach license
-  const license = await License.findById(req.body.licenseId)
-  if (!license) throw new AppError('LICENSE_NOT_FOUND', 404)
-  newTrack.license = license
+  //attach pricing info
+  newTrack.pricingType = pricingType
+
+  if (pricingType === 'paid') {
+    newTrack.sellThrough = sellThrough
+
+    if(!sellThrough) {
+       throw new AppError('sellThrough is required when track is paid', 400)
+    }
+
+    if (sellThrough === 'platform') {
+      if (!tiers || tiers.length === 0) {
+        throw new AppError('At least one tier is required when selling through platform', 400)
+      }
+
+      //check if there are more than 1 tiers with single licenseId
+      const licenseIds = tiers.map(tier => tier.licenseId)
+      const uniqueLicenseIds = new Set(licenseIds)
+      if (uniqueLicenseIds.size !== licenseIds.length) {
+        throw new AppError('Duplicate license types are not allowed', 400)
+      }
+
+      //for each license of the checked tiers: Check if license with such id exists in database
+      for (const licenseId of licenseIds) {
+        const license = await License.findById(licenseId)
+        if (!license) {
+          throw new AppError(`License with id "${licenseId}" not found`, 400)
+        }
+      }
+
+      //actually attach tiers to the newTrack
+      newTrack.tiers = tiers.map(tier => ({
+        price: Number(tier.price),
+        license: tier.licenseId,
+      }))
+    }
+  }
 
   //save a track
   await newTrack.save()
@@ -519,7 +536,7 @@ export const getPopularTracks = async (req, res) => {
   const formattedTracks = await Promise.all(
     tracks.map(async popularTrack => {
       //when popualting _id field, _id becomes track
-      console.log("POPULAR TRACK: ", popularTrack)
+      console.log('POPULAR TRACK: ', popularTrack)
 
       const formattedTrack = await formatTrackData(popularTrack.track)
 

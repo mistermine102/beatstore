@@ -63,7 +63,6 @@ const uploadTrackValidators = [
     .isLength({ min: 4, max: 100 })
     .withMessage('Title must be between 4 and 100 characters')
     .escape(),
-  body('licenseId').exists().withMessage('License cannot be empty').trim().isString().withMessage('License ID must be a string').escape(),
   body('bpm')
     .optional()
     .custom(value => {
@@ -124,11 +123,31 @@ const uploadTrackValidators = [
 
       return true
     }),
-  body('price')
+  body('pricingType')
+    .exists()
+    .withMessage('pricingType is required')
+    .isIn(['free', 'paid'])
+    .withMessage('pricingType must be either "free" or "paid"'),
+  body('sellThrough')
     .optional()
-    .isInt({ min: 1, max: 99999 })
-    .withMessage('Price must be a positive integer between 1 and 99999')
-    .escape()
+    .isIn(['platform', 'external'])
+    .withMessage('sellThrough must be either "platform" or "external"'),
+  body('tiers')
+    .optional()
+    .isArray()
+    .withMessage('tiers must be an array')
+    .custom(tiers => {
+      for (const tier of tiers || []) {
+        const price = Number(tier.price)
+        if (isNaN(price) || price <= 0 || price > 1000000) {
+          throw new Error('Each tier must include a valid price (number between 0 and 1,000,000)')
+        }
+        if (!tier.licenseId || typeof tier.licenseId !== 'string') {
+          throw new Error('Each tier must include a licenseId (string)')
+        }
+      }
+      return true
+    }),
 ]
 
 const addCommentValidators = [

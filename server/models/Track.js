@@ -70,20 +70,11 @@ const schema = new Schema({
   genre: String,
   instruments: [String],
   mood: String,
-  pricingType: {
-    type: String,
-    enum: ['free', 'paid'],
-    default: 'free',
-  },
-  sellThrough: {
-    type: String,
-    enum: ['platform', 'external', null],
-    default: null,
-  },
-  price: Object,
+
   playable: Boolean,
   totalLikes: Number,
   totalStreams: Number,
+  streamsHistory: Object,
   verified: {
     type: Boolean,
     default: false,
@@ -96,11 +87,27 @@ const schema = new Schema({
     type: [commentSchema],
     default: [],
   },
-  license: {
-    type: licenseSchema,
-    required: true,
+  pricingType: {
+    type: String,
+    enum: ['free', 'paid'],
+    required: true
   },
-  streamsHistory: Object
+  sellThrough: {
+    type: String,
+    enum: ['platform', 'external'],
+  },
+  tiers: {
+    type: [
+      {
+         _id: false,
+        price: Number,
+        license: {
+          type: String,
+          ref: 'license',
+        },
+      },
+    ]
+  },
 })
 
 // Add a text index on the title to allow text search
