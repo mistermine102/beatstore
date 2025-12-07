@@ -42,7 +42,7 @@ export const verifyTrack = async (req, res) => {
 
 //controller to get ALL of the unverified tracks
 export const getUnverifiedTracks = async (req, res) => {
-  const tracks = await UnverifiedTrack.find().populate('tiers.license')
+  const tracks = await UnverifiedTrack.find()
 
   const formattedTracks = await Promise.all(
     tracks.map(async track => {

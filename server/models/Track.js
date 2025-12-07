@@ -90,7 +90,7 @@ const schema = new Schema({
   pricingType: {
     type: String,
     enum: ['free', 'paid'],
-    required: true
+    required: true,
   },
   sellThrough: {
     type: String,
@@ -99,14 +99,18 @@ const schema = new Schema({
   tiers: {
     type: [
       {
-         _id: false,
+        _id: false,
         price: Number,
         license: {
           type: String,
           ref: 'license',
         },
       },
-    ]
+    ],
+  },
+  freeDownloadPolicy: {
+    type: String,
+    enum: ['unavailable', 'direct'],
   },
 })
 

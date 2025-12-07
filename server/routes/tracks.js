@@ -128,10 +128,7 @@ const uploadTrackValidators = [
     .withMessage('pricingType is required')
     .isIn(['free', 'paid'])
     .withMessage('pricingType must be either "free" or "paid"'),
-  body('sellThrough')
-    .optional()
-    .isIn(['platform', 'external'])
-    .withMessage('sellThrough must be either "platform" or "external"'),
+  body('sellThrough').optional().isIn(['platform', 'external']).withMessage('sellThrough must be either "platform" or "external"'),
   body('tiers')
     .optional()
     .isArray()
@@ -148,6 +145,7 @@ const uploadTrackValidators = [
       }
       return true
     }),
+  body('freeDownloadPolicy').exists().isIn(['unavailable', 'direct']),
 ]
 
 const addCommentValidators = [

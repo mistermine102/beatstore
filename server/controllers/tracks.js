@@ -160,8 +160,8 @@ export const uploadTrack = async (req, res) => {
   if (pricingType === 'paid') {
     newTrack.sellThrough = sellThrough
 
-    if(!sellThrough) {
-       throw new AppError('sellThrough is required when track is paid', 400)
+    if (!sellThrough) {
+      throw new AppError('sellThrough is required when track is paid', 400)
     }
 
     if (sellThrough === 'platform') {
@@ -191,6 +191,8 @@ export const uploadTrack = async (req, res) => {
       }))
     }
   }
+
+  newTrack.freeDownloadPolicy = req.body.freeDownloadPolicy
 
   //save a track
   await newTrack.save()
@@ -347,10 +349,16 @@ export const getTracks = async (req, res) => {
   }
 
   //only populate username on author
-  const tracks = await Model.find(filter).sort({ createdAt: -1 }).skip(start).limit(amount).populate('author', 'username').populate({
-    path: 'comments.author', // Populate the author field in comments
-    select: 'username image', // Only select username and profilePic
-  })
+  const tracks = await Model.find(filter)
+    .sort({ createdAt: -1 })
+    .skip(start)
+    .limit(amount)
+    .populate('author', 'username')
+    .populate({
+      path: 'comments.author', // Populate the author field in comments
+      select: 'username image', // Only select username and profilePic
+    })
+
   const trackIds = tracks.map(el => el._id)
 
   //create an object where keys are trackIds and values are whether they're liked
@@ -389,6 +397,7 @@ export const getSingleTrack = async (req, res) => {
       path: 'comments.author', // Populate the author field in comments
       select: 'username image', // Only select username and profilePic
     })
+    .populate('tiers.license')
   if (!track) throw new AppError('TRACK_NOT_FOUND', 404)
 
   const formattedTrack = await formatTrackData(track)
