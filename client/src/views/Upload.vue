@@ -11,6 +11,11 @@ import { KEYS, GENRES, INSTRUMENTS, MOODS, GENERIC_ERROR_TOAST } from '../consta
 import BaseSelect from '../components/base/BaseSelect.vue'
 import BaseCheckboxSelect from '../components/base/BaseCheckboxSelect.vue'
 
+interface Tier {
+  licenseId: string
+  price: string
+}
+
 interface NewTrack {
   title: string
   type: TrackType
@@ -22,10 +27,9 @@ interface NewTrack {
   mood?: string
   instruments?: string[]
   audio?: File | null
-  licenseId: string | null
   pricingType?: 'free' | 'paid'
   sellThrough?: 'platform' | 'external'
-  price?: string
+  freeDownloadPolicy: 'unavailable' | 'direct'
 }
 
 interface NewBeat extends NewTrack {
@@ -76,7 +80,7 @@ const NEW_BEAT_SCHEMA: NewBeat = {
   genre: '',
   image: null,
   audio: null,
-  licenseId: null,
+  freeDownloadPolicy: 'unavailable',
 }
 
 const NEW_SAMPLE_SCHEMA: NewSample = {
@@ -89,7 +93,7 @@ const NEW_SAMPLE_SCHEMA: NewSample = {
   instruments: [],
   image: null,
   audio: null,
-  licenseId: null,
+  freeDownloadPolicy: 'unavailable',
 }
 
 const NEW_DRUMKIT_SCHEMA: NewDrumkit = {
@@ -97,7 +101,7 @@ const NEW_DRUMKIT_SCHEMA: NewDrumkit = {
   type: 'drumkit',
   description: '',
   image: null,
-  licenseId: null,
+  freeDownloadPolicy: 'unavailable',
 }
 
 const NEW_LOOP_SCHEMA: NewLoop = {
@@ -110,7 +114,7 @@ const NEW_LOOP_SCHEMA: NewLoop = {
   instruments: [],
   image: null,
   audio: null,
-  licenseId: null,
+  freeDownloadPolicy: 'unavailable',
 }
 
 //schemas keys are the values of TrackType so we can use dynamic
@@ -160,11 +164,6 @@ function validate() {
     }
   }
 
-  if (!newTrack.value.licenseId) {
-    toastStore.show({ type, title, message: 'Terms are required' })
-    return false
-  }
-
   if (newTrack.value.title.length < 4) {
     toastStore.show({ type, title, message: 'Title must be at least 4 characters long' })
     return false
@@ -197,20 +196,18 @@ function validate() {
     }
 
     if (newTrack.value.sellThrough === 'platform') {
-      if (!newTrack.value.price) {
-        toastStore.show({ type, title, message: 'Price is required' })
+      if (tiers.value.length === 0) {
+        toastStore.show({ type, title, message: 'Select at least one license tier' })
         return false
       }
 
-      const price = parseFloat(newTrack.value.price)
-      if (isNaN(price) || price < 0) {
-        toastStore.show({ type, title, message: 'Price must be a valid positive number' })
-        return false
-      }
-
-      if (price === 0) {
-        toastStore.show({ type, title, message: 'Price must be greater than 0' })
-        return false
+      for (const tier of tiers.value) {
+        const price = parseFloat(tier.price)
+        if (!tier.price || isNaN(price) || price <= 0) {
+          const licenseTitle = licenses.value.find(l => l._id === tier.licenseId)?.title || 'tier'
+          toastStore.show({ type, title, message: `Enter a valid price for ${licenseTitle}` })
+          return false
+        }
       }
     }
   }
@@ -224,14 +221,17 @@ function uploadTrack(e: Event) {
 
   wrapUploadTrack.run(
     async () => {
-      const trackData = {
+      const trackData: Record<string, unknown> = {
         ...newTrack.value,
         image: null,
       }
 
-      // Convert price from dollars to cents (multiply by 100) for platform purchases
-      if (trackData.pricingType === 'paid' && trackData.sellThrough === 'platform' && trackData.price) {
-        trackData.price = String(Math.round(parseFloat(trackData.price) * 100))
+      // Add tiers with prices converted to cents for platform purchases
+      if (trackData.pricingType === 'paid' && trackData.sellThrough === 'platform') {
+        trackData.tiers = tiers.value.map(t => ({
+          licenseId: t.licenseId,
+          price: Math.round(parseFloat(t.price) * 100),
+        }))
       }
 
       //set image field to null so backend doesn't complain it got an unexpected field (issue only with file fields)
@@ -267,6 +267,26 @@ function getLicenses() {
 }
 
 getLicenses()
+
+// Tiers for pricing
+const tiers = ref<Tier[]>([])
+
+function isTierSelected(licenseId: string): boolean {
+  return tiers.value.some(t => t.licenseId === licenseId)
+}
+
+function getTier(licenseId: string): Tier | undefined {
+  return tiers.value.find(t => t.licenseId === licenseId)
+}
+
+function toggleTier(licenseId: string) {
+  const index = tiers.value.findIndex(t => t.licenseId === licenseId)
+  if (index === -1) {
+    tiers.value.push({ licenseId, price: '' })
+  } else {
+    tiers.value.splice(index, 1)
+  }
+}
 </script>
 
 <template>
@@ -324,20 +344,6 @@ getLicenses()
               <ImageIcon :size="48" />
             </template>
           </UploadFileContainer>
-        </div>
-
-        <div class="panel col-span-3">
-          <h2 class="text-2xl mb-6">Terms</h2>
-          <BaseSelect
-            v-model="newTrack.licenseId"
-            :options="licenses.map(l => ({ value: l._id, label: l.title }))"
-            class="[&>.popover-button]:bg-background"
-            placeholder="Select terms"
-          />
-          <div v-if="newTrack.licenseId !== null">
-            <p class="text-lg mt-4">{{ licenses.find(l => l._id === newTrack.licenseId)?.shortDescription }}</p>
-            <p class="mt-2 text-textLightGrey">{{ licenses.find(l => l._id === newTrack.licenseId)?.longDescription }}</p>
-          </div>
         </div>
 
         <!-- Basic Information Panel -->
@@ -449,17 +455,33 @@ getLicenses()
             </div>
           </div>
 
-          <!-- Price Input (Only show if Through Platform) -->
+          <!-- License Tiers (Only show if Through Platform) -->
           <div v-if="newTrack.pricingType === 'paid' && newTrack.sellThrough === 'platform'">
-            <label class="block text-textLightGrey mb-2">Price in USD</label>
-            <input
-              v-model="newTrack.price"
-              type="number"
-              step="0.01"
-              min="0.01"
-              placeholder="Enter price in dollars (e.g., 9.99)"
-              class="base-input bg-background w-full"
-            />
+            <p class="text-lg mb-4">Select license tiers and set prices</p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div
+                v-for="license in licenses"
+                :key="license._id"
+                @click="toggleTier(license._id)"
+                :class="[
+                  'p-4 rounded-regular cursor-pointer transition-all border',
+                  isTierSelected(license._id) ? 'bg-primary/10 border-primary' : 'bg-darkGrey border-white/[0.1] hover:border-white/[0.3]',
+                ]"
+              >
+                <p class="text-lg font-medium mb-2">{{ license.title }}</p>
+                <input
+                  :value="getTier(license._id)?.price || ''"
+                  @input="e => { const t = getTier(license._id); if (t) t.price = (e.target as HTMLInputElement).value }"
+                  type="number"
+                  step="0.01"
+                  min="0.01"
+                  placeholder="Price in USD"
+                  :disabled="!isTierSelected(license._id)"
+                  :class="['base-input bg-background w-full', !isTierSelected(license._id) && 'opacity-50 cursor-not-allowed']"
+                  @click.stop
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>

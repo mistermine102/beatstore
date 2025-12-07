@@ -36,6 +36,11 @@ interface TrackComment {
   updatedAt: Date
 }
 
+interface TrackPricingTier {
+  license: License
+  price: number
+}
+
 interface BaseTrack {
   _id: string
   title: string
@@ -55,13 +60,13 @@ interface BaseTrack {
     username: string
     _id: string
   }
-  license: License
   createdAt: Date
   comments: TrackComment[]
   verified: boolean
-  price: { unitAmount: 50; currency: 'USD' }
+  tiers: TrackPricingTier[]
   pricingType?: 'free' | 'paid'
-  sellThrough?: 'platform' | 'external' | null
+  sellThrough?: 'platform' | 'external'
+  freeDownloadPolicy: 'unavailable' | 'direct'
   totalLikes: number
   isLiked: boolean
   audio?: {

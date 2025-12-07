@@ -193,11 +193,7 @@ function downloadAudio(track: PlayableTrack) {
         </div>
       </div>
     </div>
-    <div class="mb-16 flex gap-x-16">
-      <div>
-        <h2 class="base-heading mb-2">{{ track.license.shortDescription }}</h2>
-        <p class="text-textLightGrey text-sm">{{ track.license.longDescription }}</p>
-      </div>
+    <div v-if="track.freeDownloadPolicy !== 'unavailable'" class="mb-16 flex gap-x-16">
       <BaseButton v-if="track.playable" class="w-full mt-2" alt @click="downloadAudio(track)">
         <div class="flex gap-x-2 items-center">
           <span>Download</span>
