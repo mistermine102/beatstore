@@ -160,23 +160,21 @@ export const uploadTrack = async (req, res) => {
   if (pricingType === 'paid') {
     newTrack.sellThrough = sellThrough
 
-    if (!sellThrough) {
-      throw new AppError('sellThrough is required when track is paid', 400)
-    }
-
     if (sellThrough === 'platform') {
-      if (!tiers || tiers.length === 0) {
-        throw new AppError('At least one tier is required when selling through platform', 400)
+      // Check if user has connected their Stripe account (business logic validation)
+      const user = await User.findById(req.userId)
+      if (!user.stripe?.isConnectedAccountLinked) {
+        throw new AppError('STRIPE_NOT_CONNECTED', 403)
       }
 
-      //check if there are more than 1 tiers with single licenseId
+      // Check for duplicate license IDs (business logic validation)
       const licenseIds = tiers.map(tier => tier.licenseId)
       const uniqueLicenseIds = new Set(licenseIds)
       if (uniqueLicenseIds.size !== licenseIds.length) {
         throw new AppError('Duplicate license types are not allowed', 400)
       }
 
-      //for each license of the checked tiers: Check if license with such id exists in database
+      // Validate licenses exist in database
       for (const licenseId of licenseIds) {
         const license = await License.findById(licenseId)
         if (!license) {
@@ -184,7 +182,7 @@ export const uploadTrack = async (req, res) => {
         }
       }
 
-      //actually attach tiers to the newTrack
+      // Attach tiers to the new track
       newTrack.tiers = tiers.map(tier => ({
         price: Number(tier.price),
         license: tier.licenseId,

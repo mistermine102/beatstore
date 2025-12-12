@@ -14,6 +14,10 @@ const createCheckoutSessionValidators = [
     .isMongoId()
     .withMessage('Track ID must be a valid MongoDB ObjectId')
     .escape(),
+  body('licenseId')
+    .exists()
+    .withMessage('License ID is required')
+    .escape(),
 ]
 
 router.post('/create-checkout-session', createCheckoutSessionValidators, validate, tryCatch(createCheckoutSession))

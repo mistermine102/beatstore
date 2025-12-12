@@ -37,13 +37,25 @@ const getConnectedAccountId = async user => {
 }
 
 export const createCheckoutSession = async (req, res) => {
-  const { trackId } = req.body
+  const { trackId, licenseId } = req.body
 
-  const track = await Track.findById(trackId)
+  const track = await Track.findById(trackId).populate('author').populate('tiers.license')
   if (!track) throw new AppError('Track not found', 404)
 
-  if (track.price.unitAmount === 0) {
-    throw new AppError('Cannot create a checkout session for a free track', 400)
+  const tier = track.tiers.find(t => t.license._id.toString() === licenseId)
+  if (!tier) throw new AppError('License tier not found for this track', 404)
+
+  if (tier.price === 0) {
+    throw new AppError('Cannot create a checkout session for a free tier', 400)
+  }
+
+  // Validate seller's Stripe account is still connected
+  if (!track.author.stripe?.connectedAccountId) {
+    throw new AppError('Seller has not set up payment account', 400)
+  }
+
+  if (!track.author.stripe?.isConnectedAccountLinked) {
+    throw new AppError('Seller payment account is not available. Please contact the seller.', 400)
   }
 
   const trackImageUrl = await generateSignedUrl(track.image.filename)
@@ -54,10 +66,10 @@ export const createCheckoutSession = async (req, res) => {
       {
         price_data: {
           currency: 'usd',
-          unit_amount: track.price.unitAmount,
+          unit_amount: tier.price,
           product_data: {
-            name: track.title,
-            description: track.license.shortDescription,
+            name: `${track.title} - ${tier.license.title}`,
+            description: tier.license.shortDescription,
             images: [trackImageUrl],
           },
         },
@@ -66,8 +78,12 @@ export const createCheckoutSession = async (req, res) => {
     ],
     payment_intent_data: {
       transfer_data: {
-        destination: track.author.connectedAccountId,
+        destination: track.author.stripe.connectedAccountId,
       },
+    },
+    metadata: {
+      trackId: track._id.toString(),
+      licenseId: tier.license._id.toString(),
     },
     success_url: `${process.env.FRONTEND_URL}/payment/success`,
     cancel_url: `${process.env.FRONTEND_URL}/payment/cancel`,

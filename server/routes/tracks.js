@@ -128,24 +128,66 @@ const uploadTrackValidators = [
     .withMessage('pricingType is required')
     .isIn(['free', 'paid'])
     .withMessage('pricingType must be either "free" or "paid"'),
-  body('sellThrough').optional().isIn(['platform', 'external']).withMessage('sellThrough must be either "platform" or "external"'),
+  body('sellThrough')
+    .optional()
+    .isIn(['platform', 'external'])
+    .withMessage('sellThrough must be either "platform" or "external"')
+    .custom((value, { req }) => {
+      // If pricingType is paid, sellThrough is required
+      if (req.body.pricingType === 'paid' && !value) {
+        throw new Error('sellThrough is required when pricingType is paid')
+      }
+      return true
+    }),
   body('tiers')
     .optional()
     .isArray()
     .withMessage('tiers must be an array')
-    .custom(tiers => {
+    .custom((tiers, { req }) => {
+      // If pricingType is free, tiers should not be provided
+      if (req.body.pricingType === 'free' && tiers && tiers.length > 0) {
+        throw new Error('tiers are not allowed when pricingType is free')
+      }
+
+      // If sellThrough is platform, tiers are required
+      if (req.body.sellThrough === 'platform' && (!tiers || tiers.length === 0)) {
+        throw new Error('tiers are required when selling through platform')
+      }
+
+      // Validate each tier
       for (const tier of tiers || []) {
         const price = Number(tier.price)
-        if (isNaN(price) || price <= 0 || price > 1000000) {
-          throw new Error('Each tier must include a valid price (number between 0 and 1,000,000)')
+
+        // Price must be a valid non-negative number
+        if (isNaN(price) || price < 0 || price > 1000000) {
+          throw new Error('Each tier price must be a valid number between 0 and 1,000,000')
         }
+
         if (!tier.licenseId || typeof tier.licenseId !== 'string') {
           throw new Error('Each tier must include a licenseId (string)')
         }
       }
+
+      // If selling through platform, ensure at least one tier has price > 0
+      if (req.body.sellThrough === 'platform' && tiers && tiers.length > 0) {
+        const hasPayingTier = tiers.some(tier => Number(tier.price) > 0)
+        if (!hasPayingTier) {
+          throw new Error('At least one tier must have a price greater than zero when selling through platform')
+        }
+      }
+
       return true
     }),
-  body('freeDownloadPolicy').exists().isIn(['unavailable', 'direct']),
+  body('freeDownloadPolicy')
+    .exists()
+    .isIn(['unavailable', 'direct'])
+    .custom((value, { req }) => {
+      // Free tracks must allow downloads
+      if (req.body.pricingType === 'free' && value === 'unavailable') {
+        throw new Error('Free tracks must have freeDownloadPolicy set to "direct"')
+      }
+      return true
+    }),
 ]
 
 const addCommentValidators = [

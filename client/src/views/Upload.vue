@@ -247,8 +247,23 @@ function uploadTrack(e: Event) {
       router.push('/')
     },
     err => {
-      if (err.response.data.message === 'TITLE_NOT_AVAILABLE')
+      if (err.response?.data?.message === 'TITLE_NOT_AVAILABLE') {
         return toastStore.show({ type: 'error', title: "Can't upload", message: 'Title not available' })
+      }
+
+      if (err.response?.data?.message === 'STRIPE_NOT_CONNECTED') {
+        toastStore.show({
+          type: 'error',
+          title: 'Stripe account required',
+          message: 'Please connect your Stripe account to sell through the platform',
+        })
+        // Navigate to billing page after a short delay
+        setTimeout(() => {
+          router.push('/billing')
+        }, 2000)
+        return
+      }
+
       return toastStore.show(GENERIC_ERROR_TOAST)
     }
   )
@@ -482,6 +497,19 @@ function toggleTier(licenseId: string) {
                 />
               </div>
             </div>
+          </div>
+
+          <!-- Free Download Option (Only show if Free) -->
+          <div v-if="newTrack.pricingType === 'paid'" class="my-8">
+            <label class="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                :checked="newTrack.freeDownloadPolicy === 'direct'"
+                @change="newTrack.freeDownloadPolicy = ($event.target as HTMLInputElement).checked ? 'direct' : 'unavailable'"
+                class="w-5 h-5 rounded border-white/[0.1] bg-background text-primary focus:ring-2 focus:ring-primary cursor-pointer"
+              />
+              <span class="text-lg">Allow free download</span>
+            </label>
           </div>
         </div>
       </div>

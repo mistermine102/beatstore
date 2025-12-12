@@ -32,6 +32,7 @@ function logout() {
     <template #popover-content>
       <div class="flex flex-col divide-y-2 divide-lightGray">
         <button @click="() => router.push('/profile/' + user?._id)" class="whitespace-nowrap py-2">View profile</button>
+        <button @click="() => router.push('/billing')" class="whitespace-nowrap py-2">Billing</button>
         <button v-if="user.roles.includes('admin')" @click="() => router.push('/admin')" class="whitespace-nowrap py-2">Admin</button>
         <button @click="logout" class="whitespace-nowrap py-2">Logout</button>
       </div>

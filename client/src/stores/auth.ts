@@ -22,6 +22,8 @@ export const useAuthStore = defineStore('authStore', () => {
           return
         }
 
+        console.log("USER: ", response.data.user)
+
         user.value = response.data.user
         accessToken.value = response.data.accessToken
       },

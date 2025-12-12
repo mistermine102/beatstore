@@ -27,7 +27,7 @@ export const sendNotificationEmail = async (user, notificationType, data) => {
 
 export const sendVerifyEmail = async email => {
   //generate url with token
-  const baseUrl = process.env.FRONTEND_URL
+  const baseUrl = process.env.API_URL
   const token = jwt.sign({ email }, process.env.JWT_EMAIL_SECRET, { expiresIn: 3600 })
   const link = `${baseUrl}/api/auth/verify/${token}`
 
