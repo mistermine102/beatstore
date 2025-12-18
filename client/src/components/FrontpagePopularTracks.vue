@@ -57,13 +57,13 @@ onMounted(() => {
           <div>
             <ClickableTrackImage :track="track" class="w-full h-[150px] md:h-[200px]" />
             <div class="flex justify-between items-center mt-2">
-              <div class="max-w-24 sm:max-w-40 truncate">
+              <div class="max-w-24 sm:max-w-40 truncate flex flex-col">
                 <router-link :to="`/track/${track._id}`" class="text-xl">
                   {{ track.title }}
                 </router-link>
-                <p class="text-textLightGrey">
+                <router-link :to="`profile/${track.author._id}`" class="text-textLightGrey">
                   {{ track.author.username }}
-                </p>
+                </router-link>
               </div>
               <div class="flex gap-x-2 items-center">
                 <PlayIcon class="text-iconLightGrey" :size="20" />

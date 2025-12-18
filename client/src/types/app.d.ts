@@ -5,6 +5,10 @@ interface User {
   createdAt: Date
   roles: string[]
   notificationRules: Record<string, Record<string, boolean>>
+  stripe?: {
+    connectedAccountId: string | null
+    isConnectedAccountLinked: boolean
+  }
 }
 
 interface License {
@@ -32,6 +36,11 @@ interface TrackComment {
   updatedAt: Date
 }
 
+interface TrackPricingTier {
+  license: License
+  price: number
+}
+
 interface BaseTrack {
   _id: string
   title: string
@@ -51,14 +60,13 @@ interface BaseTrack {
     username: string
     _id: string
   }
-  license: License
   createdAt: Date
   comments: TrackComment[]
   verified: boolean
-  price?: {
-    currency: string
-    value: number
-  }
+  tiers: TrackPricingTier[]
+  pricingType?: 'free' | 'paid'
+  sellThrough?: 'platform' | 'external'
+  freeDownloadPolicy: 'unavailable' | 'direct'
   totalLikes: number
   isLiked: boolean
   audio?: {

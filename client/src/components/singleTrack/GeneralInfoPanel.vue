@@ -10,6 +10,7 @@ import PlayPauseBtn from '../PlayPauseBtn.vue'
 import useToggleLike from '../../composables/useToggleLike'
 import { computed, ref } from 'vue'
 import LoginPromptModal from '../../components/LoginPromptModal.vue'
+import BuyTrackModal from './BuyTrackModal.vue'
 import BaseButton from '../base/BaseButton.vue'
 import useAsyncWrap from '../../composables/useAsyncWrap'
 import axios from 'axios'
@@ -22,6 +23,7 @@ const authStore = useAuthStore()
 const { toggleLike, showLoginPrompt } = useToggleLike()
 
 const isAnimating = ref(false)
+const isBuyModalOpen = ref(false)
 
 function handleLike() {
   toggleLike(props.track)
@@ -110,7 +112,7 @@ function downloadAudio(track: PlayableTrack) {
 
 <template>
   <div class="panel relative">
-    <div class="mb-16">
+    <div class="mb-8">
       <div v-if="track.author._id === authStore.user?._id" class="absolute top-4 right-4 z-20">
         <TrackOptionsPopover :track="track" />
       </div>
@@ -129,7 +131,7 @@ function downloadAudio(track: PlayableTrack) {
               class="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-150"
             />
           </div>
-          <div class="flex justify-center gap-x-8 mt-4">
+          <div class="flex justify-center gap-x-8 mt-4 mb-2">
             <button @click="handleLike" class="flex gap-x-2 items-center group cursor-pointer">
               <HeartIcon
                 :fill="track.isLiked"
@@ -146,6 +148,23 @@ function downloadAudio(track: PlayableTrack) {
             <div class="flex gap-x-2 items-center">
               <PlayIcon class="w-10 text-iconLightGrey shrink-0" />
               <p class="text-lg text-textLightGrey">{{ track.totalStreams }}</p>
+            </div>
+          </div>
+          <div>
+            <div v-if="track.pricingType === 'paid' && track.sellThrough === 'platform'">
+              <BaseButton v-if="track.playable" class="w-full mt-2" @click="isBuyModalOpen = true">
+                <div class="flex gap-x-2 items-center">
+                  <span>Buy now</span>
+                </div>
+              </BaseButton>
+            </div>
+            <div v-if="track.freeDownloadPolicy !== 'unavailable'">
+              <BaseButton v-if="track.playable" class="w-full mt-2" alt @click="downloadAudio(track)">
+                <div class="flex gap-x-2 items-center">
+                  <span>Download</span>
+                  <DownloadIcon class="text-iconLightGrey" :size="20" />
+                </div>
+              </BaseButton>
             </div>
           </div>
         </div>
@@ -193,18 +212,6 @@ function downloadAudio(track: PlayableTrack) {
         </div>
       </div>
     </div>
-    <div class="mb-16 flex gap-x-16">
-      <div>
-        <h2 class="base-heading mb-2">{{ track.license.shortDescription }}</h2>
-        <p class="text-textLightGrey text-sm">{{ track.license.longDescription }}</p>
-      </div>
-      <BaseButton v-if="track.playable" class="w-full mt-2" alt @click="downloadAudio(track)">
-        <div class="flex gap-x-2 items-center">
-          <span>Download</span>
-          <DownloadIcon class="text-iconLightGrey" :size="20" />
-        </div>
-      </BaseButton>
-    </div>
 
     <div class="mb-8">
       <h2 class="base-heading mb-4">Description</h2>
@@ -214,4 +221,5 @@ function downloadAudio(track: PlayableTrack) {
   </div>
 
   <LoginPromptModal :is-open="showLoginPrompt" message="Log in to leave a like" @close="showLoginPrompt = false" />
+  <BuyTrackModal :is-open="isBuyModalOpen" :tiers="track.tiers" :track-title="track.title" :track-id="track._id" @close="isBuyModalOpen = false" />
 </template>

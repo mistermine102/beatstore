@@ -88,6 +88,17 @@ const schema = new Schema({
       },
     },
   },
+  stripe: {
+    type: {
+      _id: false,
+      connectedAccountId: String,
+      isConnectedAccountLinked: Boolean,
+    },
+    default: {
+      connectedAccountId: null,
+      isConnectedAccountLinked: false,
+    },
+  },
   createdAt: {
     type: Date,
     default: Date.now,

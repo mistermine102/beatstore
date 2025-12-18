@@ -115,7 +115,7 @@ function sanitizeSearchText(text) {
 }
 
 export const uploadTrack = async (req, res) => {
-  const { type } = req.body
+  const { type, pricingType, sellThrough, tiers } = req.body
 
   if (type === 'drumkit') throw new AppError('Drumkits not available yet', 400)
 
@@ -154,10 +154,43 @@ export const uploadTrack = async (req, res) => {
     }
   }
 
-  //attach license
-  const license = await License.findById(req.body.licenseId)
-  if (!license) throw new AppError('LICENSE_NOT_FOUND', 404)
-  newTrack.license = license
+  //attach pricing info
+  newTrack.pricingType = pricingType
+
+  if (pricingType === 'paid') {
+    newTrack.sellThrough = sellThrough
+
+    if (sellThrough === 'platform') {
+      // Check if user has connected their Stripe account (business logic validation)
+      const user = await User.findById(req.userId)
+      if (!user.stripe?.isConnectedAccountLinked) {
+        throw new AppError('STRIPE_NOT_CONNECTED', 403)
+      }
+
+      // Check for duplicate license IDs (business logic validation)
+      const licenseIds = tiers.map(tier => tier.licenseId)
+      const uniqueLicenseIds = new Set(licenseIds)
+      if (uniqueLicenseIds.size !== licenseIds.length) {
+        throw new AppError('Duplicate license types are not allowed', 400)
+      }
+
+      // Validate licenses exist in database
+      for (const licenseId of licenseIds) {
+        const license = await License.findById(licenseId)
+        if (!license) {
+          throw new AppError(`License with id "${licenseId}" not found`, 400)
+        }
+      }
+
+      // Attach tiers to the new track
+      newTrack.tiers = tiers.map(tier => ({
+        price: Number(tier.price),
+        license: tier.licenseId,
+      }))
+    }
+  }
+
+  newTrack.freeDownloadPolicy = req.body.freeDownloadPolicy
 
   //save a track
   await newTrack.save()
@@ -314,10 +347,16 @@ export const getTracks = async (req, res) => {
   }
 
   //only populate username on author
-  const tracks = await Model.find(filter).sort({ createdAt: -1 }).skip(start).limit(amount).populate('author', 'username').populate({
-    path: 'comments.author', // Populate the author field in comments
-    select: 'username image', // Only select username and profilePic
-  })
+  const tracks = await Model.find(filter)
+    .sort({ createdAt: -1 })
+    .skip(start)
+    .limit(amount)
+    .populate('author', 'username')
+    .populate({
+      path: 'comments.author', // Populate the author field in comments
+      select: 'username image', // Only select username and profilePic
+    })
+
   const trackIds = tracks.map(el => el._id)
 
   //create an object where keys are trackIds and values are whether they're liked
@@ -356,6 +395,7 @@ export const getSingleTrack = async (req, res) => {
       path: 'comments.author', // Populate the author field in comments
       select: 'username image', // Only select username and profilePic
     })
+    .populate('tiers.license')
   if (!track) throw new AppError('TRACK_NOT_FOUND', 404)
 
   const formattedTrack = await formatTrackData(track)
@@ -503,6 +543,8 @@ export const getPopularTracks = async (req, res) => {
   const formattedTracks = await Promise.all(
     tracks.map(async popularTrack => {
       //when popualting _id field, _id becomes track
+      console.log('POPULAR TRACK: ', popularTrack)
+
       const formattedTrack = await formatTrackData(popularTrack.track)
 
       return {

@@ -6,8 +6,10 @@ import ejs from 'ejs'
 
 const NOREPLY_EMAIL = 'noreply@wavsmarket.com'
 const ADMIN_ADDRESSES = ['szymonjarosz102@gmail.com']
+const NOTIFICATION_EMAILS_ENABLED = process.env.NOTIFICATION_EMAILS_ENABLED === 'true'
 
 export const sendNotificationEmail = async (user, notificationType, data) => {
+  if (!NOTIFICATION_EMAILS_ENABLED) return
   if (!user.notificationRules[notificationType].email) return
 
   switch (notificationType) {
@@ -25,7 +27,7 @@ export const sendNotificationEmail = async (user, notificationType, data) => {
 
 export const sendVerifyEmail = async email => {
   //generate url with token
-  const baseUrl = process.env.FRONTEND_URL
+  const baseUrl = process.env.API_URL
   const token = jwt.sign({ email }, process.env.JWT_EMAIL_SECRET, { expiresIn: 3600 })
   const link = `${baseUrl}/api/auth/verify/${token}`
 
@@ -53,6 +55,8 @@ export const sendResetPasswordEmail = async (email, resetLink) => {
 }
 
 export const sendTrackPendingEmail = async () => {
+  if (!NOTIFICATION_EMAILS_ENABLED) return
+
   await transporter.sendMail({
     from: NOREPLY_EMAIL,
     to: ADMIN_ADDRESSES,
@@ -62,6 +66,8 @@ export const sendTrackPendingEmail = async () => {
 }
 
 export const sendTrackVerifiedEmail = async (email, track) => {
+  if (!NOTIFICATION_EMAILS_ENABLED) return
+
   const viewUploadLink = `${process.env.FRONTEND_URL}/track/${track._id}`
 
   const template = await ejs.renderFile(path.join(__dirname, '../templates/trackVerifiedEmail.ejs'), { viewUploadLink, uploadTitle: track.title })
@@ -75,6 +81,8 @@ export const sendTrackVerifiedEmail = async (email, track) => {
 }
 
 export const sendTrackLikedEmail = async (email, track) => {
+  if (!NOTIFICATION_EMAILS_ENABLED) return
+
   const viewUploadLink = `${process.env.FRONTEND_URL}/track/${track._id}`
 
   const template = await ejs.renderFile(path.join(__dirname, '../templates/trackLikedEmail.ejs'), { viewUploadLink, uploadTitle: track.title })
@@ -88,6 +96,8 @@ export const sendTrackLikedEmail = async (email, track) => {
 }
 
 export const sendTrackCommentedEmail = async (email, track) => {
+  if (!NOTIFICATION_EMAILS_ENABLED) return
+
   const viewUploadLink = `${process.env.FRONTEND_URL}/track/${track._id}`
   const template = await ejs.renderFile(path.join(__dirname, '../templates/trackCommentedEmail.ejs'), { viewUploadLink, uploadTitle: track.title })
 

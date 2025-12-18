@@ -11,6 +11,11 @@ import { KEYS, GENRES, INSTRUMENTS, MOODS, GENERIC_ERROR_TOAST } from '../consta
 import BaseSelect from '../components/base/BaseSelect.vue'
 import BaseCheckboxSelect from '../components/base/BaseCheckboxSelect.vue'
 
+interface Tier {
+  licenseId: string
+  price: string
+}
+
 interface NewTrack {
   title: string
   type: TrackType
@@ -22,7 +27,9 @@ interface NewTrack {
   mood?: string
   instruments?: string[]
   audio?: File | null
-  licenseId: string | null
+  pricingType?: 'free' | 'paid'
+  sellThrough?: 'platform' | 'external'
+  freeDownloadPolicy: 'unavailable' | 'direct'
 }
 
 interface NewBeat extends NewTrack {
@@ -73,7 +80,7 @@ const NEW_BEAT_SCHEMA: NewBeat = {
   genre: '',
   image: null,
   audio: null,
-  licenseId: null,
+  freeDownloadPolicy: 'unavailable',
 }
 
 const NEW_SAMPLE_SCHEMA: NewSample = {
@@ -86,7 +93,7 @@ const NEW_SAMPLE_SCHEMA: NewSample = {
   instruments: [],
   image: null,
   audio: null,
-  licenseId: null,
+  freeDownloadPolicy: 'unavailable',
 }
 
 const NEW_DRUMKIT_SCHEMA: NewDrumkit = {
@@ -94,7 +101,7 @@ const NEW_DRUMKIT_SCHEMA: NewDrumkit = {
   type: 'drumkit',
   description: '',
   image: null,
-  licenseId: null,
+  freeDownloadPolicy: 'unavailable',
 }
 
 const NEW_LOOP_SCHEMA: NewLoop = {
@@ -107,7 +114,7 @@ const NEW_LOOP_SCHEMA: NewLoop = {
   instruments: [],
   image: null,
   audio: null,
-  licenseId: null,
+  freeDownloadPolicy: 'unavailable',
 }
 
 //schemas keys are the values of TrackType so we can use dynamic
@@ -157,11 +164,6 @@ function validate() {
     }
   }
 
-  if (!newTrack.value.licenseId) {
-    toastStore.show({ type, title, message: 'Terms are required' })
-    return false
-  }
-
   if (newTrack.value.title.length < 4) {
     toastStore.show({ type, title, message: 'Title must be at least 4 characters long' })
     return false
@@ -182,6 +184,34 @@ function validate() {
     return false
   }
 
+  if (!newTrack.value.pricingType) {
+    toastStore.show({ type, title, message: 'Pricing type (Free/Paid) is required' })
+    return false
+  }
+
+  if (newTrack.value.pricingType === 'paid') {
+    if (!newTrack.value.sellThrough) {
+      toastStore.show({ type, title, message: 'Please select how you want to sell' })
+      return false
+    }
+
+    if (newTrack.value.sellThrough === 'platform') {
+      if (tiers.value.length === 0) {
+        toastStore.show({ type, title, message: 'Select at least one license tier' })
+        return false
+      }
+
+      for (const tier of tiers.value) {
+        const price = parseFloat(tier.price)
+        if (!tier.price || isNaN(price) || price <= 0) {
+          const licenseTitle = licenses.value.find(l => l._id === tier.licenseId)?.title || 'tier'
+          toastStore.show({ type, title, message: `Enter a valid price for ${licenseTitle}` })
+          return false
+        }
+      }
+    }
+  }
+
   return true
 }
 
@@ -191,11 +221,21 @@ function uploadTrack(e: Event) {
 
   wrapUploadTrack.run(
     async () => {
-      //set image field to null so backend doesn't complain it got an unexpected field (issue only with file fields)
-      const response = await appApi.postForm<{ trackId: string }>('/tracks', {
+      const trackData: Record<string, unknown> = {
         ...newTrack.value,
         image: null,
-      })
+      }
+
+      // Add tiers with prices converted to cents for platform purchases
+      if (trackData.pricingType === 'paid' && trackData.sellThrough === 'platform') {
+        trackData.tiers = tiers.value.map(t => ({
+          licenseId: t.licenseId,
+          price: Math.round(parseFloat(t.price) * 100),
+        }))
+      }
+
+      //set image field to null so backend doesn't complain it got an unexpected field (issue only with file fields)
+      const response = await appApi.postForm<{ trackId: string }>('/tracks', trackData)
 
       if (newTrack.value.image) {
         await appApi.postForm(`tracks/${response.data.trackId}/image`, {
@@ -207,8 +247,23 @@ function uploadTrack(e: Event) {
       router.push('/')
     },
     err => {
-      if (err.response.data.message === 'TITLE_NOT_AVAILABLE')
+      if (err.response?.data?.message === 'TITLE_NOT_AVAILABLE') {
         return toastStore.show({ type: 'error', title: "Can't upload", message: 'Title not available' })
+      }
+
+      if (err.response?.data?.message === 'STRIPE_NOT_CONNECTED') {
+        toastStore.show({
+          type: 'error',
+          title: 'Stripe account required',
+          message: 'Please connect your Stripe account to sell through the platform',
+        })
+        // Navigate to billing page after a short delay
+        setTimeout(() => {
+          router.push('/billing')
+        }, 2000)
+        return
+      }
+
       return toastStore.show(GENERIC_ERROR_TOAST)
     }
   )
@@ -227,6 +282,26 @@ function getLicenses() {
 }
 
 getLicenses()
+
+// Tiers for pricing
+const tiers = ref<Tier[]>([])
+
+function isTierSelected(licenseId: string): boolean {
+  return tiers.value.some(t => t.licenseId === licenseId)
+}
+
+function getTier(licenseId: string): Tier | undefined {
+  return tiers.value.find(t => t.licenseId === licenseId)
+}
+
+function toggleTier(licenseId: string) {
+  const index = tiers.value.findIndex(t => t.licenseId === licenseId)
+  if (index === -1) {
+    tiers.value.push({ licenseId, price: '' })
+  } else {
+    tiers.value.splice(index, 1)
+  }
+}
 </script>
 
 <template>
@@ -284,20 +359,6 @@ getLicenses()
               <ImageIcon :size="48" />
             </template>
           </UploadFileContainer>
-        </div>
-
-        <div class="panel col-span-3">
-          <h2 class="text-2xl mb-6">Terms</h2>
-          <BaseSelect
-            v-model="newTrack.licenseId"
-            :options="licenses.map(l => ({ value: l._id, label: l.title }))"
-            class="[&>.popover-button]:bg-background"
-            placeholder="Select terms"
-          />
-          <div v-if="newTrack.licenseId !== null">
-            <p class="text-lg mt-4">{{ licenses.find(l => l._id === newTrack.licenseId)?.shortDescription }}</p>
-            <p class="mt-2 text-textLightGrey">{{ licenses.find(l => l._id === newTrack.licenseId)?.longDescription }}</p>
-          </div>
         </div>
 
         <!-- Basic Information Panel -->
@@ -358,6 +419,98 @@ getLicenses()
             placeholder="Describe your upload (max 500 characters)"
             maxlength="500"
           ></textarea>
+        </div>
+
+        <!-- Pricing Panel -->
+        <div class="panel col-span-3">
+          <h2 class="text-2xl mb-6">Pricing</h2>
+
+          <!-- Free/Paid Selection -->
+          <div class="mb-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <BaseButton
+                type="button"
+                @click="newTrack.pricingType = 'free'"
+                :alt="newTrack.pricingType !== 'free'"
+                :class="['h-24 w-full', newTrack.pricingType === 'free' ? 'hover:bg-primary' : '']"
+              >
+                <span class="text-lg">Free</span>
+              </BaseButton>
+              <BaseButton
+                type="button"
+                @click="newTrack.pricingType = 'paid'"
+                :alt="newTrack.pricingType !== 'paid'"
+                :class="['h-24 w-full', newTrack.pricingType === 'paid' ? 'hover:bg-primary' : '']"
+              >
+                <span class="text-lg">Paid</span>
+              </BaseButton>
+            </div>
+          </div>
+
+          <!-- How to Sell Selection (Only show if Paid) -->
+          <div v-if="newTrack.pricingType === 'paid'" class="mb-8">
+            <p class="text-lg mb-4">How do you want to sell?</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <BaseButton
+                type="button"
+                @click="newTrack.sellThrough = 'platform'"
+                :alt="newTrack.sellThrough !== 'platform'"
+                :class="['h-24 w-full', newTrack.sellThrough === 'platform' ? 'hover:bg-primary' : '']"
+              >
+                <span class="text-lg">Through WavsMarket</span>
+              </BaseButton>
+              <BaseButton
+                type="button"
+                @click="newTrack.sellThrough = 'external'"
+                :alt="newTrack.sellThrough !== 'external'"
+                :class="['h-24 w-full', newTrack.sellThrough === 'external' ? 'hover:bg-primary' : '']"
+              >
+                <span class="text-lg">Outside the platform</span>
+              </BaseButton>
+            </div>
+          </div>
+
+          <!-- License Tiers (Only show if Through Platform) -->
+          <div v-if="newTrack.pricingType === 'paid' && newTrack.sellThrough === 'platform'">
+            <p class="text-lg mb-4">Select license tiers and set prices</p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div
+                v-for="license in licenses"
+                :key="license._id"
+                @click="toggleTier(license._id)"
+                :class="[
+                  'p-4 rounded-regular cursor-pointer transition-all border',
+                  isTierSelected(license._id) ? 'bg-primary/10 border-primary' : 'bg-darkGrey border-white/[0.1] hover:border-white/[0.3]',
+                ]"
+              >
+                <p class="text-lg font-medium mb-2">{{ license.title }}</p>
+                <input
+                  :value="getTier(license._id)?.price || ''"
+                  @input="e => { const t = getTier(license._id); if (t) t.price = (e.target as HTMLInputElement).value }"
+                  type="number"
+                  step="0.01"
+                  min="0.01"
+                  placeholder="Price in USD"
+                  :disabled="!isTierSelected(license._id)"
+                  :class="['base-input bg-background w-full', !isTierSelected(license._id) && 'opacity-50 cursor-not-allowed']"
+                  @click.stop
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Free Download Option (Only show if Free) -->
+          <div v-if="newTrack.pricingType === 'paid'" class="my-8">
+            <label class="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                :checked="newTrack.freeDownloadPolicy === 'direct'"
+                @change="newTrack.freeDownloadPolicy = ($event.target as HTMLInputElement).checked ? 'direct' : 'unavailable'"
+                class="w-5 h-5 rounded border-white/[0.1] bg-background text-primary focus:ring-2 focus:ring-primary cursor-pointer"
+              />
+              <span class="text-lg">Allow free download</span>
+            </label>
+          </div>
         </div>
       </div>
       <BaseButton type="submit" :is-loading="wrapUploadTrack.isLoading" class="mt-8 w-full sm:w-1/2 mx-auto">
