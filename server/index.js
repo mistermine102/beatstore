@@ -20,6 +20,14 @@ import { globalLimiter } from './limiters.js'
 
 import { verifyToken } from './middleware/auth.js'
 
+const allowedOrigins = [
+  'https://www.wavsmarket.com',    // Prod
+  'https://wavsmarket.com',        // Prod (no www)
+  'https://test.wavsmarket.com',   // Test Environment
+  'http://localhost:5173',         // Local Vue/Vite
+  'http://localhost:3000'          // Local Node (just in case)
+];
+
 const app = express()
 
 // Webhook route with raw body BEFORE json middleware
@@ -27,7 +35,21 @@ app.use('/api/payments/stripe-events', express.raw({ type: 'application/json' })
 
 app.use(express.json())
 app.use(cookieParser())
-app.use(cors({ credentials: true, origin: process.env.FRONTEND_URL }))
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // allow requests with no origin (like mobile apps, curl, or Postman)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  credentials: true,
+}));
+
 app.use(helmet())
 app.set('trust proxy', 1)
 app.use(globalLimiter)
