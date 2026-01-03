@@ -3,8 +3,6 @@ import AppError from '../classes/AppError.js'
 import User from '../models/User.js'
 
 export const verifyToken = async (req, res, next) => {
-  console.log('VerifyToken Middleware is RUNNING for path:', req.path);
-
   // Skip token verification for refresh endpoint
   if (req.path === '/auth/refresh') {
     return next()

@@ -87,7 +87,7 @@ app.use(async (req, res, next) => {
   next()
 })
 
-// app.use(verifyToken)
+app.use(verifyToken)
 
 //routes
 app.use('/api/auth', authRoutes)
