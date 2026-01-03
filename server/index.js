@@ -20,36 +20,34 @@ import { globalLimiter } from './limiters.js'
 
 import { verifyToken } from './middleware/auth.js'
 
+
 const allowedOrigins = [
-  'https://www.wavsmarket.com',    // Prod
-  'https://wavsmarket.com',        // Prod (no www)
-  'https://test.wavsmarket.com',   // Test Environment
-  'http://localhost:5173',         // Local Vue/Vite
-  'http://localhost:3000'          // Local Node (just in case)
+  'https://www.wavsmarket.com',
+  'https://wavsmarket.com',
+  'https://test.wavsmarket.com',
+  'http://localhost:5173',
+  'http://localhost:3000'
 ];
 
-const app = express()
-
-// Webhook route with raw body BEFORE json middleware
-app.use('/api/payments/stripe-events', express.raw({ type: 'application/json' }))
-
-app.use(express.json())
-app.use(cookieParser())
-
-app.use(cors({
+const corsOptions = {
   origin: function (origin, callback) {
-    // allow requests with no origin (like mobile apps, curl, or Postman)
     if (!origin) return callback(null, true);
-    
     if (allowedOrigins.indexOf(origin) === -1) {
       const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
       return callback(new Error(msg), false);
     }
     return callback(null, true);
   },
-  credentials: true,
-}));
+  credentials: true
+};
 
+const app = express()
+
+app.use('/api/payments/stripe-events', express.raw({ type: 'application/json' }))
+
+app.use(express.json())
+app.use(cookieParser())
+app.use(cors(corsOptions));
 app.use(helmet())
 app.set('trust proxy', 1)
 app.use(globalLimiter)
@@ -89,7 +87,7 @@ app.use(async (req, res, next) => {
   next()
 })
 
-app.use(verifyToken)
+// app.use(verifyToken)
 
 //routes
 app.use('/api/auth', authRoutes)
