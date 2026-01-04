@@ -24,17 +24,6 @@ const formatIndex = (i: number) => {
   return (i + 1).toString().padStart(2, '0')
 }
 
-// Helper to get display price from tiers
-const getDisplayPrice = (track: PopularTrack) => {
-  if (track.pricingType === 'free') return 'Free'
-  
-  if (track.tiers && track.tiers.length > 0) {
-    const minPrice = Math.min(...track.tiers.map(t => t.price))
-    return `$${minPrice.toFixed(2)}`
-  }
-  
-  return 'N/A'
-}
 
 // Helper to construct "tags" from available metadata
 const getTrackTags = (track: PopularTrack) => {

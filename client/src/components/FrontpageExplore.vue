@@ -1,10 +1,7 @@
 <script setup lang="ts">
-import BaseButton from './base/BaseButton.vue'
 import useFeaturedProfiles from '../composables/useFeaturedProfiles'
-import { useRouter } from 'vue-router'
 import ClickableTrackImage from './ClickableTrackImage.vue'
 
-const router = useRouter()
 const { featuredProfiles, isLoadingFeaturedProfiles, getFeaturedProfiles } = useFeaturedProfiles()
 
 getFeaturedProfiles()
@@ -35,7 +32,7 @@ const formatPrice = (price?: number) => {
       <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         
         <div 
-          v-for="(featured, index) in featuredProfiles" 
+          v-for="(featured) in featuredProfiles" 
           :key="featured.track._id" 
           class="group relative bg-grey border border-midGrey rounded-xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-darkPrimary hover:shadow-xl flex flex-col"
         >
