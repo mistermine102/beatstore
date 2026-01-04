@@ -1,86 +1,124 @@
 <script setup lang="ts">
-import { onMounted, ref, useTemplateRef } from 'vue'
-import { PlayIcon, ChevronLeftIcon, ChevronRightIcon } from '../components/icons/index.vine'
+import { ref } from 'vue'
 import ClickableTrackImage from './ClickableTrackImage.vue'
 import appApi from '../api/appApi'
-import type { Swiper, SwiperOptions } from 'swiper/types'
-import BaseButton from './base/BaseButton.vue'
 
 const popularTracks = ref<PopularTrack[]>([])
-
-const swiperOptions: SwiperOptions = {
-  breakpoints: {
-    640: {
-      slidesPerView: 3,
-      spaceBetween: 32
-    },
-    1280: {
-      slidesPerView: 4,
-    },
-  },
-}
-
-const swiperRef = useTemplateRef('tracks-swiper')
-
-function handleSwiperNavigation(direction: 'prev' | 'next') {
-  if (!swiperRef.value) return
-  const swiper = (swiperRef.value as any).swiper as Swiper
-  direction === 'prev' ? swiper.slidePrev() : swiper.slideNext()
-}
-
-const hasPrevSlide = ref(false)
-const hasNextSlide = ref(true)
+const isLoading = ref(true)
 
 async function getPopularTracks() {
-  const response = await appApi.get('/tracks/popular')
-  popularTracks.value = response.data.tracks
+  try {
+    isLoading.value = true
+    const response = await appApi.get('/tracks/popular')
+    // Slice to get only top 5 for the list view
+    popularTracks.value = response.data.tracks.slice(0, 5)
+  } catch (e) {
+    console.error(e)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+// Helper to pad index (0 -> 01, 1 -> 02)
+const formatIndex = (i: number) => {
+  return (i + 1).toString().padStart(2, '0')
+}
+
+// Helper to get display price from tiers
+const getDisplayPrice = (track: PopularTrack) => {
+  if (track.pricingType === 'free') return 'Free'
+  
+  if (track.tiers && track.tiers.length > 0) {
+    const minPrice = Math.min(...track.tiers.map(t => t.price))
+    return `$${minPrice.toFixed(2)}`
+  }
+  
+  return 'N/A'
+}
+
+// Helper to construct "tags" from available metadata
+const getTrackTags = (track: PopularTrack) => {
+  const tags: string[] = []
+  
+  // Add Genre
+  if (track.genre) tags.push(track.genre)
+  
+  // Add Mood
+  if (track.mood) tags.push(track.mood)
+  
+  // Fallback or extra info if we don't have enough tags
+  if (tags.length < 2 && track.type) {
+    // Capitalize type (beat -> Beat)
+    tags.push(track.type.charAt(0).toUpperCase() + track.type.slice(1))
+  }
+
+  // Slice to max 2 tags for display
+  return tags.slice(0, 2)
 }
 
 getPopularTracks()
-
-onMounted(() => {
-  const swiper = (swiperRef.value as any).swiper as Swiper
-
-  swiper.on('slideChange', s => {
-    hasNextSlide.value = !s.isEnd
-    hasPrevSlide.value = !s.isBeginning
-  })
-})
 </script>
 
 <template>
-  <div class="mt-12 sm:mt-48">
-    <h2 class="text-[40px] mb-8 font-secondary">Popular right now</h2>
-    <div class="relative px-12 sm:px-16">
-      <swiper-container ref="tracks-swiper" :slides-per-view="2" :space-between="16" :breakpoints="swiperOptions.breakpoints">
-        <swiper-slide v-for="track in popularTracks" :key="track._id" class="w-[150px] md:w-[200px]">
-          <div>
-            <ClickableTrackImage :track="track" class="w-full h-[150px] md:h-[200px]" />
-            <div class="flex justify-between items-center mt-2">
-              <div class="max-w-24 sm:max-w-40 truncate flex flex-col">
-                <router-link :to="`/track/${track._id}`" class="text-xl">
-                  {{ track.title }}
-                </router-link>
-                <router-link :to="`profile/${track.author._id}`" class="text-textLightGrey">
-                  {{ track.author.username }}
-                </router-link>
-              </div>
-              <div class="flex gap-x-2 items-center">
-                <PlayIcon class="text-iconLightGrey" :size="20" />
-                <p class="text-sm">{{ track.totalStreams }}</p>
-              </div>
-            </div>
+  <section class="py-20 w-full border-b border-midGrey">
+    <div class="max-w-[1300px] mx-auto px-6 md:px-8">
+      
+      <!-- Section Header -->
+      <div class="mb-10">
+        <h2 class="font-secondary text-5xl mb-2 text-white tracking-wide">TRENDING NOW</h2>
+        <p class="text-textLightGrey text-xl">Top 5 beats this week.</p>
+      </div>
+
+      <!-- Loading State -->
+      <div v-if="isLoading" class="flex justify-center items-center h-[300px]">
+        <div class="loader"></div>
+      </div>
+
+      <!-- Vertical List -->
+      <div v-else class="flex flex-col gap-4">
+        
+        <div 
+          v-for="(track, index) in popularTracks" 
+          :key="track._id"
+          class="group flex items-center p-3 sm:p-4 rounded-xl border border-transparent hover:bg-grey hover:border-midGrey transition-all duration-200 cursor-default"
+        >
+          
+          <!-- 1. Index (01, 02...) -->
+          <div class="font-secondary text-3xl text-midGrey w-12 sm:w-16 text-center group-hover:text-primary transition-colors duration-200">
+            {{ formatIndex(index) }}
           </div>
-        </swiper-slide>
-      </swiper-container>
-      <div class="absolute inset-0 z-[5] pointer-events-none flex items-center justify-between">
-        <BaseButton @click="handleSwiperNavigation('prev')" :disabled="!hasPrevSlide" alt class="pointer-events-auto !px-1">
-          <ChevronLeftIcon :size="32" class="text-white" />
-        </BaseButton>
-        <BaseButton @click="handleSwiperNavigation('next')" :disabled="!hasNextSlide" alt class="pointer-events-auto !px-1">
-          <ChevronRightIcon :size="32" class="text-white" />
-        </BaseButton>
+
+          <!-- 2. Thumbnail (Playable) -->
+          <div class="w-[80px] h-[80px] rounded-lg overflow-hidden mx-4 sm:mx-6 flex-shrink-0 bg-black">
+            <ClickableTrackImage :track="track" class="w-full h-full object-cover" />
+          </div>
+
+          <!-- 3. Track Details -->
+          <div class="flex-1 min-w-0 mr-4">
+            <router-link :to="`/track/${track._id}`" class="block">
+              <h3 class="font-semibold text-white text-xl truncate hover:text-primary transition-colors">
+                {{ track.title }}
+              </h3>
+            </router-link>
+            <router-link :to="`/profile/${track.author._id}`" class="block">
+              <span class="text-textLightGrey hover:text-white transition-colors">
+                Prod. {{ track.author.username }}
+              </span>
+            </router-link>
+          </div>
+
+          <!-- 4. Tags (Constructed from metadata, Hidden on Mobile) -->
+          <div class="hidden md:flex gap-3 mr-8">
+            <span 
+              v-for="tag in getTrackTags(track)" 
+              :key="tag" 
+              class=" bg-[#222] text-[#888] px-3 py-1 rounded-md"
+            >
+              {{ tag }}
+            </span>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
+  </section>
 </template>

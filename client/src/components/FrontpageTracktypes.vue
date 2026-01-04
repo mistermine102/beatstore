@@ -1,70 +1,109 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { SearchIcon } from './icons/index.vine'
-import { GENRES, KEYS, INSTRUMENTS, MOODS } from '../constants'
-import BaseButton from './base/BaseButton.vue'
 
 const router = useRouter()
 
-function navigateToBrowse(paramName: string, paramValue: string) {
-  router.push({
-    path: '/tracks/browse',
-    query: {
-      [paramName]: paramValue,
-    },
-  })
+/* 
+  TODO: ARTIST & VIBE CURATION NEEDED
+  
+  We need to define 4 distinct "Artist Archetypes" to represent specific Vibe combinations (Genre + Mood).
+  
+  Current Idea Candidates:
+  1. "The Emo Rapper" (e.g., Juice WRLD) -> Vibe: Sad Trap / Melodic
+  2. "The Drill Sergeant" (e.g., Pop Smoke/Central Cee) -> Vibe: Aggressive Drill / Dark
+  3. "The Night Cruiser" (e.g., The Weeknd) -> Vibe: Synthwave / Atmospheric
+  4. "The Soul Sampler" (e.g., J Dilla/Griselda) -> Vibe: Boom Bap / Gritty
+  
+  Action: Find high-quality stock photos representing these artist personas.
+*/
+
+const vibes = [
+  {
+    id: 1,
+    title: 'SAD TRAP',
+    subtitle: 'Melodic 808s & Emo Rap',
+    image: 'https://placehold.co/400x600/111/444?text=Emo+Rapper', // Placeholder
+    query: { genre: 'Trap', mood: 'Sad' }
+  },
+  {
+    id: 2,
+    title: 'UK DRILL',
+    subtitle: 'Sliding Bass & Dark Melodies',
+    image: 'https://placehold.co/400x600/111/444?text=Drill+Artist', // Placeholder
+    query: { genre: 'Drill', mood: 'Dark' }
+  },
+  {
+    id: 3,
+    title: 'LATE NIGHT',
+    subtitle: 'Synthwave & R&B Chords',
+    image: 'https://placehold.co/400x600/111/444?text=R%26B+Singer', // Placeholder
+    query: { genre: 'RnB', mood: 'Atmospheric' }
+  },
+  {
+    id: 4,
+    title: 'BOOM BAP',
+    subtitle: 'Soul Samples & Gritty Drums',
+    image: 'https://placehold.co/400x600/111/444?text=LoFi+Producer', // Placeholder
+    query: { genre: 'HipHop', mood: 'Chill' }
+  }
+]
+
+const handleVibeClick = (query: any) => {
+  router.push({ path: '/tracks/browse', query })
 }
 </script>
 
 <template>
-  <div class="mt-48">
-    <h2 class="text-[40px] mb-8 font-secondary">Find what you need</h2>
+  <section class="py-20 w-full">
+    <div class="max-w-[1300px] mx-auto px-6 md:px-8">
+      
+      <!-- Section Header -->
+      <div class="mb-10">
+        <h2 class="font-secondary text-5xl mb-2 text-white tracking-wide">SELECT YOUR VIBE</h2>
+        <p class="text-textLightGrey text-xl">Find the sound that matches your energy.</p>
+      </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-      <div>
-        <h3 class="text-2xl mb-4 font-semibold">Genres</h3>
-        <div class="flex flex-wrap gap-3">
-          <BaseButton @click="navigateToBrowse('genre', genre)" v-for="genre in GENRES.slice(0, 12)" :key="genre" alt>
-            <div class="flex gap-x-2 items-center">
-              <span>{{ genre }}</span>
-              <SearchIcon :size="16" />
+      <!-- Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div 
+          v-for="vibe in vibes" 
+          :key="vibe.id"
+          @click="handleVibeClick(vibe.query)"
+          class="group relative h-[450px] rounded-xl overflow-hidden border border-midGrey cursor-pointer transition-all duration-300 hover:border-primary hover:shadow-glow hover:-translate-y-2 bg-black"
+        >
+          
+          <!-- Background Image -->
+          <img 
+            :src="vibe.image" 
+            :alt="vibe.title" 
+            class="absolute inset-0 w-full h-full object-cover transition-all duration-700 grayscale brightness-75 group-hover:grayscale-0 group-hover:brightness-100 group-hover:scale-110"
+          />
+
+          <!-- Gradient Overlay -->
+          <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-80"></div>
+
+          <!-- Content (Bottom) -->
+          <div class="absolute bottom-0 left-0 w-full z-10 translate-y-2 transition-transform duration-300 group-hover:translate-y-0 p-4">
+            <h3 class="font-black italic text-3xl text-white uppercase leading-none mb-2 tracking-tighter">
+              {{ vibe.title }}
+            </h3>
+            <div class="flex items-center gap-2">
+              <p class="text-primary font-semibold tracking-wide uppercase">
+                {{ vibe.subtitle }}
+              </p>
             </div>
-          </BaseButton>
+          </div>
+
         </div>
       </div>
-      <div>
-        <h3 class="text-2xl mb-4 font-semibold">Keys</h3>
-        <div class="flex flex-wrap gap-3">
-          <BaseButton @click="navigateToBrowse('key', key)" v-for="key in KEYS.slice(0, 12)" :key="key" alt>
-            <div class="flex gap-x-2 items-center">
-              <span>{{ key }}</span>
-              <SearchIcon :size="16" />
-            </div>
-          </BaseButton>
-        </div>
-      </div>
-      <div>
-        <h3 class="text-2xl mb-4 font-semibold">Instruments</h3>
-        <div class="flex flex-wrap gap-3">
-          <BaseButton @click="navigateToBrowse('instruments', instrument)" v-for="instrument in INSTRUMENTS.slice(0, 12)" :key="instrument" alt>
-            <div class="flex gap-x-2 items-center">
-              <span>{{ instrument }}</span>
-              <SearchIcon :size="16" />
-            </div>
-          </BaseButton>
-        </div>
-      </div>
-      <div>
-        <h3 class="text-2xl mb-4 font-semibold">Moods</h3>
-        <div class="flex flex-wrap gap-3">
-          <BaseButton @click="navigateToBrowse('mood', mood)" v-for="mood in MOODS.slice(0, 12)" :key="mood" alt>
-            <div class="flex gap-x-2 items-center">
-              <span>{{ mood }}</span>
-              <SearchIcon :size="16" />
-            </div>
-          </BaseButton>
-        </div>
-      </div>
+
     </div>
-  </div>
+  </section>
 </template>
+
+<style scoped>
+/* Custom utility for the specific shadow glow on hover */
+.hover\:shadow-glow:hover {
+  box-shadow: 0 10px 30px -10px rgba(247, 101, 184, 0.3);
+}
+</style>

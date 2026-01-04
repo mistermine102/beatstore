@@ -5,30 +5,81 @@ import { useRouter } from 'vue-router'
 import ClickableTrackImage from './ClickableTrackImage.vue'
 
 const router = useRouter()
-
 const { featuredProfiles, isLoadingFeaturedProfiles, getFeaturedProfiles } = useFeaturedProfiles()
+
 getFeaturedProfiles()
+
+const formatPrice = (price?: number) => {
+  return price ? `$${price.toFixed(2)}` : '$29.99'
+}
 </script>
 
 <template>
-  <div class="mt-48">
-    <h2 class="text-[40px] mb-4 font-secondary">Explore</h2>
-    <div class="bg-darkGrey w-full shadow-xl p-8 xl:h-[500px]">
-      <div v-if="isLoadingFeaturedProfiles" class="flex justify-center items-center h-full w-full">
-        <div class="loader"></div>
-      </div>
-      <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-y-16 gap-x-8 md:gap-x-16 h-full">
-        <div v-for="featured in featuredProfiles" class="flex flex-col h-full">
-          <ClickableTrackImage :track="featured.track" class="w-full h-[200px] xl:h-[75%]" />
-          <div class="flex flex-col xl:flex-row justify-between gap-x-2 xl:items-center mt-2 xl:h-[25%]">
-            <div class="overflow-hidden flex flex-col">
-              <router-link :to="`/track/${featured.track._id}`" class="text-2xl truncate">{{ featured.track.title }}</router-link>
-              <router-link :to="`/profile/${featured.profile._id}`" class="text-textLightGrey truncate">{{ featured.profile.username }}</router-link>
-            </div>
-            <BaseButton @click="router.push(`/profile/${featured.profile._id}`)" class="mt-4 xl:mt-0 w-full xl:w-auto">See more</BaseButton>
-          </div>
+  <section class="py-20 border-b border-midGrey w-full">
+    <div class="max-w-[1300px] mx-auto px-6 md:px-8">
+      
+      <!-- Section Header -->
+      <div class="flex flex-col md:flex-row justify-between items-end mb-10 gap-4">
+        <div>
+          <h2 class="font-secondary text-5xl mb-2 text-white">AMPLIFIED</h2>
+          <p class="text-textLightGrey text-xl">Promoted beats and featured releases.</p>
         </div>
       </div>
+
+      <!-- Loading State -->
+      <div v-if="isLoadingFeaturedProfiles" class="flex justify-center items-center h-[400px] w-full">
+        <div class="loader"></div>
+      </div>
+
+      <!-- Content Grid -->
+      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        
+        <div 
+          v-for="(featured, index) in featuredProfiles" 
+          :key="featured.track._id" 
+          class="group relative bg-grey border border-midGrey rounded-xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-darkPrimary hover:shadow-xl flex flex-col"
+        >
+          
+          <!-- Badge -->
+          <div class="absolute top-3 left-3 bg-primary text-background font-bold text-xs px-2 py-1 rounded z-20 pointer-events-none shadow-md">
+            FEATURED
+          </div>
+
+          <!-- Image Area using ClickableTrackImage -->
+          <div class="w-full aspect-square">
+            <ClickableTrackImage 
+              :track="featured.track" 
+              class="w-full h-full !rounded-none" 
+            />
+          </div>
+
+          <!-- Card Content -->
+          <div class="p-5 flex flex-col flex-grow">
+            <router-link :to="`/track/${featured.track._id}`" class="block group/text">
+              <div class="font-secondary text-[24px] text-white mb-1 truncate group-hover/text:text-primary transition-colors">
+                {{ featured.track.title }}
+              </div>
+            </router-link>
+            
+            <router-link :to="`/profile/${featured.profile._id}`" class="block group/author">
+              <div class="text-textLightGrey mb-4 group-hover/author:text-white transition-colors">
+                Prod. {{ featured.profile.username }}
+              </div>
+            </router-link>
+            <div class="mt-auto flex justify-between items-center border-t border-midGrey pt-4">
+              <span class="font-mono bg-[#222] text-[#888] px-2 py-1 rounded border border-[#333]">
+                {{ featured.track.bpm || 'N/A' }} BPM
+              </span>
+              <div class="text-primary font-bold text-xl tracking-wider">
+                <!-- TODO: Add a "loweset price" field on backend and put it here -->
+                {{ formatPrice(29.99) }}
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
     </div>
-  </div>
+  </section>
 </template>

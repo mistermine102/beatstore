@@ -12,6 +12,7 @@ import BaseSelect from '../components/base/BaseSelect.vue'
 import { TRACK_TYPES } from '../constants'
 import useToggleLike from '../composables/useToggleLike'
 import LoginPromptModal from '../components/LoginPromptModal.vue'
+import ScreenWrapper from '../components/common/ScreenWrapper.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -118,29 +119,31 @@ const options = [
 
 <template>
   <LoginPromptModal :is-open="showLoginPrompt" message="Log in to leave a like" @close="showLoginPrompt = false" />
-  <div>
-    <div class="flex flex-col gap-y-4 sm:flex-row sm:gap-x-8 mb-4">
-      <BaseSelect v-model="trackType" :options="options" class="w-full sm:w-48" />
-      <BaseSearchbar
-        @search="phrase => (searchPhrase = phrase)"
-        v-model="searchPhrase"
-        :show-icon="true"
-        :show-button="false"
-        placeholder="Search"
-        class="flex-1"
+  <ScreenWrapper>
+    <div class="">
+      <div class="flex flex-col gap-y-4 sm:flex-row sm:gap-x-8 mb-4">
+        <BaseSelect v-model="trackType" :options="options" class="w-full sm:w-48" />
+        <BaseSearchbar
+          @search="phrase => (searchPhrase = phrase)"
+          v-model="searchPhrase"
+          :show-icon="true"
+          :show-button="false"
+          placeholder="Search"
+          class="flex-1"
+        />
+      </div>
+      <FiltersPanel :filters="currentFilters" />
+      <div class="min-h-8 mb-4">
+        <CurrentFilters :filters="currentFilters" @remove-filter="removeFilter" />
+      </div>
+      <TracksContainer
+        :tracks="tracks"
+        :is-loading="isLoading"
+        :is-more="isMore"
+        :is-loading-more="isLoadingMore"
+        @loaded-more="loadMoreTracks(trackType)"
+        @like-toggled="toggleLike"
       />
     </div>
-    <FiltersPanel :filters="currentFilters" />
-    <div class="min-h-8 mb-4">
-      <CurrentFilters :filters="currentFilters" @remove-filter="removeFilter" />
-    </div>
-    <TracksContainer
-      :tracks="tracks"
-      :is-loading="isLoading"
-      :is-more="isMore"
-      :is-loading-more="isLoadingMore"
-      @loaded-more="loadMoreTracks(trackType)"
-      @like-toggled="toggleLike"
-    />
-  </div>
+  </ScreenWrapper>
 </template>

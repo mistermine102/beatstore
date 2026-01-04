@@ -2,58 +2,98 @@
 import { ref } from 'vue'
 import BaseSearchbar from './base/BaseSearchbar.vue'
 import { useRouter } from 'vue-router'
-import { SearchIcon } from './icons/index.vine'
 
 const router = useRouter()
-
 const searchPhrase = ref('')
+
+const handleSearch = (phrase: string) => {
+  router.push(`/tracks/browse?q=${phrase}`)
+}
 </script>
 
 <template>
-  <div class="relative grid lg:grid-cols-2 gap-x-8">
-    <div class="flex flex-col justify-center relative">
-      <h1 class="flex flex-col leading-tight">
-        <span class="font-secondary text-[40px] md:text-[48px]">Find high quality</span>
-        <span class="font-secondary text-[48px] md:text-[56px] text-primary">Beats, Samples and more</span>
-      </h1>
-      <BaseSearchbar
-        v-model="searchPhrase"
-        @search="phrase => router.push(`/tracks/browse?q=${phrase}`)"
-        placeholder="What are you looking for?"
-        class="mt-8"
-        container-class="md:py-2 bg-grey px-2 md:px-4"
-        button-class="h-full px-8"
-        :show-button="true"
-      />
-      <div class="flex mt-4 gap-x-4">
-        <button
-          @click="router.push({ path: 'tracks/browse', query: { type: 'beat' } })"
-          class="bg-darkGrey px-4 py-1 flex items-center gap-x-2 rounded-regular clickable-icon"
-        >
-          <span>Beats</span>
-          <SearchIcon :size="16" />
-        </button>
-        <button
-          @click="router.push({ path: 'tracks/browse', query: { type: 'sample' } })"
-          class="bg-darkGrey px-4 py-1 flex items-center gap-x-2 rounded-regular clickable-icon"
-        >
-          <span>Samples</span>
-          <SearchIcon :size="16" />
-        </button>
-        <button
-          @click="router.push({ path: 'tracks/browse', query: { type: 'loop' } })"
-          class="bg-darkGrey px-4 py-1 flex items-center gap-x-2 rounded-regular clickable-icon"
-        >
-          <span>Loops</span>
-          <SearchIcon :size="16" />
-        </button>
+  <!-- Main Hero Section -->
+  <section class="hero-section relative w-full pt-20 pb-20 lg:pt-[120px] lg:pb-[100px] border-b border-midGrey overflow-hidden">
+    
+    <!-- Background Gradient -->
+    <!-- Uses var(--darkPrimary) with 0.1 opacity for the subtle glow effect -->
+    <div 
+      class="absolute inset-0 pointer-events-none"
+      style="background: radial-gradient(circle at 80% 20%, var(--darkPrimary) 0%, transparent 60%); opacity: 0.2;"
+    ></div>
+
+    <div class="max-w-[1300px] mx-auto px-6 md:px-8 relative z-10">
+      <div class="flex flex-col-reverse lg:flex-row items-center justify-between gap-10 lg:gap-20">
+        
+        <!-- Left: Heading & Search -->
+        <div class="flex-1 w-full text-center lg:text-left">
+          <h1 class="font-black font-secondary text-5xl md:text-[72px] leading-[1.1] tracking-tight text-white mb-8">
+            DEFINE YOUR<br />
+            <span class="text-primary">SONIC SIGNATURE</span>
+          </h1>
+
+          <!-- Search Wrapper -->
+          <div class="relative max-w-[650px] mx-auto lg:mx-0">
+            <BaseSearchbar
+              v-model="searchPhrase"
+              @search="handleSearch"
+              placeholder="Search by Key, BPM, Mood, or Artist..."
+              container-class="w-full py-2 px-6 bg-grey border border-midGrey rounded-xl text-lg shadow-md transition focus-within:border-primary focus-within:shadow-glow"
+              input-class="bg-transparent text-white placeholder-textLightGrey w-full outline-none font-primary"
+              :show-button="true"
+              button-class="py-8"
+            />
+          </div>
+
+          <!-- Trending Tags -->
+          <p class="mt-4 text-textLightGrey">
+            Trending:
+            <span class="text-white cursor-pointer hover:text-primary transition">#Drake</span>,
+            <span class="text-white cursor-pointer hover:text-primary transition">#Afrobeat</span>,
+            <span class="text-white cursor-pointer hover:text-primary transition">#SamplePack</span>
+          </p>
+        </div>
+
+        <!-- Right: Giant Logo Text -->
+        <div class="flex-[0.8] flex justify-center lg:justify-end w-full">
+          <div class="big-logo-text font-secondary select-none">WavsMarket</div>
+        </div>
+
       </div>
     </div>
-    <div class="hidden lg:flex items-end justify-center w-full h-[450px] relative">
-      <img src="/pixel-art-hero.png" alt="" class="w-full h-full object-contain" />
-      <div class="absolute inset-0 z-0 flex justify-center items-end mb-16">
-        <div class="bg-primary w-[150px] h-[200px] absolute blur-[200px]"></div>
-      </div>
-    </div>
-  </div>
+  </section>
 </template>
+
+<style scoped>
+/* 
+   We define a custom shadow utility class here for the specific glow 
+   since Tailwind's default shadow utilities are black.
+   We use color-mix to get an RGBA-like transparency using the CSS variable.
+*/
+.focus-within\:shadow-glow:focus-within {
+  box-shadow: 0 0 25px color-mix(in srgb, var(--primary), transparent 80%);
+}
+
+/* Fallback for browsers not supporting color-mix (though most do) */
+@supports not (color: color-mix(in srgb, white, black)) {
+  .focus-within\:shadow-glow:focus-within {
+    box-shadow: 0 0 25px var(--primary);
+  }
+}
+
+.big-logo-text {
+  font-size: 4rem; /* Mobile Size */
+  color: #ffffff;
+  line-height: 0.85;
+  /* Using the global variable for the text shadow color */
+  text-shadow: 5px 5px 0px var(--darkPrimary);
+  text-align: center;
+}
+
+@media (min-width: 1024px) {
+  .big-logo-text {
+    font-size: 5.5rem; /* Desktop Size */
+    text-align: right;
+  }
+}
+</style>
