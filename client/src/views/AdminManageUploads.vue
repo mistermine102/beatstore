@@ -5,6 +5,7 @@ import useAsyncWrap from '../composables/useAsyncWrap'
 import BaseButton from '../components/base/BaseButton.vue'
 import EmptyState from '../components/EmptyState.vue'
 import PlayPauseBtn from '../components/PlayPauseBtn.vue'
+import ScreenWrapper from '../components/common/ScreenWrapper.vue'
 
 const tracks = ref<Track[]>([])
 const wrapGetTracks = useAsyncWrap()
@@ -36,7 +37,7 @@ getTracks()
 </script>
 
 <template>
-  <div>
+  <ScreenWrapper>
     <h1 class="base-heading">Uploads to Verify</h1>
     <div v-if="wrapGetTracks.isLoading.value" class="flex justify-center">
       <div class="loader"></div>
@@ -87,5 +88,5 @@ getTracks()
         </div>
       </div>
     </div>
-  </div>
-</template> 
+  </ScreenWrapper>
+</template>

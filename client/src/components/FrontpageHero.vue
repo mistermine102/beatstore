@@ -12,11 +12,7 @@ const handleSearch = (phrase: string) => {
 </script>
 
 <template>
-  <!-- Main Hero Section -->
-  <section class="hero-section relative w-full pt-20 pb-20 lg:pt-[120px] lg:pb-[100px] border-b border-midGrey overflow-hidden">
-    
-    <!-- Background Gradient -->
-    <!-- Uses var(--darkPrimary) with 0.1 opacity for the subtle glow effect -->
+  <section class="hero-section relative w-full pt-20 pb-20 lg:pt-[200px] lg:pb-[200px] border-b border-midGrey overflow-hidden">
     <div 
       class="absolute inset-0 pointer-events-none"
       style="background: radial-gradient(circle at 80% 20%, var(--darkPrimary) 0%, transparent 60%); opacity: 0.2;"
@@ -24,41 +20,26 @@ const handleSearch = (phrase: string) => {
 
     <div class="max-w-[1300px] mx-auto px-6 md:px-8 relative z-10">
       <div class="flex flex-col-reverse lg:flex-row items-center justify-between gap-10 lg:gap-20">
-        
-        <!-- Left: Heading & Search -->
         <div class="flex-1 w-full text-center lg:text-left">
-          <h1 class="font-black font-secondary text-5xl md:text-[72px] leading-[1.1] tracking-tight text-white mb-8">
-            DEFINE YOUR<br />
-            <span class="text-primary">SONIC SIGNATURE</span>
+          <h1 class="font-secondary text-5xl md:text-[72px] leading-[1.1] tracking-tight text-white mb-8">
+            FIND YOUR<br />
+            <span class="text-primary">SIGNATURE SOUND</span>
           </h1>
-
-          <!-- Search Wrapper -->
           <div class="relative max-w-[650px] mx-auto lg:mx-0">
             <BaseSearchbar
               v-model="searchPhrase"
               @search="handleSearch"
-              placeholder="Search by Key, BPM, Mood, or Artist..."
+              placeholder="What are you looking for?"
               container-class="w-full py-2 px-6 bg-grey border border-midGrey rounded-xl text-lg shadow-md transition focus-within:border-primary focus-within:shadow-glow"
               input-class="bg-transparent text-white placeholder-textLightGrey w-full outline-none font-primary"
               :show-button="true"
               button-class="py-8"
             />
           </div>
-
-          <!-- Trending Tags -->
-          <p class="mt-4 text-textLightGrey">
-            Trending:
-            <span class="text-white cursor-pointer hover:text-primary transition">#Drake</span>,
-            <span class="text-white cursor-pointer hover:text-primary transition">#Afrobeat</span>,
-            <span class="text-white cursor-pointer hover:text-primary transition">#SamplePack</span>
-          </p>
         </div>
-
-        <!-- Right: Giant Logo Text -->
         <div class="flex-[0.8] flex justify-center lg:justify-end w-full">
           <div class="big-logo-text font-secondary select-none">WavsMarket</div>
         </div>
-
       </div>
     </div>
   </section>

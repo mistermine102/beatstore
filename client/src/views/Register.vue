@@ -8,6 +8,7 @@ import { AxiosError } from 'axios'
 import { useRouter } from 'vue-router'
 import validator from 'validator'
 import { GENERIC_ERROR_TOAST } from '../constants'
+import ScreenWrapper from '../components/common/ScreenWrapper.vue'
 
 const wrapRegister = reactive(useAsyncWrap())
 const toastStore = useToastStore()
@@ -74,32 +75,34 @@ function register() {
 </script>
 
 <template>
-  <div class="panel w-full md:w-[600px] mx-auto bg-background">
-    <h2 class="text-2xl font-bold mb-8 text-center">Create Account</h2>
-    <form class="flex flex-col" @submit.prevent="register">
-      <div class="flex flex-col gap-y-4 mb-8">
-        <div class="relative">
-          <input v-model="email" type="text" placeholder="Email" class="base-input w-full" />
+  <ScreenWrapper>
+    <div class="panel w-full md:w-[600px] mx-auto bg-background">
+      <h2 class="text-2xl font-bold mb-8 text-center">Create Account</h2>
+      <form class="flex flex-col" @submit.prevent="register">
+        <div class="flex flex-col gap-y-4 mb-8">
+          <div class="relative">
+            <input v-model="email" type="text" placeholder="Email" class="base-input w-full" />
+          </div>
+          <div class="relative">
+            <input v-model="username" type="text" placeholder="Username" class="base-input w-full" />
+          </div>
+          <div class="relative">
+            <input v-model="password" type="password" placeholder="Password" class="base-input w-full" />
+          </div>
         </div>
-        <div class="relative">
-          <input v-model="username" type="text" placeholder="Username" class="base-input w-full" />
-        </div>
-        <div class="relative">
-          <input v-model="password" type="password" placeholder="Password" class="base-input w-full" />
-        </div>
-      </div>
-      <BaseButton class="w-full" :isLoading="wrapRegister.isLoading">Sign Up</BaseButton>
-    </form>
-    <p class="text-textLightGrey text-sm mt-2">
-      By registering, you confirm that you have read and agree to our
-      <router-link to="/terms" class="font-semibold text-textLightGrey hover:text-white transition-colors underline">Terms of Service</router-link>
-      and <router-link to="/privacy-policy" class="font-semibold text-textLightGrey hover:text-white transition-colors underline">Privacy Policy</router-link>.
-    </p>
-    <div class="mt-6 text-center">
-      <p class="text-textLightGrey">
-        Already have an account?
-        <router-link class="text-primary hover:text-darkPrimary" to="/signin"> Sign in now </router-link>
+        <BaseButton class="w-full" :isLoading="wrapRegister.isLoading">Sign Up</BaseButton>
+      </form>
+      <p class="text-textLightGrey text-sm mt-2">
+        By registering, you confirm that you have read and agree to our
+        <router-link to="/terms" class="font-semibold text-textLightGrey hover:text-white transition-colors underline">Terms of Service</router-link>
+        and <router-link to="/privacy-policy" class="font-semibold text-textLightGrey hover:text-white transition-colors underline">Privacy Policy</router-link>.
       </p>
+      <div class="mt-6 text-center">
+        <p class="text-textLightGrey">
+          Already have an account?
+          <router-link class="text-primary hover:text-darkPrimary" to="/signin"> Sign in now </router-link>
+        </p>
+      </div>
     </div>
-  </div>
+  </ScreenWrapper>
 </template>

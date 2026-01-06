@@ -9,6 +9,7 @@ import useTracks from '../composables/useTracks'
 import { TrashIcon } from '../components/icons/index.vine'
 import EmptyState from '../components/EmptyState.vue'
 import useFeaturedProfiles from '../composables/useFeaturedProfiles'
+import ScreenWrapper from '../components/common/ScreenWrapper.vue'
 
 // Use the featured profiles composable
 const {
@@ -81,95 +82,97 @@ function isProfileFeatured(profile: Profile) {
 </script>
 
 <template>
-  <ListModal
-    :is-open="isProfilesModalOpen"
-    title="Select profile"
-    description="Please select a profile you want to add:"
-    :is-loading="wrapGetProfiles.isLoading.value"
-    @close="isProfilesModalOpen = false"
-  >
-    <SelectListItem
-      v-for="profile in profiles"
-      @click="selectProfile(profile)"
-      :upper-text="`${profile.username} ${isProfileFeatured(profile) ? '(Featured)' : ''}`"
-      :lower-text="profile._id"
-      :right-text="`Uploads: ${profile.totalUploads.toString()}`"
-      :is-selected="selectedProfile?._id === profile._id"
-      :image-url="profile.image.url"
-    />
-  </ListModal>
-  <ListModal
-    :is-open="isTracksModalOpen"
-    title="Select a track"
-    description="Please select a track that will be displayed:"
-    :is-loading="isTracksLoading"
-    @close="isTracksModalOpen = false"
-  >
-    <SelectListItem
-      v-for="track in tracks"
-      @click="selectTrack(track)"
-      :upper-text="track.title"
-      :lower-text="track._id"
-      :is-selected="selectedTrack?._id === track._id"
-      :image-url="track.image.url"
-    />
-  </ListModal>
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-    <div class="panel order-2 lg:order-1">
-      <h2 class="base-heading">Featured profiles</h2>
-      <div v-if="isLoadingFeaturedProfiles" class="flex justify-center">
-        <div class="loader"></div>
-      </div>
-      <EmptyState v-else-if="!featuredProfiles.length" />
-      <div v-else class="flex flex-col gap-y-4">
-        <div v-for="featured in featuredProfiles" class="flex gap-x-4 group">
-          <div class="flex gap-x-2 relative w-full">
-            <img :src="featured.profile.image.url" class="w-[50px] max-h-[50px] rounded-regular" />
-            <div>
-              <p>
-                <router-link :to="`/profile/${featured.profile._id}`">{{ featured.profile.username }}</router-link>
-                <span class="text-textLightGrey ml-2"
-                  >with <router-link :to="`/track/${featured.track._id}`">{{ featured.track.title }}</router-link>
-                </span>
-              </p>
-              <p class="text-textLightGrey">Until: {{ formatFeaturedDate(featured.featuredUntil) }}</p>
+  <ScreenWrapper>
+    <ListModal
+      :is-open="isProfilesModalOpen"
+      title="Select profile"
+      description="Please select a profile you want to add:"
+      :is-loading="wrapGetProfiles.isLoading.value"
+      @close="isProfilesModalOpen = false"
+    >
+      <SelectListItem
+        v-for="profile in profiles"
+        @click="selectProfile(profile)"
+        :upper-text="`${profile.username} ${isProfileFeatured(profile) ? '(Featured)' : ''}`"
+        :lower-text="profile._id"
+        :right-text="`Uploads: ${profile.totalUploads.toString()}`"
+        :is-selected="selectedProfile?._id === profile._id"
+        :image-url="profile.image.url"
+      />
+    </ListModal>
+    <ListModal
+      :is-open="isTracksModalOpen"
+      title="Select a track"
+      description="Please select a track that will be displayed:"
+      :is-loading="isTracksLoading"
+      @close="isTracksModalOpen = false"
+    >
+      <SelectListItem
+        v-for="track in tracks"
+        @click="selectTrack(track)"
+        :upper-text="track.title"
+        :lower-text="track._id"
+        :is-selected="selectedTrack?._id === track._id"
+        :image-url="track.image.url"
+      />
+    </ListModal>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div class="panel order-2 lg:order-1">
+        <h2 class="base-heading">Featured profiles</h2>
+        <div v-if="isLoadingFeaturedProfiles" class="flex justify-center">
+          <div class="loader"></div>
+        </div>
+        <EmptyState v-else-if="!featuredProfiles.length" />
+        <div v-else class="flex flex-col gap-y-4">
+          <div v-for="featured in featuredProfiles" class="flex gap-x-4 group">
+            <div class="flex gap-x-2 relative w-full">
+              <img :src="featured.profile.image.url" class="w-[50px] max-h-[50px] rounded-regular" />
+              <div>
+                <p>
+                  <router-link :to="`/profile/${featured.profile._id}`">{{ featured.profile.username }}</router-link>
+                  <span class="text-textLightGrey ml-2"
+                    >with <router-link :to="`/track/${featured.track._id}`">{{ featured.track.title }}</router-link>
+                  </span>
+                </p>
+                <p class="text-textLightGrey">Until: {{ formatFeaturedDate(featured.featuredUntil) }}</p>
+              </div>
+              <button
+                @click="deleteFeaturedProfile(featured.profile._id, featured.track._id)"
+                class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-700 transition-all duration-150"
+              >
+                <TrashIcon />
+              </button>
             </div>
-            <button
-              @click="deleteFeaturedProfile(featured.profile._id, featured.track._id)"
-              class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-700 transition-all duration-150"
-            >
-              <TrashIcon />
-            </button>
           </div>
         </div>
       </div>
-    </div>
-    <form class="panel order-1 lg:order-2" @submit="handleAddFeaturedProfile">
-      <h2 class="base-heading">Add featured profile</h2>
-      <div class="flex flex-col gap-y-6 mb-8">
-        <div class="flex gap-x-4 items-center justify-between">
-          <div class="py-2 rounded-regular" :class="selectedProfile ? 'bg-background' : ''">
-            <div v-if="selectedProfile" class="px-4">
-              <p>{{ selectedProfile.username }}</p>
-              <p class="text-textLightGrey">{{ selectedProfile._id }}</p>
+      <form class="panel order-1 lg:order-2" @submit="handleAddFeaturedProfile">
+        <h2 class="base-heading">Add featured profile</h2>
+        <div class="flex flex-col gap-y-6 mb-8">
+          <div class="flex gap-x-4 items-center justify-between">
+            <div class="py-2 rounded-regular" :class="selectedProfile ? 'bg-background' : ''">
+              <div v-if="selectedProfile" class="px-4">
+                <p>{{ selectedProfile.username }}</p>
+                <p class="text-textLightGrey">{{ selectedProfile._id }}</p>
+              </div>
+              <p v-else class="text-textLightGrey">No profile selected</p>
             </div>
-            <p v-else class="text-textLightGrey">No profile selected</p>
+            <BaseButton @click="openProfilesModal" alt type="button">Select profile</BaseButton>
           </div>
-          <BaseButton @click="openProfilesModal" alt type="button">Select profile</BaseButton>
-        </div>
-        <div class="flex gap-x-4 items-center justify-between" :class="!selectedProfile ? 'opacity-50' : ''">
-          <div class="py-2 rounded-regular" :class="selectedTrack ? 'bg-background' : ''">
-            <div v-if="selectedTrack" class="px-4">
-              <p>{{ selectedTrack.title }}</p>
-              <p class="text-textLightGrey">{{ selectedTrack._id }}</p>
+          <div class="flex gap-x-4 items-center justify-between" :class="!selectedProfile ? 'opacity-50' : ''">
+            <div class="py-2 rounded-regular" :class="selectedTrack ? 'bg-background' : ''">
+              <div v-if="selectedTrack" class="px-4">
+                <p>{{ selectedTrack.title }}</p>
+                <p class="text-textLightGrey">{{ selectedTrack._id }}</p>
+              </div>
+              <p v-else class="text-textLightGrey">No profile selected</p>
             </div>
-            <p v-else class="text-textLightGrey">No profile selected</p>
-          </div>
 
-          <BaseButton @click="openTracksModal" alt type="button" :disabled="!selectedProfile">Select upload</BaseButton>
+            <BaseButton @click="openTracksModal" alt type="button" :disabled="!selectedProfile">Select upload</BaseButton>
+          </div>
         </div>
-      </div>
-      <BaseButton :is-loading="isAddingFeaturedProfile" :disabled="!selectedProfile || !selectedTrack">Add</BaseButton>
-    </form>
-  </div>
+        <BaseButton :is-loading="isAddingFeaturedProfile" :disabled="!selectedProfile || !selectedTrack">Add</BaseButton>
+      </form>
+    </div>
+  </ScreenWrapper>
 </template>

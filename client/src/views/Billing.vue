@@ -4,6 +4,7 @@ import appApi from '../api/appApi'
 import useAsyncWrap from '../composables/useAsyncWrap'
 import { useAuthStore } from '../stores/auth'
 import { computed } from 'vue'
+import ScreenWrapper from '../components/common/ScreenWrapper.vue'
 
 const authStore = useAuthStore()
 const wrapAction = useAsyncWrap()
@@ -28,21 +29,23 @@ function connectAccount() {
 </script>
 
 <template>
-  <div class="panel">
-    <h1 class="text-4xl font-secondary mb-4">Billing</h1>
-    <BaseButton
-      v-if="isConnectedAccountLinked"
-      @click="openDashboard"
-      :is-loading="wrapAction.isLoading.value"
-    >
-      View dashboard
-    </BaseButton>
-    <BaseButton
-      v-else
-      @click="connectAccount"
-      :is-loading="wrapAction.isLoading.value"
-    >
-      Connect account to stripe
-    </BaseButton>
-  </div>
+  <ScreenWrapper>
+    <div class="panel">
+      <h1 class="text-4xl font-secondary mb-4">Billing</h1>
+      <BaseButton
+        v-if="isConnectedAccountLinked"
+        @click="openDashboard"
+        :is-loading="wrapAction.isLoading.value"
+      >
+        View dashboard
+      </BaseButton>
+      <BaseButton
+        v-else
+        @click="connectAccount"
+        :is-loading="wrapAction.isLoading.value"
+      >
+        Connect account to stripe
+      </BaseButton>
+    </div>
+  </ScreenWrapper>
 </template>

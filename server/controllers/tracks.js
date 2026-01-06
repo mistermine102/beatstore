@@ -543,8 +543,6 @@ export const getPopularTracks = async (req, res) => {
   const formattedTracks = await Promise.all(
     tracks.map(async popularTrack => {
       //when popualting _id field, _id becomes track
-      console.log('POPULAR TRACK: ', popularTrack)
-
       const formattedTrack = await formatTrackData(popularTrack.track)
 
       return {

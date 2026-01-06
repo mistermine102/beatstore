@@ -1,46 +1,49 @@
 <template>
-  <div class="container mx-auto px-4 py-8 max-w-4xl">
-    <h1 class="text-3xl font-bold text-center mb-6">Privacy Policy</h1>
+  <ScreenWrapper>
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+      <h1 class="text-3xl font-bold text-center mb-6">Privacy Policy</h1>
 
-    <div class="text-center text-textLightGrey mb-8">
-      <p>Effective Date: <span class="placeholder">27.03.2025</span></p>
-    </div>
+      <div class="text-center text-textLightGrey mb-8">
+        <p>Effective Date: <span class="placeholder">27.03.2025</span></p>
+      </div>
 
-    <div>
-      <div v-for="(section, index) in sections" :key="index" class="panel mb-8">
-        <h2 class="text-2xl font-bold pb-3 mb-4">{{ section.number }}. {{ section.title }}</h2>
+      <div>
+        <div v-for="(section, index) in sections" :key="index" class="panel mb-8">
+          <h2 class="text-2xl font-bold pb-3 mb-4">{{ section.number }}. {{ section.title }}</h2>
 
-        <div v-if="section.content" class="mb-4 text-textLightGrey">
-          <p>{{ section.content }}</p>
-        </div>
+          <div v-if="section.content" class="mb-4 text-textLightGrey">
+            <p>{{ section.content }}</p>
+          </div>
 
-        <ul v-if="section.points" class="list-disc list-outside pl-5 space-y-2 text-textLightGrey">
-          <li v-for="(point, pointIndex) in section.points" :key="pointIndex">
-            {{ point }}
-          </li>
-        </ul>
+          <ul v-if="section.points" class="list-disc list-outside pl-5 space-y-2 text-textLightGrey">
+            <li v-for="(point, pointIndex) in section.points" :key="pointIndex">
+              {{ point }}
+            </li>
+          </ul>
 
-        <div v-if="section.subsections" class="ml-4">
-          <div v-for="subsection in section.subsections" :key="subsection.number" class="mb-4">
-            <h2 class="text-xl mb-2 text-gray-200">{{ section.number }}.{{ subsection.number }} {{ subsection.title }}</h2>
-            <div v-if="subsection.content" class="mb-4 text-textLightGrey">
-              <p>{{ subsection.content }}</p>
+          <div v-if="section.subsections" class="ml-4">
+            <div v-for="subsection in section.subsections" :key="subsection.number" class="mb-4">
+              <h2 class="text-xl mb-2 text-gray-200">{{ section.number }}.{{ subsection.number }} {{ subsection.title }}</h2>
+              <div v-if="subsection.content" class="mb-4 text-textLightGrey">
+                <p>{{ subsection.content }}</p>
+              </div>
+
+              <ul v-if="subsection.points" class="list-disc list-outside pl-5 space-y-2 text-textLightGrey">
+                <li v-for="(point, pointIndex) in subsection.points" :key="pointIndex">
+                  {{ point }}
+                </li>
+              </ul>
             </div>
-
-            <ul v-if="subsection.points" class="list-disc list-outside pl-5 space-y-2 text-textLightGrey">
-              <li v-for="(point, pointIndex) in subsection.points" :key="pointIndex">
-                {{ point }}
-              </li>
-            </ul>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </ScreenWrapper>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import ScreenWrapper from '../components/common/ScreenWrapper.vue'
 
 interface PrivacySection {
   number: number

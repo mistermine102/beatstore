@@ -8,6 +8,7 @@ import { AxiosError } from 'axios'
 import appApi from '../api/appApi'
 import validator from 'validator'
 import { GENERIC_ERROR_TOAST } from '../constants'
+import ScreenWrapper from '../components/common/ScreenWrapper.vue'
 
 const toastStore = useToastStore()
 const wrapReset = reactive(useAsyncWrap())
@@ -102,24 +103,26 @@ async function resetPassword() {
 </script>
 
 <template>
-  <div class="panel w-full md:w-[600px] mx-auto bg-background">
-    <h2 class="text-2xl font-bold mb-8 text-center">Reset Your Password</h2>
-    <form class="flex flex-col" @submit.prevent="resetPassword">
-      <div class="flex flex-col gap-y-4 mb-8">
-        <div class="relative">
-          <input v-model="password" type="password" placeholder="New Password" class="base-input w-full" />
+  <ScreenWrapper>
+    <div class="panel w-full md:w-[600px] mx-auto bg-background">
+      <h2 class="text-2xl font-bold mb-8 text-center">Reset Your Password</h2>
+      <form class="flex flex-col" @submit.prevent="resetPassword">
+        <div class="flex flex-col gap-y-4 mb-8">
+          <div class="relative">
+            <input v-model="password" type="password" placeholder="New Password" class="base-input w-full" />
+          </div>
+          <div class="relative">
+            <input v-model="confirmPassword" type="password" placeholder="Confirm New Password" class="base-input w-full" />
+          </div>
         </div>
-        <div class="relative">
-          <input v-model="confirmPassword" type="password" placeholder="Confirm New Password" class="base-input w-full" />
-        </div>
+        <BaseButton class="w-full" :is-loading="wrapReset.isLoading">Reset Password</BaseButton>
+      </form>
+      <div class="mt-6 text-center">
+        <p class="text-textLightGrey">
+          Remember your password?
+          <router-link class="text-primary hover:text-darkPrimary" to="/login"> Sign in </router-link>
+        </p>
       </div>
-      <BaseButton class="w-full" :is-loading="wrapReset.isLoading">Reset Password</BaseButton>
-    </form>
-    <div class="mt-6 text-center">
-      <p class="text-textLightGrey">
-        Remember your password?
-        <router-link class="text-primary hover:text-darkPrimary" to="/login"> Sign in </router-link>
-      </p>
     </div>
-  </div>
+  </ScreenWrapper>
 </template>

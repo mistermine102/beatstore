@@ -18,8 +18,8 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const widthClasses: Record<WidthVariant, string> = {
-  default: 'max-w-[1300px] mx-auto px-8',
-  narrow: 'max-w-4xl mx-auto px-8',
+  default: 'w-full max-w-[1400px] mx-auto px-6 md:px-8',
+  narrow: 'w-full max-w-4xl mx-auto px-8',
   full: 'w-full',
 }
 
@@ -27,10 +27,12 @@ const activeClass = computed(() => widthClasses[props.width])
 </script>
 
 <template>
-  <div class="flex flex-col min-h-full w-full">
-    <TheNavbar v-if="showNavbar" />
-    <div :class="activeClass">
-      <main class="flex-1 flex flex-col mt-[100px]">
+  <div class="flex flex-col min-h-screen w-full">
+    <slot name="header">
+      <TheNavbar v-if="showNavbar" />
+    </slot>
+    <div :class="[activeClass, 'flex-1 flex flex-col']">
+      <main class="flex-1 flex flex-col" :class="{ 'mt-[100px]': showNavbar }">
         <slot />
       </main>
     </div>

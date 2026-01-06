@@ -12,6 +12,7 @@ import BaseButton from '../components/base/BaseButton.vue'
 import { UploadIcon, PencilIcon } from '../components/icons/index.vine'
 import SocialLink from '../components/SocialLink.vue'
 import EmptyState from '../components/EmptyState.vue'
+import ScreenWrapper from '../components/common/ScreenWrapper.vue'
 
 const route = useRoute()
 const authStore = useAuthStore()
@@ -54,7 +55,7 @@ const isOwnProfile = computed(() => {
 </script>
 
 <template>
-  <div>
+  <ScreenWrapper>
     <div v-if="isLoadingProfile" class="flex justify-center">
       <div class="loader"></div>
     </div>
@@ -129,5 +130,5 @@ const isOwnProfile = computed(() => {
 
     <LoginPromptModal :is-open="followLoginPrompt" message="Log in to follow this profile" @close="followLoginPrompt = false" />
     <LoginPromptModal :is-open="likeLoginPrompt" message="Log in to leave a like" @close="likeLoginPrompt = false" />
-  </div>
+  </ScreenWrapper>
 </template>

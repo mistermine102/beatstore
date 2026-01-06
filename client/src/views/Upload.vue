@@ -10,6 +10,7 @@ import { useRouter } from 'vue-router'
 import { KEYS, GENRES, INSTRUMENTS, MOODS, GENERIC_ERROR_TOAST } from '../constants'
 import BaseSelect from '../components/base/BaseSelect.vue'
 import BaseCheckboxSelect from '../components/base/BaseCheckboxSelect.vue'
+import ScreenWrapper from '../components/common/ScreenWrapper.vue'
 
 interface Tier {
   licenseId: string
@@ -305,220 +306,222 @@ function toggleTier(licenseId: string) {
 </script>
 
 <template>
-  <div class="">
-    <div class="panel mb-8">
-      <h1 class="text-4xl font-secondary mb-4">Upload</h1>
-      <p class="text-textLightGrey">Choose the type</p>
+  <ScreenWrapper>
+    <div class="">
+      <div class="panel mb-8">
+        <h1 class="text-4xl font-secondary mb-4">Upload</h1>
+        <p class="text-textLightGrey">Choose the type</p>
 
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
-        <BaseButton
-          v-for="btn in TRACK_TYPES_BUTTONS"
-          :key="btn.type"
-          @click="uploadType = btn.type"
-          :alt="btn.type !== uploadType"
-          :disabled="btn.type === 'drumkit'"
-          :class="['h-24 w-full', btn.type === 'drumkit' ? 'opacity-50' : undefined, uploadType === btn.type ? 'hover:bg-primary' : '']"
-        >
-          <div class="w-full flex sm:flex-col gap-x-2 items-center">
-            <UploadIcon :size="32" class="hidden sm:block" />
-            <UploadIcon class="block sm:hidden" />
-            <span class="text-lg">{{ btn.title }}</span>
-          </div>
-        </BaseButton>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
+          <BaseButton
+            v-for="btn in TRACK_TYPES_BUTTONS"
+            :key="btn.type"
+            @click="uploadType = btn.type"
+            :alt="btn.type !== uploadType"
+            :disabled="btn.type === 'drumkit'"
+            :class="['h-24 w-full', btn.type === 'drumkit' ? 'opacity-50' : undefined, uploadType === btn.type ? 'hover:bg-primary' : '']"
+          >
+            <div class="w-full flex sm:flex-col gap-x-2 items-center">
+              <UploadIcon :size="32" class="hidden sm:block" />
+              <UploadIcon class="block sm:hidden" />
+              <span class="text-lg">{{ btn.title }}</span>
+            </div>
+          </BaseButton>
+        </div>
       </div>
-    </div>
 
-    <form @submit="uploadTrack">
-      <div class="grid grid-cols-3 gap-8">
-        <!-- Audio Upload Panel -->
-        <div v-if="newTrack.audio !== undefined" class="panel col-span-3 lg:col-span-2">
-          <h2 class="text-2xl mb-4">Audio File</h2>
-          <UploadFileContainer
-            @file-selected="file => (newTrack.audio = file ? file : null)"
-            id="audio"
-            max-file-size="50MB"
-            accept="audio/*"
-            class="border-2 border-dashed border-white/[0.1] hover:border-primary transition-colors duration-150"
-          >
-            <template #icon>
-              <UploadIcon :size="48" />
-            </template>
-          </UploadFileContainer>
-        </div>
-        <div class="col-span-3 lg:col-span-1 panel">
-          <h2 class="text-2xl mb-4">Cover Image</h2>
-          <UploadFileContainer
-            v-if="newTrack.image !== undefined"
-            @file-selected="file => (newTrack.image = file ? file : null)"
-            class="border-2 border-dashed border-white/[0.1] hover:border-primary transition-colors duration-150"
-            accept="image/*"
-            max-file-size="25MB"
-            id="image"
-          >
-            <template #icon>
-              <ImageIcon :size="48" />
-            </template>
-          </UploadFileContainer>
-        </div>
-
-        <!-- Basic Information Panel -->
-        <div class="panel col-span-3">
-          <h2 class="text-2xl mb-6">Basic Information</h2>
-          <div class="grid grid-cols-2 gap-4">
-            <input
-              v-if="newTrack.title !== undefined"
-              v-model="newTrack.title"
-              id="title"
-              class="base-input bg-background col-span-2"
-              type="text"
-              placeholder="Title"
-            />
-            <input
-              v-if="newTrack.bpm !== undefined"
-              v-model="newTrack.bpm"
-              id="bpm"
-              class="base-input w-full bg-background"
-              type="number"
-              placeholder="BPM"
-            />
-            <BaseSelect
-              v-if="newTrack.key !== undefined"
-              v-model="newTrack.key"
-              :options="KEYS.map(k => ({ value: k, label: k }))"
-              placeholder="Key"
-              class="[&>.popover-button]:bg-background"
-            />
-            <BaseSelect
-              v-if="newTrack.genre !== undefined"
-              v-model="newTrack.genre"
-              :options="GENRES.map(g => ({ value: g, label: g }))"
-              placeholder="Genre"
-              class="col-span-2 [&>.popover-button]:bg-background"
-            />
-            <BaseSelect
-              v-if="newTrack.mood !== undefined"
-              v-model="newTrack.mood"
-              :options="MOODS.map(m => ({ value: m, label: m }))"
-              placeholder="Mood"
-              class="col-span-2 bg-background [&>.popover-button]:bg-background"
-            />
-            <BaseCheckboxSelect
-              v-if="newTrack.instruments !== undefined"
-              v-model="newTrack.instruments"
-              :options="INSTRUMENTS.map(i => ({ value: i, label: i }))"
-              placeholder="Select instruments"
-              class="col-span-2 [&>.popover-button]:bg-background"
-            />
+      <form @submit="uploadTrack">
+        <div class="grid grid-cols-3 gap-8">
+          <!-- Audio Upload Panel -->
+          <div v-if="newTrack.audio !== undefined" class="panel col-span-3 lg:col-span-2">
+            <h2 class="text-2xl mb-4">Audio File</h2>
+            <UploadFileContainer
+              @file-selected="file => (newTrack.audio = file ? file : null)"
+              id="audio"
+              max-file-size="50MB"
+              accept="audio/*"
+              class="border-2 border-dashed border-white/[0.1] hover:border-primary transition-colors duration-150"
+            >
+              <template #icon>
+                <UploadIcon :size="48" />
+              </template>
+            </UploadFileContainer>
           </div>
-        </div>
-        <div class="panel col-span-3">
-          <h2 class="text-2xl mb-4">Description</h2>
-          <textarea
-            v-model="newTrack.description"
-            class="base-input bg-background w-full h-32 resize-none"
-            placeholder="Describe your upload (max 500 characters)"
-            maxlength="500"
-          ></textarea>
-        </div>
+          <div class="col-span-3 lg:col-span-1 panel">
+            <h2 class="text-2xl mb-4">Cover Image</h2>
+            <UploadFileContainer
+              v-if="newTrack.image !== undefined"
+              @file-selected="file => (newTrack.image = file ? file : null)"
+              class="border-2 border-dashed border-white/[0.1] hover:border-primary transition-colors duration-150"
+              accept="image/*"
+              max-file-size="25MB"
+              id="image"
+            >
+              <template #icon>
+                <ImageIcon :size="48" />
+              </template>
+            </UploadFileContainer>
+          </div>
 
-        <!-- Pricing Panel -->
-        <div class="panel col-span-3">
-          <h2 class="text-2xl mb-6">Pricing</h2>
-
-          <!-- Free/Paid Selection -->
-          <div class="mb-8">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <BaseButton
-                type="button"
-                @click="newTrack.pricingType = 'free'"
-                :alt="newTrack.pricingType !== 'free'"
-                :class="['h-24 w-full', newTrack.pricingType === 'free' ? 'hover:bg-primary' : '']"
-              >
-                <span class="text-lg">Free</span>
-              </BaseButton>
-              <BaseButton
-                type="button"
-                @click="newTrack.pricingType = 'paid'"
-                :alt="newTrack.pricingType !== 'paid'"
-                :class="['h-24 w-full', newTrack.pricingType === 'paid' ? 'hover:bg-primary' : '']"
-              >
-                <span class="text-lg">Paid</span>
-              </BaseButton>
+          <!-- Basic Information Panel -->
+          <div class="panel col-span-3">
+            <h2 class="text-2xl mb-6">Basic Information</h2>
+            <div class="grid grid-cols-2 gap-4">
+              <input
+                v-if="newTrack.title !== undefined"
+                v-model="newTrack.title"
+                id="title"
+                class="base-input bg-background col-span-2"
+                type="text"
+                placeholder="Title"
+              />
+              <input
+                v-if="newTrack.bpm !== undefined"
+                v-model="newTrack.bpm"
+                id="bpm"
+                class="base-input w-full bg-background"
+                type="number"
+                placeholder="BPM"
+              />
+              <BaseSelect
+                v-if="newTrack.key !== undefined"
+                v-model="newTrack.key"
+                :options="KEYS.map(k => ({ value: k, label: k }))"
+                placeholder="Key"
+                class="[&>.popover-button]:bg-background"
+              />
+              <BaseSelect
+                v-if="newTrack.genre !== undefined"
+                v-model="newTrack.genre"
+                :options="GENRES.map(g => ({ value: g, label: g }))"
+                placeholder="Genre"
+                class="col-span-2 [&>.popover-button]:bg-background"
+              />
+              <BaseSelect
+                v-if="newTrack.mood !== undefined"
+                v-model="newTrack.mood"
+                :options="MOODS.map(m => ({ value: m, label: m }))"
+                placeholder="Mood"
+                class="col-span-2 bg-background [&>.popover-button]:bg-background"
+              />
+              <BaseCheckboxSelect
+                v-if="newTrack.instruments !== undefined"
+                v-model="newTrack.instruments"
+                :options="INSTRUMENTS.map(i => ({ value: i, label: i }))"
+                placeholder="Select instruments"
+                class="col-span-2 [&>.popover-button]:bg-background"
+              />
             </div>
           </div>
-
-          <!-- How to Sell Selection (Only show if Paid) -->
-          <div v-if="newTrack.pricingType === 'paid'" class="mb-8">
-            <p class="text-lg mb-4">How do you want to sell?</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <BaseButton
-                type="button"
-                @click="newTrack.sellThrough = 'platform'"
-                :alt="newTrack.sellThrough !== 'platform'"
-                :class="['h-24 w-full', newTrack.sellThrough === 'platform' ? 'hover:bg-primary' : '']"
-              >
-                <span class="text-lg">Through WavsMarket</span>
-              </BaseButton>
-              <BaseButton
-                type="button"
-                @click="newTrack.sellThrough = 'external'"
-                :alt="newTrack.sellThrough !== 'external'"
-                :class="['h-24 w-full', newTrack.sellThrough === 'external' ? 'hover:bg-primary' : '']"
-              >
-                <span class="text-lg">Outside the platform</span>
-              </BaseButton>
-            </div>
+          <div class="panel col-span-3">
+            <h2 class="text-2xl mb-4">Description</h2>
+            <textarea
+              v-model="newTrack.description"
+              class="base-input bg-background w-full h-32 resize-none"
+              placeholder="Describe your upload (max 500 characters)"
+              maxlength="500"
+            ></textarea>
           </div>
 
-          <!-- License Tiers (Only show if Through Platform) -->
-          <div v-if="newTrack.pricingType === 'paid' && newTrack.sellThrough === 'platform'">
-            <p class="text-lg mb-4">Select license tiers and set prices</p>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div
-                v-for="license in licenses"
-                :key="license._id"
-                @click="toggleTier(license._id)"
-                :class="[
-                  'p-4 rounded-regular cursor-pointer transition-all border',
-                  isTierSelected(license._id) ? 'bg-primary/10 border-primary' : 'bg-darkGrey border-white/[0.1] hover:border-white/[0.3]',
-                ]"
-              >
-                <p class="text-lg font-medium mb-2">{{ license.title }}</p>
-                <input
-                  :value="getTier(license._id)?.price || ''"
-                  @input="e => { const t = getTier(license._id); if (t) t.price = (e.target as HTMLInputElement).value }"
-                  type="number"
-                  step="0.01"
-                  min="0.01"
-                  placeholder="Price in USD"
-                  :disabled="!isTierSelected(license._id)"
-                  :class="['base-input bg-background w-full', !isTierSelected(license._id) && 'opacity-50 cursor-not-allowed']"
-                  @click.stop
-                />
+          <!-- Pricing Panel -->
+          <div class="panel col-span-3">
+            <h2 class="text-2xl mb-6">Pricing</h2>
+
+            <!-- Free/Paid Selection -->
+            <div class="mb-8">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <BaseButton
+                  type="button"
+                  @click="newTrack.pricingType = 'free'"
+                  :alt="newTrack.pricingType !== 'free'"
+                  :class="['h-24 w-full', newTrack.pricingType === 'free' ? 'hover:bg-primary' : '']"
+                >
+                  <span class="text-lg">Free</span>
+                </BaseButton>
+                <BaseButton
+                  type="button"
+                  @click="newTrack.pricingType = 'paid'"
+                  :alt="newTrack.pricingType !== 'paid'"
+                  :class="['h-24 w-full', newTrack.pricingType === 'paid' ? 'hover:bg-primary' : '']"
+                >
+                  <span class="text-lg">Paid</span>
+                </BaseButton>
               </div>
             </div>
-          </div>
 
-          <!-- Free Download Option (Only show if Free) -->
-          <div v-if="newTrack.pricingType === 'paid'" class="my-8">
-            <label class="flex items-center gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                :checked="newTrack.freeDownloadPolicy === 'direct'"
-                @change="newTrack.freeDownloadPolicy = ($event.target as HTMLInputElement).checked ? 'direct' : 'unavailable'"
-                class="w-5 h-5 rounded border-white/[0.1] bg-background text-primary focus:ring-2 focus:ring-primary cursor-pointer"
-              />
-              <span class="text-lg">Allow free download</span>
-            </label>
+            <!-- How to Sell Selection (Only show if Paid) -->
+            <div v-if="newTrack.pricingType === 'paid'" class="mb-8">
+              <p class="text-lg mb-4">How do you want to sell?</p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <BaseButton
+                  type="button"
+                  @click="newTrack.sellThrough = 'platform'"
+                  :alt="newTrack.sellThrough !== 'platform'"
+                  :class="['h-24 w-full', newTrack.sellThrough === 'platform' ? 'hover:bg-primary' : '']"
+                >
+                  <span class="text-lg">Through WavsMarket</span>
+                </BaseButton>
+                <BaseButton
+                  type="button"
+                  @click="newTrack.sellThrough = 'external'"
+                  :alt="newTrack.sellThrough !== 'external'"
+                  :class="['h-24 w-full', newTrack.sellThrough === 'external' ? 'hover:bg-primary' : '']"
+                >
+                  <span class="text-lg">Outside the platform</span>
+                </BaseButton>
+              </div>
+            </div>
+
+            <!-- License Tiers (Only show if Through Platform) -->
+            <div v-if="newTrack.pricingType === 'paid' && newTrack.sellThrough === 'platform'">
+              <p class="text-lg mb-4">Select license tiers and set prices</p>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div
+                  v-for="license in licenses"
+                  :key="license._id"
+                  @click="toggleTier(license._id)"
+                  :class="[
+                    'p-4 rounded-regular cursor-pointer transition-all border',
+                    isTierSelected(license._id) ? 'bg-primary/10 border-primary' : 'bg-darkGrey border-white/[0.1] hover:border-white/[0.3]',
+                  ]"
+                >
+                  <p class="text-lg font-medium mb-2">{{ license.title }}</p>
+                  <input
+                    :value="getTier(license._id)?.price || ''"
+                    @input="e => { const t = getTier(license._id); if (t) t.price = (e.target as HTMLInputElement).value }"
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    placeholder="Price in USD"
+                    :disabled="!isTierSelected(license._id)"
+                    :class="['base-input bg-background w-full', !isTierSelected(license._id) && 'opacity-50 cursor-not-allowed']"
+                    @click.stop
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Free Download Option (Only show if Free) -->
+            <div v-if="newTrack.pricingType === 'paid'" class="my-8">
+              <label class="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  :checked="newTrack.freeDownloadPolicy === 'direct'"
+                  @change="newTrack.freeDownloadPolicy = ($event.target as HTMLInputElement).checked ? 'direct' : 'unavailable'"
+                  class="w-5 h-5 rounded border-white/[0.1] bg-background text-primary focus:ring-2 focus:ring-primary cursor-pointer"
+                />
+                <span class="text-lg">Allow free download</span>
+              </label>
+            </div>
           </div>
         </div>
-      </div>
-      <BaseButton type="submit" :is-loading="wrapUploadTrack.isLoading" class="mt-8 w-full sm:w-1/2 mx-auto">
-        <div class="flex items-center justify-center gap-2">
-          <UploadIcon :size="20" />
-          <span>Upload</span>
-        </div>
-      </BaseButton>
-    </form>
-  </div>
+        <BaseButton type="submit" :is-loading="wrapUploadTrack.isLoading" class="mt-8 w-full sm:w-1/2 mx-auto">
+          <div class="flex items-center justify-center gap-2">
+            <UploadIcon :size="20" />
+            <span>Upload</span>
+          </div>
+        </BaseButton>
+      </form>
+    </div>
+  </ScreenWrapper>
 </template>

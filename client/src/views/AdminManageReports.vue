@@ -4,6 +4,7 @@ import appApi from '../api/appApi'
 import useAsyncWrap from '../composables/useAsyncWrap'
 import BaseButton from '../components/base/BaseButton.vue'
 import EmptyState from '../components/EmptyState.vue'
+import ScreenWrapper from '../components/common/ScreenWrapper.vue'
 
 interface Report {
   _id: string
@@ -42,7 +43,7 @@ getReports()
 </script>
 
 <template>
-  <div>
+  <ScreenWrapper>
     <h1 class="base-heading">Manage Reports</h1>
     <div v-if="wrapGetReports.isLoading.value" class="flex justify-center">
       <div class="loader"></div>
@@ -96,5 +97,5 @@ getReports()
         </div>
       </div>
     </div>
-  </div>
-</template> 
+  </ScreenWrapper>
+</template>

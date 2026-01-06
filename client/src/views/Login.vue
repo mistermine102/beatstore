@@ -11,6 +11,7 @@ import validator from 'validator'
 import ResendVerificationModal from '../components/ResendVerificationModal.vue'
 import ForgotPasswordModal from '../components/ForgotPasswordModal.vue'
 import { GENERIC_ERROR_TOAST } from '../constants'
+import ScreenWrapper from '../components/common/ScreenWrapper.vue'
 
 const authStore = useAuthStore()
 const toastStore = useToastStore()
@@ -84,30 +85,32 @@ async function login() {
 </script>
 
 <template>
-  <div class="panel w-full md:w-[600px] mx-auto bg-background">
-    <h2 class="text-2xl font-bold mb-8 text-center">Welcome Back</h2>
-    <form class="flex flex-col" @submit.prevent="login">
-      <div class="flex flex-col gap-y-4 mb-8">
-        <div class="relative">
-          <input v-model="email" type="text" placeholder="Email" class="base-input w-full" />
+  <ScreenWrapper>
+    <div class="panel w-full md:w-[600px] mx-auto bg-background">
+      <h2 class="text-2xl font-bold mb-8 text-center">Welcome Back</h2>
+      <form class="flex flex-col" @submit.prevent="login">
+        <div class="flex flex-col gap-y-4 mb-8">
+          <div class="relative">
+            <input v-model="email" type="text" placeholder="Email" class="base-input w-full" />
+          </div>
+          <div class="relative">
+            <input v-model="password" type="password" placeholder="Password" class="base-input w-full" />
+            <button type="button" class="w-fit text-textLightGrey hover:text-white transition-colors mt-2" @click="openForgotPasswordModal">
+              Forgot password?
+            </button>
+          </div>
         </div>
-        <div class="relative">
-          <input v-model="password" type="password" placeholder="Password" class="base-input w-full" />
-          <button type="button" class="w-fit text-textLightGrey hover:text-white transition-colors mt-2" @click="openForgotPasswordModal">
-            Forgot password?
-          </button>
-        </div>
+        <BaseButton class="w-full" :is-loading="wrapLogin.isLoading">Sign In</BaseButton>
+      </form>
+      <div class="mt-6 text-center">
+        <p class="text-textLightGrey">
+          Don't have an account?
+          <router-link class="text-primary hover:text-darkPrimary" to="/signup"> Sign up now </router-link>
+        </p>
       </div>
-      <BaseButton class="w-full" :is-loading="wrapLogin.isLoading">Sign In</BaseButton>
-    </form>
-    <div class="mt-6 text-center">
-      <p class="text-textLightGrey">
-        Don't have an account?
-        <router-link class="text-primary hover:text-darkPrimary" to="/signup"> Sign up now </router-link>
-      </p>
     </div>
-  </div>
 
-  <ResendVerificationModal :is-open="showVerificationModal" :email="email" @close="showVerificationModal = false" />
-  <ForgotPasswordModal :is-open="showForgotPasswordModal" :email="email" @close="showForgotPasswordModal = false" />
+    <ResendVerificationModal :is-open="showVerificationModal" :email="email" @close="showVerificationModal = false" />
+    <ForgotPasswordModal :is-open="showForgotPasswordModal" :email="email" @close="showForgotPasswordModal = false" />
+  </ScreenWrapper>
 </template>

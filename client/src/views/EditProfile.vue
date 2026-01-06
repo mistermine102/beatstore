@@ -15,6 +15,7 @@ import { GENERIC_ERROR_TOAST, PLATFORM_LABELS, PLATFORMS } from '../constants'
 import EmptyState from '../components/EmptyState.vue'
 import { useAuthStore } from '../stores/auth'
 import BaseSwitch from '../components/base/BaseSwitch.vue'
+import ScreenWrapper from '../components/common/ScreenWrapper.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -129,7 +130,7 @@ onMounted(async () => {
 })
 </script>
 <template>
-  <div>
+  <ScreenWrapper>
     <div v-if="isLoading" class="flex justify-center">
       <div class="loader"></div>
     </div>
@@ -227,5 +228,5 @@ onMounted(async () => {
         >
       </div>
     </div>
-  </div>
+  </ScreenWrapper>
 </template>
