@@ -184,9 +184,32 @@ function downloadAudio(track: Track) {
 
         <!-- Action Buttons -->
         <div class="grid grid-cols-1 md:flex gap-4 md:gap-x-4 w-full md:w-auto mt-auto">
-          <BaseButton @click="isBuyModalOpen = true" class="w-full md:w-auto px-8 py-3 md:py-2"> Buy now </BaseButton>
+          <!-- Case 1: Paid + Platform - Show Buy Button -->
+          <BaseButton
+            v-if="track.pricingType === 'paid' && track.sellThrough === 'platform'"
+            @click="isBuyModalOpen = true"
+            class="w-full md:w-auto px-8 py-3 md:py-2"
+          >
+            Buy now
+          </BaseButton>
 
-          <BaseButton v-if="track.audio" @click="downloadAudio(track)" :alt="true" class="w-full md:w-auto">
+          <!-- Case 2: Free - Show Free Use Message -->
+          <div
+            v-else-if="track.pricingType === 'free'"
+            class="bg-grey border border-white/[0.1] rounded-regular px-4 py-3 text-textLightGrey text-sm"
+          >
+            <span class="text-primary font-medium">Free to use!</span> This track was generously uploaded for commercial use at no cost.
+          </div>
+
+          <!-- Case 3: Paid + External - Show Contact Seller Message -->
+          <div
+            v-else-if="track.pricingType === 'paid' && track.sellThrough === 'external'"
+            class="bg-grey border border-white/[0.1] rounded-regular px-4 py-3 text-textLightGrey text-sm"
+          >
+            To purchase this track, please contact the seller directly.
+          </div>
+
+          <BaseButton v-if="track.audio && track.freeDownloadPolicy === 'direct'" @click="downloadAudio(track)" :alt="true" class="w-full md:w-auto">
             <Box class="flex justify-center md:justify-start gap-x-2 items-center px-6">
               <DownloadIcon class="w-5 h-5" />
               <span>Download</span>
@@ -207,7 +230,14 @@ function downloadAudio(track: Track) {
   </div>
 
   <LoginPromptModal :is-open="showLoginPrompt" message="Log in to leave a like" @close="showLoginPrompt = false" />
-  <BuyTrackModal :is-open="isBuyModalOpen" :tiers="track.tiers" :track-title="track.title" :track-id="track._id" @close="isBuyModalOpen = false" />
+  <BuyTrackModal
+    v-if="track.pricingType === 'paid' && track.sellThrough === 'platform'"
+    :is-open="isBuyModalOpen"
+    :tiers="track.tiers"
+    :track-title="track.title"
+    :track-id="track._id"
+    @close="isBuyModalOpen = false"
+  />
 </template>
 
 <style scoped>
