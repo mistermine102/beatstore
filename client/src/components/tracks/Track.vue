@@ -5,6 +5,7 @@ import useInteractiveWafeform from '../../composables/useInteractiveWafeform'
 import { useCssVar } from '@vueuse/core'
 import LikeButton from '../common/LikeButton.vue'
 import { computed } from 'vue'
+import BaseBadge from '../base/BaseBadge.vue'
 
 const { track } = defineProps<{ track: Track }>()
 const emit = defineEmits(['likeToggled'])
@@ -94,17 +95,9 @@ const waveformWidth = computed(() => {
     </div>
     <div>
       <p v-if="!track.verified" class="text-orange-500">Unverified</p>
-      <p
-        class="inline-block px-3 py-1 rounded-regular text-sm font-semibold shadow-md"
-        :class="{
-          'bg-indigo-700': track.type === 'beat',
-          'bg-fuchsia-700': track.type === 'sample',
-          'bg-yellow-700': track.type === 'drumkit',
-          'bg-emerald-700': track.type === 'loop',
-        }"
-      >
+      <BaseBadge>
         {{ track.type === 'beat' ? 'Beat' : track.type === 'sample' ? 'Sample' : track.type === 'drumkit' ? 'Drumkit' : 'Loop' }}
-      </p>
+      </BaseBadge>
     </div>
   </div>
 </template>

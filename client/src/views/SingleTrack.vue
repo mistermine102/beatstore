@@ -107,7 +107,7 @@ function openReportModal() {
         <EmptyState />
       </div>
       <div v-else>
-        <div class="grid grid-cols-1 xl:grid-cols-3 xl:gap-x-8 mb-16">
+        <div class="grid grid-cols-1 xl:grid-cols-3 xl:gap-x-8 mb-8 xl:mb-16">
           <div class="col-span-2">
             <GeneralInfoPanel :track="track" />
             <button
@@ -118,12 +118,24 @@ function openReportModal() {
               <FlagIcon :size="20" />
               <span>Report</span>
             </button>
-            <CommentsPanel class="hidden xl:block" :comments="track.comments" :track="track" @change-comments="getTrack" @toggleLike="toggleCommentLike" />
+            <CommentsPanel
+              class="hidden xl:block"
+              :comments="track.comments"
+              :track="track"
+              @change-comments="getTrack"
+              @toggleLike="toggleCommentLike"
+            />
           </div>
           <div>
             <DetailsPanel :track="track" @track-like-toggled="toggleLike(track)" />
             <AuthorPanel :profile-id="track.author._id" />
-            <CommentsPanel class="block xl:hidden" :comments="track.comments" :track="track" @change-comments="getTrack" @toggleLike="toggleCommentLike" />
+            <CommentsPanel
+              class="block xl:hidden"
+              :comments="track.comments"
+              :track="track"
+              @change-comments="getTrack"
+              @toggleLike="toggleCommentLike"
+            />
           </div>
         </div>
 

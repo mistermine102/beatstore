@@ -13,9 +13,9 @@ const handleSearch = (phrase: string) => {
 
 <template>
   <section class="hero-section relative w-full pt-20 pb-20 lg:pt-[200px] lg:pb-[200px] border-b border-midGrey overflow-hidden">
-    <div 
+    <div
       class="absolute inset-0 pointer-events-none"
-      style="background: radial-gradient(circle at 80% 20%, var(--darkPrimary) 0%, transparent 60%); opacity: 0.2;"
+      style="background: radial-gradient(circle at 80% 20%, var(--darkPrimary) 0%, transparent 60%); opacity: 0.2"
     ></div>
 
     <div class="max-w-[1300px] mx-auto px-6 md:px-8 relative z-10">

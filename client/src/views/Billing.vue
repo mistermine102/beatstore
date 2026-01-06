@@ -32,20 +32,8 @@ function connectAccount() {
   <ScreenWrapper>
     <div class="panel">
       <h1 class="text-4xl font-secondary mb-4">Billing</h1>
-      <BaseButton
-        v-if="isConnectedAccountLinked"
-        @click="openDashboard"
-        :is-loading="wrapAction.isLoading.value"
-      >
-        View dashboard
-      </BaseButton>
-      <BaseButton
-        v-else
-        @click="connectAccount"
-        :is-loading="wrapAction.isLoading.value"
-      >
-        Connect account to stripe
-      </BaseButton>
+      <BaseButton v-if="isConnectedAccountLinked" @click="openDashboard" :is-loading="wrapAction.isLoading.value"> View dashboard </BaseButton>
+      <BaseButton v-else @click="connectAccount" :is-loading="wrapAction.isLoading.value"> Connect account to stripe </BaseButton>
     </div>
   </ScreenWrapper>
 </template>

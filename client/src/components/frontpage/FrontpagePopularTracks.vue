@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import ClickableTrackImage from '../common/ClickableTrackImage.vue'
+import SectionHeading from '../common/SectionHeading.vue'
 import appApi from '../../api/appApi'
 
 const popularTracks = ref<PopularTrack[]>([])
@@ -24,17 +25,16 @@ const formatIndex = (i: number) => {
   return (i + 1).toString().padStart(2, '0')
 }
 
-
 // Helper to construct "tags" from available metadata
 const getTrackTags = (track: PopularTrack) => {
   const tags: string[] = []
-  
+
   // Add Genre
   if (track.genre) tags.push(track.genre)
-  
+
   // Add Mood
   if (track.mood) tags.push(track.mood)
-  
+
   // Fallback or extra info if we don't have enough tags
   if (tags.length < 2 && track.type) {
     // Capitalize type (beat -> Beat)
@@ -51,20 +51,16 @@ getPopularTracks()
 <template>
   <section class="py-20 w-full border-b border-midGrey">
     <div class="max-w-[1300px] mx-auto px-6 md:px-8">
-      <div class="mb-10">
-        <h2 class="font-secondary text-5xl mb-2 text-white tracking-wide">TRENDING NOW</h2>
-        <p class="text-textLightGrey text-xl">Top 5 beats this week.</p>
-      </div>
+      <SectionHeading title="TRENDING NOW" subtitle="Top 5 beats this week." />
       <div v-if="isLoading" class="flex justify-center items-center h-[300px]">
         <div class="loader"></div>
       </div>
       <div v-else class="flex flex-col gap-4">
-        <div 
-          v-for="(track, index) in popularTracks" 
+        <div
+          v-for="(track, index) in popularTracks"
           :key="track._id"
           class="group flex items-center p-3 sm:p-4 rounded-xl border border-transparent hover:bg-grey hover:border-midGrey transition-all duration-200 cursor-default"
         >
-          
           <!-- 1. Index (01, 02...) -->
           <div class="font-secondary text-3xl text-midGrey w-12 sm:w-16 text-center group-hover:text-primary transition-colors duration-200">
             {{ formatIndex(index) }}
@@ -83,19 +79,13 @@ getPopularTracks()
               </h3>
             </router-link>
             <router-link :to="`/profile/${track.author._id}`" class="block">
-              <span class="text-textLightGrey hover:text-white transition-colors">
-                Prod. {{ track.author.username }}
-              </span>
+              <span class="text-textLightGrey hover:text-white transition-colors"> Prod. {{ track.author.username }} </span>
             </router-link>
           </div>
 
           <!-- 4. Tags (Constructed from metadata, Hidden on Mobile) -->
           <div class="hidden md:flex gap-3 mr-8">
-            <span 
-              v-for="tag in getTrackTags(track)" 
-              :key="tag" 
-              class=" bg-[#222] text-[#888] px-3 py-1 rounded-md"
-            >
+            <span v-for="tag in getTrackTags(track)" :key="tag" class="bg-[#222] text-[#888] px-3 py-1 rounded-md">
               {{ tag }}
             </span>
           </div>

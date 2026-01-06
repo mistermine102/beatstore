@@ -14,6 +14,7 @@ import BaseButton from '../base/BaseButton.vue'
 import useAsyncWrap from '../../composables/useAsyncWrap'
 import axios from 'axios'
 import LoginPromptModal from '../auth/LoginPromptModal.vue'
+import BaseBadge from '../base/BaseBadge.vue'
 
 const props = defineProps<{ track: Track }>()
 const emit = defineEmits(['likeToggled'])
@@ -30,7 +31,6 @@ function handleLike() {
   isAnimating.value = true
   emit('likeToggled')
 
-  // Reset animation state after animation completes
   setTimeout(() => {
     isAnimating.value = false
   }, 300)
@@ -45,66 +45,40 @@ const defaultColors = {
 }
 
 const colors = track.image.averageColor ? getWaveformColors(track.image.averageColor.hex) : defaultColors
-
 const { waveformColor, progressColor, highlightColor } = colors
 
+// Adjusted width calculation logic
 const waveformWidth = computed(() => {
-  switch (true) {
-    case window.innerWidth > 1800:
-      return 500
-    case window.innerWidth > 1650:
-      return 400
-    case window.innerWidth > 1536:
-      return 320
-    case window.innerWidth > 1280:
-      return 350
-    case window.innerWidth > 1024:
-      return 500
-    case window.innerWidth > 768:
-      return 400
-    default:
-      return 400
-  }
+  if (typeof window === 'undefined') return 400
+  if (window.innerWidth > 1800) return 500
+  if (window.innerWidth > 1650) return 400
+  if (window.innerWidth > 1536) return 320
+  if (window.innerWidth > 1280) return 350
+  if (window.innerWidth > 1024) return 500
+  return 400
 })
 
 const waveformHeight = computed(() => {
-  switch (true) {
-    case waveformWidth.value > 380:
-      return 80
-    default:
-      return 60
-  }
+  return waveformWidth.value > 380 ? 80 : 60
 })
 
 const wrapDownloadAudio = useAsyncWrap()
 
-function downloadAudio(track: PlayableTrack) {
+function downloadAudio(track: Track) {
   wrapDownloadAudio.run(async () => {
+    if (!track.audio?.url) return
     const filename = track.title
-
-    const response = await axios.get(track.audio.url, {
-      responseType: 'blob',
-    })
-
-    // Sanitize filename
+    const response = await axios.get(track.audio.url, { responseType: 'blob' })
     const sanitizedFilename = filename.replace(/[^a-z0-9.]/gi, '_').replace(/_+/g, '_')
-
-    // Ensure correct file extension and add prefix
     const prefixedFilename = `wm-${track.type}-${sanitizedFilename}`
     const finalFilename = prefixedFilename.includes('.') ? prefixedFilename : `${prefixedFilename}.wav`
-
-    // Create a link element to trigger the download
     const downloadUrl = window.URL.createObjectURL(new Blob([response.data], { type: 'audio/wav' }))
     const link = document.createElement('a')
     link.href = downloadUrl
     link.download = finalFilename
-
-    // Append to body, click, and remove
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
-
-    // Clean up the created URL
     window.URL.revokeObjectURL(downloadUrl)
   })
 }
@@ -112,114 +86,133 @@ function downloadAudio(track: PlayableTrack) {
 
 <template>
   <div class="panel relative">
-    <div class="mb-8">
-      <div v-if="track.author._id === authStore.user?._id" class="absolute top-4 right-4 z-20">
-        <TrackOptionsPopover :track="track" />
-      </div>
-      <div class="flex gap-x-8">
-        <div>
-          <div class="relative group w-[200px] h-[200px] rounded-xl overflow-hidden">
-            <div
-              v-if="track.playable"
-              class="absolute inset-0 z-10 flex justify-center items-center bg-black/30 opacity-0 group-hover:opacity-100 transition-all duration-150"
+    <!-- Options Popover (Absolute) -->
+    <div v-if="track.author._id === authStore.user?._id" class="absolute top-0 right-0 z-20">
+      <TrackOptionsPopover :track="track" />
+    </div>
+
+    <!-- Main Content Layout -->
+    <div class="flex flex-col md:flex-row gap-8 mb-8">
+      <!-- LEFT COLUMN: Image & Stats -->
+      <div class="flex flex-col items-center md:items-start shrink-0">
+        <!-- Image Container -->
+        <div class="relative group w-full max-w-[280px] aspect-square md:w-[200px] md:h-[200px] rounded-xl overflow-hidden shadow-lg">
+          <!-- Play Overlay (Desktop Hover / Mobile Visible) -->
+          <div
+            v-if="track.playable"
+            class="absolute inset-0 z-10 flex justify-center items-center bg-black/30 md:opacity-0 md:group-hover:opacity-100 transition-all duration-150"
+          >
+            <!-- Only show this play button on hover for desktop, or if needed on mobile visual -->
+            <PlayPauseBtn :track="track" class="scale-125 transform transition-transform duration-150" button-class="hover:text-white" />
+          </div>
+          <img
+            :src="track.image.url"
+            alt="Track"
+            class="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-150"
+          />
+        </div>
+
+        <!-- Stats Row -->
+        <div class="flex justify-center md:justify-start gap-x-8 mt-4 md:mt-4 w-full">
+          <!-- Like Button -->
+          <button @click="handleLike" class="flex gap-x-2 items-center group cursor-pointer p-2 md:p-0">
+            <HeartIcon
+              :fill="track.isLiked"
+              class="w-6 h-6 md:w-8 md:h-8 transition-all duration-150 shrink-0"
+              :class="[isAnimating && 'animate-like', track.isLiked ? 'text-primary' : 'text-iconLightGrey group-hover:text-primary']"
+            />
+            <p
+              class="text-base md:text-lg transition-colors duration-150 font-medium"
+              :class="[track.isLiked ? 'text-primary' : 'text-textLightGrey group-hover:text-primary']"
             >
-              <PlayPauseBtn :track="track" class="scale-125 transform transition-transform duration-150" button-class="hover:text-white" />
-            </div>
-            <img
-              :src="track.image.url"
-              alt="Track"
-              class="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-150"
+              {{ track.totalLikes }}
+            </p>
+          </button>
+
+          <!-- Stream Count -->
+          <div class="flex gap-x-2 items-center p-2 md:p-0">
+            <PlayIcon class="w-8 h-8 md:w-10 md:h-10 text-iconLightGrey shrink-0" />
+            <p class="text-base md:text-lg text-textLightGrey font-medium">{{ track.totalStreams }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: Details & Actions -->
+      <div class="flex flex-col min-w-0 max-w-full flex-1 text-center md:text-left">
+        <!-- Author Name -->
+        <router-link
+          :to="`/profile/${track.author._id}`"
+          class="text-base md:text-lg text-textLightGrey hover:text-white transition-colors truncate block mb-1 md:mb-0"
+        >
+          {{ track.author.username }}
+        </router-link>
+
+        <!-- Title & Badge -->
+        <div class="flex flex-col md:flex-row md:justify-between items-center md:items-start mb-6 md:mb-4 gap-2">
+          <h2 class="font-secondary text-3xl md:text-5xl text-white leading-tight break-words max-w-full">
+            {{ track.title }}
+          </h2>
+
+          <BaseBadge class="mt-1 md:mt-2">
+            {{ track.type === 'beat' ? 'Beat' : track.type === 'sample' ? 'Sample' : track.type === 'drumkit' ? 'Drumkit' : 'Loop' }}
+          </BaseBadge>
+        </div>
+
+        <!-- Waveform Section (Hidden on Mobile) -->
+        <div v-if="track.playable" class="hidden md:flex gap-x-8 items-center justify-start sm:justify-center mb-6">
+          <div class="w-fit group" :style="{ color: progressColor }">
+            <PlayPauseBtn
+              :track="track"
+              :icon-size="32"
+              class="[&>.play-pause-text]:hidden relative"
+              button-class="hover:scale-105 transition-transform duration-150"
             />
           </div>
-          <div class="flex justify-center gap-x-8 mt-4 mb-2">
-            <button @click="handleLike" class="flex gap-x-2 items-center group cursor-pointer">
-              <HeartIcon
-                :fill="track.isLiked"
-                class="w-8 transition-all duration-150 shrink-0"
-                :class="[isAnimating && 'animate-like', track.isLiked ? 'text-primary' : 'text-iconLightGrey group-hover:text-primary']"
-              />
-              <p
-                class="text-lg transition-colors duration-150"
-                :class="[track.isLiked ? 'text-primary' : 'text-textLightGrey group-hover:text-primary']"
-              >
-                {{ track.totalLikes }}
-              </p>
-            </button>
-            <div class="flex gap-x-2 items-center">
-              <PlayIcon class="w-10 text-iconLightGrey shrink-0" />
-              <p class="text-lg text-textLightGrey">{{ track.totalStreams }}</p>
-            </div>
-          </div>
-          <div>
-            <div v-if="track.pricingType === 'paid' && track.sellThrough === 'platform'">
-              <BaseButton v-if="track.playable" class="w-full mt-2" @click="isBuyModalOpen = true">
-                <div class="flex gap-x-2 items-center">
-                  <span>Buy now</span>
-                </div>
-              </BaseButton>
-            </div>
-            <div v-if="track.freeDownloadPolicy !== 'unavailable'">
-              <BaseButton v-if="track.playable" class="w-full mt-2" alt @click="downloadAudio(track)">
-                <div class="flex gap-x-2 items-center">
-                  <span>Download</span>
-                  <DownloadIcon class="text-iconLightGrey" :size="20" />
-                </div>
-              </BaseButton>
-            </div>
+          <div class="space-y-4 w-full h-full">
+            <InteractiveWaveform
+              :width="waveformWidth"
+              :height="waveformHeight"
+              :waveform-color="waveformColor"
+              :progress-color="progressColor"
+              :highlight-color="highlightColor"
+              :waveform-data="track.audio.waveform.samples"
+              :progress="waveformProgress"
+              @progress-click="handleWaveformClick"
+            />
           </div>
         </div>
 
-        <div class="flex flex-col min-w-0 max-w-full flex-1">
-          <router-link :to="`/profile/${track.author._id}`" class="text-lg text-textLightGrey truncate block">
-            {{ track.author.username }}
-          </router-link>
-          <div class="flex justify-between items-center">
-            <h2 class="font-secondary text-[48px] text-white -mt-2 mb-4 truncate">{{ track.title }}</h2>
-            <p
-              class="inline-block px-3 py-1 rounded-regular text-sm font-semibold shadow-md h-fit mb-4"
-              :class="{
-                'bg-indigo-700': track.type === 'beat',
-                'bg-fuchsia-700': track.type === 'sample',
-                'bg-yellow-700': track.type === 'drumkit',
-                'bg-emerald-700': track.type === 'loop',
-              }"
-            >
-              {{ track.type === 'beat' ? 'Beat' : track.type === 'sample' ? 'Sample' : track.type === 'drumkit' ? 'Drumkit' : 'Loop' }}
-            </p>
-          </div>
-          <div v-if="track.playable" class="flex gap-x-8 items-center justify-start sm:justify-center">
-            <div class="w-fit group" :style="{ color: progressColor }">
-              <PlayPauseBtn
-                :track="track"
-                :icon-size="32"
-                class="[&>.play-pause-text]:hidden relative"
-                button-class="hover:scale-105 transition-transform duration-150"
-              />
-            </div>
-            <div class="space-y-4 w-full h-full hidden sm:block">
-              <InteractiveWaveform
-                :width="waveformWidth"
-                :height="waveformHeight"
-                :waveform-color="waveformColor"
-                :progress-color="progressColor"
-                :highlight-color="highlightColor"
-                :waveform-data="track.audio.waveform.samples"
-                :progress="waveformProgress"
-                @progress-click="handleWaveformClick"
-              />
-            </div>
-          </div>
+        <!-- Action Buttons -->
+        <div class="grid grid-cols-1 md:flex gap-4 md:gap-x-4 w-full md:w-auto mt-auto">
+          <BaseButton @click="isBuyModalOpen = true" class="w-full md:w-auto px-8 py-3 md:py-2"> Buy now </BaseButton>
+
+          <BaseButton v-if="track.audio" @click="downloadAudio(track)" :alt="true" class="w-full md:w-auto">
+            <Box class="flex justify-center md:justify-start gap-x-2 items-center px-6">
+              <DownloadIcon class="w-5 h-5" />
+              <span>Download</span>
+            </Box>
+          </BaseButton>
         </div>
       </div>
     </div>
 
-    <div class="mb-8">
-      <h2 class="base-heading mb-4">Description</h2>
-      <p v-if="track.description" class="overflow-hidden text-textLightGrey">{{ track.description }}</p>
-      <p v-else class="text-textLightGrey">No description</p>
+    <!-- Description Section -->
+    <div class="mb-8 pt-4 md:pt-0 border-t border-white/10 md:border-none">
+      <h2 class="base-heading mb-3 text-xl md:text-2xl">Description</h2>
+      <p v-if="track.description" class="overflow-hidden text-textLightGrey leading-relaxed text-sm md:text-base">
+        {{ track.description }}
+      </p>
+      <p v-else class="text-textLightGrey italic">No description provided.</p>
     </div>
   </div>
 
   <LoginPromptModal :is-open="showLoginPrompt" message="Log in to leave a like" @close="showLoginPrompt = false" />
   <BuyTrackModal :is-open="isBuyModalOpen" :tiers="track.tiers" :track-title="track.title" :track-id="track._id" @close="isBuyModalOpen = false" />
 </template>
+
+<style scoped>
+/* Optional: Ensure text doesn't overflow inappropriately on very small screens */
+.break-words {
+  word-break: break-word;
+}
+</style>
