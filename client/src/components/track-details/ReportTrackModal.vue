@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import BaseModal from './base/BaseModal.vue'
-import BaseButton from './base/BaseButton.vue'
+import BaseModal from '../base/BaseModal.vue'
+import BaseButton from '../base/BaseButton.vue'
 import { ref } from 'vue'
-import appApi from '../api/appApi'
-import useAsyncWrap from '../composables/useAsyncWrap'
-import { useToastStore } from '../stores/toast'
+import appApi from '../../api/appApi'
+import useAsyncWrap from '../../composables/useAsyncWrap'
+import { useToastStore } from '../../stores/toast'
 
 const props = defineProps<{
   isOpen: boolean
@@ -29,7 +29,7 @@ async function submitReport() {
   wrapSubmit.run(async () => {
     await appApi.post('/reports', {
       trackId: props.trackId,
-      message: message.value.trim()
+      message: message.value.trim(),
     })
     toastStore.show({ type: 'success', title: 'Report submitted successfully' })
     message.value = ''
@@ -64,14 +64,8 @@ async function submitReport() {
           <p class="text-right text-gray-400 text-sm mt-1">{{ message.length }}/500</p>
         </div>
 
-        <BaseButton 
-          :is-loading="wrapSubmit.isLoading.value" 
-          @click="submitReport"
-          class="w-full"
-        >
-          Submit Report
-        </BaseButton>
+        <BaseButton :is-loading="wrapSubmit.isLoading.value" @click="submitReport" class="w-full"> Submit Report </BaseButton>
       </div>
     </div>
   </BaseModal>
-</template> 
+</template>

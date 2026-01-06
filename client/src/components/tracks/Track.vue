@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import PlayPauseBtn from './PlayPauseBtn.vue'
-import InteractiveWaveform from './InteractiveWaveform.vue'
-import useInteractiveWafeform from '../composables/useInteractiveWafeform'
+import PlayPauseBtn from '../common/PlayPauseBtn.vue'
+import InteractiveWaveform from '../common/InteractiveWaveform.vue'
+import useInteractiveWafeform from '../../composables/useInteractiveWafeform'
 import { useCssVar } from '@vueuse/core'
-import LikeButton from './LikeButton.vue'
+import LikeButton from '../common/LikeButton.vue'
 import { computed } from 'vue'
 
 const { track } = defineProps<{ track: Track }>()

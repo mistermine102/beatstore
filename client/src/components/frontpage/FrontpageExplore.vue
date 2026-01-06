@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import useFeaturedProfiles from '../composables/useFeaturedProfiles'
-import ClickableTrackImage from './ClickableTrackImage.vue'
+import useFeaturedProfiles from '../../composables/useFeaturedProfiles'
+import ClickableTrackImage from '../common/ClickableTrackImage.vue'
 
 const { featuredProfiles, isLoadingFeaturedProfiles, getFeaturedProfiles } = useFeaturedProfiles()
 

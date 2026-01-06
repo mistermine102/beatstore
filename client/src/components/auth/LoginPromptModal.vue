@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import BaseModal from './base/BaseModal.vue'
-import BaseButton from './base/BaseButton.vue'
+import BaseModal from '../base/BaseModal.vue'
+import BaseButton from '../base/BaseButton.vue'
 import { useRouter } from 'vue-router'
 
 defineProps<{

@@ -3,8 +3,8 @@ import { ref } from 'vue'
 import appApi from '../api/appApi'
 import useAsyncWrap from '../composables/useAsyncWrap'
 import BaseButton from '../components/base/BaseButton.vue'
-import EmptyState from '../components/EmptyState.vue'
-import PlayPauseBtn from '../components/PlayPauseBtn.vue'
+import EmptyState from '../components/common/EmptyState.vue'
+import PlayPauseBtn from '../components/common/PlayPauseBtn.vue'
 import ScreenWrapper from '../components/common/ScreenWrapper.vue'
 
 const tracks = ref<Track[]>([])

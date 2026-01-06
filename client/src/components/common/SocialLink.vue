@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PLATFORM_ICONS } from '../constants'
+  import { PLATFORM_ICONS } from '../../constants';
 
 defineProps<{ link: SocialLink }>()
 </script>

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import useAsyncWrap from '../composables/useAsyncWrap'
-import appApi from '../api/appApi'
+import useAsyncWrap from '../../composables/useAsyncWrap'
+import appApi from '../../api/appApi'
 import { ref } from 'vue'
-import EmptyState from './EmptyState.vue'
-import BaseButton from './base/BaseButton.vue'
+import EmptyState from '../common/EmptyState.vue'
+import BaseButton from '../base/BaseButton.vue'
 
 //profiles
 const profiles = ref<Profile[]>([])

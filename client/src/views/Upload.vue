@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive, ref, watch } from 'vue'
-import UploadFileContainer from '../components/UploadFileContainer.vue'
+import UploadFileContainer from '../components/common/UploadFileContainer.vue'
 import BaseButton from '../components/base/BaseButton.vue'
 import { UploadIcon, ImageIcon } from '../components/icons/index.vine'
 import useAsyncWrap from '../composables/useAsyncWrap'

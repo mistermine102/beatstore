@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import BaseFileInput from './base/BaseFileInput.vue'
+import BaseFileInput from '../base/BaseFileInput.vue'
 
 interface Props {
   maxFileSize: string

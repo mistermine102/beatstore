@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue'
-import { useAudioPlayerStore } from '../stores/audioPlayer'
+import { useAudioPlayerStore } from '../../stores/audioPlayer'
 import { storeToRefs } from 'pinia'
-import appApi from '../api/appApi'
-import useAsyncWrap from '../composables/useAsyncWrap'
-import { PlayIcon, PauseIcon } from './icons/index.vine'
+import appApi from '../../api/appApi'
+import useAsyncWrap from '../../composables/useAsyncWrap'
+import { PlayIcon, PauseIcon } from '../icons/index.vine'
 
 const props = defineProps<{ track: PlayableTrack; buttonClass?: string; iconSize?: number }>()
 

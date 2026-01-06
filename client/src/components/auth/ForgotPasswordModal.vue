@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import BaseModal from './base/BaseModal.vue'
-import BaseButton from './base/BaseButton.vue'
+import BaseModal from '../base/BaseModal.vue'
+import BaseButton from '../base/BaseButton.vue'
 import { ref } from 'vue'
-import appApi from '../api/appApi'
-import useAsyncWrap from '../composables/useAsyncWrap'
-import { useToastStore } from '../stores/toast'
+import appApi from '../../api/appApi'
+import useAsyncWrap from '../../composables/useAsyncWrap'
+import { useToastStore } from '../../stores/toast'
 import validator from 'validator'
 
 const props = defineProps<{

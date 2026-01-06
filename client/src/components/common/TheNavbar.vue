@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { useAuthStore } from '../stores/auth'
-import ProfilePopover from './ProfilePopover.vue'
-import { HeartIcon, ListIcon, SearchIcon, UploadIcon } from './icons/index.vine'
-import BaseButton from './base/BaseButton.vue'
-import BasePopover from './base/BasePopover.vue'
+import { useAuthStore } from '../../stores/auth'
+import ProfilePopover from '../profile/ProfilePopover.vue'
+import { HeartIcon, ListIcon, SearchIcon, UploadIcon } from '../icons/index.vine'
+import BaseButton from '../base/BaseButton.vue'
+import BasePopover from '../base/BasePopover.vue'
 
 defineProps<{
   // Accept the class string from parent

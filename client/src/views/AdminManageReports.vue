@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import appApi from '../api/appApi'
 import useAsyncWrap from '../composables/useAsyncWrap'
 import BaseButton from '../components/base/BaseButton.vue'
-import EmptyState from '../components/EmptyState.vue'
+import EmptyState from '../components/common/EmptyState.vue'
 import ScreenWrapper from '../components/common/ScreenWrapper.vue'
 
 interface Report {

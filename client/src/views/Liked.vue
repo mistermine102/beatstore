@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import BaseButton from '../components/base/BaseButton.vue'
-import LikedTracks from '../components/LikedTracks.vue'
-import FollowedProfiles from '../components/FollowedProfiles.vue';
+import LikedTracks from '../components/profile/LikedTracks.vue'
+import FollowedProfiles from '../components/profile/FollowedProfiles.vue';
 import ScreenWrapper from '../components/common/ScreenWrapper.vue'
 
 const selectedTab = ref('uploads')

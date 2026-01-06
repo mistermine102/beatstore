@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { HeartIcon } from './icons/index.vine'
+import { HeartIcon } from '../icons/index.vine'
 import { ref } from 'vue'
 
 interface Props {

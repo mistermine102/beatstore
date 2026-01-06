@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import BaseButton from '../base/BaseButton.vue'
-import TrackComment from '../TrackComment.vue'
+import TrackComment from './TrackComment.vue'
 import { ref } from 'vue'
 import useAsyncWrap from '../../composables/useAsyncWrap'
 import appApi from '../../api/appApi'

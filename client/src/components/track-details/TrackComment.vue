@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import appApi from '../api/appApi'
-import useAsyncWrap from '../composables/useAsyncWrap'
-import { TrashIcon } from './icons/index.vine'
-import { useAuthStore } from '../stores/auth'
-import LikeButton from './LikeButton.vue'
-import LoginPromptModal from './LoginPromptModal.vue'
+import LikeButton from '../common/LikeButton.vue'
+import LoginPromptModal from '../auth/LoginPromptModal.vue'
 import { ref } from 'vue'
+import appApi from '../../api/appApi'
+import { useAuthStore } from '../../stores/auth'
+import useAsyncWrap from '../../composables/useAsyncWrap'
+import { TrashIcon } from '../icons/index.vine'
 
 const props = defineProps<{ comment: TrackComment; track: Track }>()
 const emit = defineEmits(['toggleLike', 'deleteComment'])

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import TracksContainer from '../components/TracksContainer.vue'
+import TracksContainer from '../components/tracks/TracksContainer.vue'
 import useProfile from '../composables/useProfile'
 import useTracks from '../composables/useTracks'
 import useToggleLike from '../composables/useToggleLike'
@@ -7,11 +7,11 @@ import { useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import moment from 'moment'
 import { computed, ref, watch } from 'vue'
-import LoginPromptModal from '../components/LoginPromptModal.vue'
+import LoginPromptModal from '../components/auth/LoginPromptModal.vue'
 import BaseButton from '../components/base/BaseButton.vue'
 import { UploadIcon, PencilIcon } from '../components/icons/index.vine'
-import SocialLink from '../components/SocialLink.vue'
-import EmptyState from '../components/EmptyState.vue'
+import SocialLink from '../components/common/SocialLink.vue'
+import EmptyState from '../components/common/EmptyState.vue'
 import ScreenWrapper from '../components/common/ScreenWrapper.vue'
 
 const route = useRoute()

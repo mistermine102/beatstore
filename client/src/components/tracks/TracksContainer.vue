@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import BaseButton from './base/BaseButton.vue'
-import EmptyState from './EmptyState.vue'
+import BaseButton from '../base/BaseButton.vue'
+import EmptyState from '../common/EmptyState.vue'
 import Track from './Track.vue'
 
 interface Props {

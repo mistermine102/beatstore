@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import BasePopover from './base/BasePopover.vue'
-import { useAuthStore } from '../stores/auth'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import { UserIcon } from './icons/index.vine'
-import useAsyncWrap from '../composables/useAsyncWrap'
-import appApi from '../api/appApi'
+import { useAuthStore } from '../../stores/auth'
+import appApi from '../../api/appApi'
+import useAsyncWrap from '../../composables/useAsyncWrap'
+import { UserIcon } from '../icons/index.vine'
+import BasePopover from '../base/BasePopover.vue'
 
 const authStore = useAuthStore()
 const router = useRouter()

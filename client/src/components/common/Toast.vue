@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useToastStore } from '../stores/toast'
+import { useToastStore } from '../../stores/toast'
 
 const toastStore = useToastStore()
 

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import useProfile from '../../composables/useProfile'
-import EmptyState from '../EmptyState.vue'
-import LoginPromptModal from '../../components/LoginPromptModal.vue'
+import EmptyState from '../common/EmptyState.vue'
 import BaseButton from '../../components/base/BaseButton.vue'
+import LoginPromptModal from '../auth/LoginPromptModal.vue';
 
 const props = defineProps<{ profileId: string }>()
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Toast from './components/Toast.vue'
-import TheAudioPlayer from './components/TheAudioPlayer.vue'
+import Toast from './components/common/Toast.vue'
+import TheAudioPlayer from './components/common/TheAudioPlayer.vue'
 import { useAudioPlayerStore } from './stores/audioPlayer'
 
 const audioPlayerStore = useAudioPlayerStore()

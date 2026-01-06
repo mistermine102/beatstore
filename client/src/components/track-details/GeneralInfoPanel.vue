@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import TrackOptionsPopover from './TrackOptionsPopover.vue'
-import InteractiveWaveform from '../InteractiveWaveform.vue'
+import InteractiveWaveform from '../common/InteractiveWaveform.vue'
 import { useAuthStore } from '../../stores/auth'
 import getWaveformColors from '../../utils/getWaveformColors'
 import useInteractiveWafeform from '../../composables/useInteractiveWafeform'
 import { useCssVar } from '@vueuse/core'
 import { DownloadIcon, HeartIcon, PlayIcon } from '../icons/index.vine'
-import PlayPauseBtn from '../PlayPauseBtn.vue'
+import PlayPauseBtn from '../common/PlayPauseBtn.vue'
 import useToggleLike from '../../composables/useToggleLike'
 import { computed, ref } from 'vue'
-import LoginPromptModal from '../../components/LoginPromptModal.vue'
 import BuyTrackModal from './BuyTrackModal.vue'
 import BaseButton from '../base/BaseButton.vue'
 import useAsyncWrap from '../../composables/useAsyncWrap'
 import axios from 'axios'
+import LoginPromptModal from '../auth/LoginPromptModal.vue'
 
 const props = defineProps<{ track: Track }>()
 const emit = defineEmits(['likeToggled'])

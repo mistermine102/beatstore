@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import ClickableTrackImage from './ClickableTrackImage.vue'
-import appApi from '../api/appApi'
+import ClickableTrackImage from '../common/ClickableTrackImage.vue'
+import appApi from '../../api/appApi'
 
 const popularTracks = ref<PopularTrack[]>([])
 const isLoading = ref(true)
@@ -51,21 +51,14 @@ getPopularTracks()
 <template>
   <section class="py-20 w-full border-b border-midGrey">
     <div class="max-w-[1300px] mx-auto px-6 md:px-8">
-      
-      <!-- Section Header -->
       <div class="mb-10">
         <h2 class="font-secondary text-5xl mb-2 text-white tracking-wide">TRENDING NOW</h2>
         <p class="text-textLightGrey text-xl">Top 5 beats this week.</p>
       </div>
-
-      <!-- Loading State -->
       <div v-if="isLoading" class="flex justify-center items-center h-[300px]">
         <div class="loader"></div>
       </div>
-
-      <!-- Vertical List -->
       <div v-else class="flex flex-col gap-4">
-        
         <div 
           v-for="(track, index) in popularTracks" 
           :key="track._id"

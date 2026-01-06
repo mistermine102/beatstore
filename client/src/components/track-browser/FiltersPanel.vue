@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import BasePopover from './base/BasePopover.vue'
-import { ChevronDownIcon } from './icons/index.vine'
+import BasePopover from '../base/BasePopover.vue'
+import { ChevronDownIcon } from '../icons/index.vine'
 
 // Props for the filters
 const props = defineProps<{ filters: Filter[] }>()

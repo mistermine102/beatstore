@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import TheNavbar from '../TheNavbar.vue'
-import TheFooter from '../TheFooter.vue'
+import TheNavbar from './TheNavbar.vue'
+import TheFooter from './TheFooter.vue'
 
 type WidthVariant = 'default' | 'narrow' | 'full'
 

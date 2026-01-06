@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import FrontpageHero from '../components/FrontpageHero.vue'
-import FrontpageExplore from '../components/FrontpageExplore.vue'
-import FrontpageTracktypes from '../components/FrontpageTracktypes.vue'
-import FrontpagePopularTracks from '../components/FrontpagePopularTracks.vue'
+import FrontpageHero from '../components/frontpage/FrontpageHero.vue'
+import FrontpageExplore from '../components/frontpage/FrontpageExplore.vue'
+import FrontpageTracktypes from '../components/frontpage/FrontpageTracktypes.vue'
+import FrontpagePopularTracks from '../components/frontpage/FrontpagePopularTracks.vue'
 import ScreenWrapper from '../components/common/ScreenWrapper.vue'
-import FrontpageMonetize from '../components/FrontpageMonetize.vue'
+import FrontpageMonetize from '../components/frontpage/FrontpageMonetize.vue'
 </script>
 
 <!-- TODO: Animations on featured profiles and/or vibe cards. 

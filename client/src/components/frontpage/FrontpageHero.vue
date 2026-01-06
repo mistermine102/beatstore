@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import BaseSearchbar from './base/BaseSearchbar.vue'
+import BaseSearchbar from '../base/BaseSearchbar.vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
